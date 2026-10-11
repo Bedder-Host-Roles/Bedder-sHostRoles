@@ -45,6 +45,32 @@ class ExileControllerWrapUpPatch
             }
         }
     }
+
+    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), nameof(AirshipExileController._WrapUpAndSpawn_d__11.MoveNext))]
+    class AirshipExileControllerPatch
+    {
+        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
+        {
+            var instance = __instance.__4__this;
+            if (!__result)
+            {
+                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
+                try
+                {
+                    WrapUpPostfix(instance.initData.networkedPlayer);
+                }
+                catch (Exception error)
+                {
+                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
+                }
+                finally
+                {
+                    WrapUpFinalizer(instance.initData.networkedPlayer);
+                }
+            }
+        }
+    }
+
     private static void CheckAndDoRandomSpawn()
     {
         if (!AmongUsClient.Instance.AmHost) return;
