@@ -6,7 +6,7 @@ using TOHE.Roles.Impostor;
 
 namespace TOHE;
 
-//ÕÅé×Çâ
+// Sabotage system patch
 //https://github.com/Koke1024/Town-Of-Moss/blob/main/TownOfMoss/Patches/MeltDownBoost.cs
 
 public class SabotageSystemPatch

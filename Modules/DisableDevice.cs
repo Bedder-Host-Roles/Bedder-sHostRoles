@@ -4,7 +4,7 @@ using static TOHE.Utils;
 
 namespace TOHE;
 
-//ÕÅé×ÇâÕàâ : https://github.com/ykundesu/SuperNewRoles/blob/master/SuperNewRoles/Mode/SuperHostRoles/BlockTool.cs
+// Reference: SuperNewRoles BlockTool: https://github.com/ykundesu/SuperNewRoles/blob/master/SuperNewRoles/Mode/SuperHostRoles/BlockTool.cs
 class DisableDevice
 {
     public static bool DoDisable => Options.DisableDevices.GetBool();

@@ -1,4 +1,4 @@
-﻿using Hazel;
+using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
@@ -254,7 +254,7 @@ internal class DoubleAgent : RoleBase
         }
     }
 
-    // Players go bye bye Â¯\_(ãƒ„)_/Â¯
+    // Players go bye bye ¯\_(ツ)_/¯
     private void BoomBoom(PlayerControl player)
     {
         if (player.inVent) player.MyPhysics.RpcBootFromVent(player.GetPlayerVentId());
@@ -280,7 +280,7 @@ internal class DoubleAgent : RoleBase
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
         if (seen == null) return string.Empty;
-        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "â’·"); // L Rizz :)
+        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "- Ⓑ"); // L Rizz :)
         return string.Empty;
     }
 
@@ -369,7 +369,7 @@ internal class DoubleAgent : RoleBase
         highlightObject?.SetActive(false);
     }
 }
-// FieryFlower was here à¶ž
+// FieryFlower was here ඞ
 // Drakos wasn't here, 100% not
 // Niko is here, what dog shxt has you guys code
 

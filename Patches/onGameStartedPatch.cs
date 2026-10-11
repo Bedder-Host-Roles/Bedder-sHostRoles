@@ -448,7 +448,7 @@ internal class StartGameHostPatch
                     RoleTypes.Scientist => CustomRoles.Scientist,
                     RoleTypes.Engineer => CustomRoles.Engineer,
                     RoleTypes.GuardianAngel => CustomRoles.GuardianAngel,
-                    RoleTypes.SpiritGuide => CustomRoles.GuardianAngel,
+                    RoleTypes.SpiritGuide => CustomRoles.SpiritGuide,
                     RoleTypes.Shapeshifter => CustomRoles.Shapeshifter,
                     RoleTypes.Noisemaker => CustomRoles.Noisemaker,
                     RoleTypes.Phantom => CustomRoles.Phantom,

@@ -1,4 +1,4 @@
-﻿using Hazel;
+using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
@@ -112,7 +112,7 @@ internal class Retributionist : RoleBase
             bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
             string txt = GetString("PlayerIdList");
             foreach (var npc in Main.EnumerateAlivePlayerControls())
-                txt += $"\n{npc.PlayerId} â†’ " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
+                txt += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
             SendMessage(txt, player.PlayerId);
             return;
         }

@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
@@ -98,7 +98,7 @@ internal class Nemesis : RoleBase
             bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
             string txt = GetString("PlayerIdList");
             foreach (var npc in Main.EnumerateAlivePlayerControls())
-                txt += $"\n{npc.PlayerId} â†’ " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
+                txt += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
             Utils.SendMessage(txt, player.PlayerId);
             return;
         }

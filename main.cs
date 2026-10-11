@@ -58,7 +58,7 @@ public class Main : BasePlugin
     public const string PluginGuid = "com.itissimonttv.townofhostenhanced";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
     public const string PluginVersion = "2026.0213.300.00028"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "5.0.0";
+    public const string PluginDisplayVersion = "1.0.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
     new List<(int year, int month, int day, int revision)>
     {
@@ -873,6 +873,7 @@ public enum CustomRoles
     Snitch,
     Socialite,
     SpeedBooster,
+    SpiritGuide,
     Spiritualist,
     Spy,
     SuperStar,

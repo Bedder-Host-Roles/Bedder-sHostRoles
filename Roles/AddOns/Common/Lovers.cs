@@ -1,4 +1,4 @@
-﻿using Hazel;
+using Hazel;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Neutral;
 using static TOHE.Options;
@@ -223,12 +223,12 @@ public class Lovers : IAddon
         string colorCode = Utils.GetRoleColorCode(CustomRoles.Lovers);
         if (AreLovers(seer, seen) || (seer.Is(CustomRoles.Lovers) && seer.PlayerId == seen.PlayerId))
         {
-            return $"<color={colorCode}>â™¥</color>";
+            return $"<color={colorCode}>♥</color>";
         }
         else if ((!seer.IsAlive() || Cupid.IsCupidLover(seer, seen)) && seen.Is(CustomRoles.Lovers))
         {
             byte loverId = GetLoverId(seen);
-            return $"<color={colorCode}>â™¥{loverId}</color>";
+            return $"<color={colorCode}>♥{loverId}</color>";
         }
 
         return "";
@@ -257,7 +257,7 @@ public class Lovers : IAddon
         {
             var pair = (reader.ReadByte(), reader.ReadByte());
             loverPairs.Add(pair);
-            Logger.Info($"{pair.Item1.GetPlayer().GetRealName()} â™¥ {pair.Item2.GetPlayer().GetRealName()}", "Lovers.ReceiveRPC");
+            Logger.Info($"{pair.Item1.GetPlayer().GetRealName()} ♥ {pair.Item2.GetPlayer().GetRealName()}", "Lovers.ReceiveRPC");
         }
 
         loverless = reader.ReadByte();
