@@ -1,4 +1,4 @@
-using TOHE.Roles.AddOns.Common;
+﻿using TOHE.Roles.AddOns.Common;
 using static TOHE.Options;
 
 namespace TOHE.Roles.AddOns.Impostor;
@@ -28,20 +28,20 @@ public class Stealer : IAddon
     { }
     public static int AddRealVotesNum(PlayerVoteArea ps)
     {
-        return (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == ps.TargetPlayerId) * TicketsPerKill.GetFloat());
+        return (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == ps.PlayerId) * TicketsPerKill.GetFloat());
     }
     public static void AddVisualVotes(PlayerVoteArea votedPlayer, ref List<MeetingHud.VoterState> statesList)
     {
         if (HideAdditionalVotes.GetBool()) return;
 
-        var additionalVotes = (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == votedPlayer.TargetPlayerId) * TicketsPerKill.GetFloat());
+        var additionalVotes = (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == votedPlayer.PlayerId) * TicketsPerKill.GetFloat());
 
         for (var i = 0; i < additionalVotes; i++)
         {
             statesList.Add(new MeetingHud.VoterState()
             {
-                VoterId = votedPlayer.TargetPlayerId,
-                VotedForId = votedPlayer.VotedFor
+                VoterId = votedPlayer.PlayerId,
+                VotedForId = votedPlayer.VotedForId
             });
         }
     }
@@ -55,3 +55,4 @@ public class Stealer : IAddon
         }, target.Is(CustomRoles.Burst) ? Burst.BurstKillDelay.GetFloat() : 0f, "BurstKillCheck");
     }
 }
+

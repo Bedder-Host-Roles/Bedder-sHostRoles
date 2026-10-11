@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using System;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
@@ -477,7 +477,7 @@ public class PlayerState(byte playerId)
             if (AmongUsClient.Instance.AmHost)
             {
                 RPC.SendDeathReason(PlayerId, deathReason);
-                if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                if (GameStates.IsMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                 {
                     MeetingHud.Instance.CheckForEndVoting();
                 }
@@ -706,8 +706,8 @@ public static class GameStates
     public static bool IsFreePlay => AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay;
     public static bool IsInTask => InGame && !MeetingHud.Instance && !Main.MeetingIsStarted;
     public static bool IsMeeting => InGame && (MeetingHud.Instance || Main.MeetingIsStarted);
-    public static bool IsVoting => IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Voted or MeetingHud.VoteStates.NotVoted;
-    public static bool IsProceeding => IsMeeting && MeetingHud.Instance.state is MeetingHud.VoteStates.Proceeding;
+    public static bool IsVoting => IsMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Voted or MeetingHud.MeetingStates.NotVoted;
+    public static bool IsProceeding => IsMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Proceeding;
     public static bool IsExilling => ExileController.Instance != null && !(AirshipIsActive && Minigame.Instance != null && Minigame.Instance.isActiveAndEnabled);
     public static bool IsCountDown => GameStartManager.InstanceExists && GameStartManager.Instance.startState == GameStartManager.StartingStates.Countdown;
     /**********TOP ZOOM.cs***********/
@@ -724,3 +724,4 @@ public static class MeetingStates
     public static bool MeetingCalled = false;
     public static bool FirstMeeting = true;
 }
+

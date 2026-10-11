@@ -1,4 +1,4 @@
-using Hazel;
+﻿using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Patches;
@@ -112,7 +112,7 @@ internal class Retributionist : RoleBase
             bool canSeeRoles = PreventSeeRolesBeforeSkillUsedUp.GetBool();
             string txt = GetString("PlayerIdList");
             foreach (var npc in Main.EnumerateAlivePlayerControls())
-                txt += $"\n{npc.PlayerId} → " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
+                txt += $"\n{npc.PlayerId} â†’ " + (canSeeRoles ? $"({npc.GetDisplayRoleAndSubName(npc, false, false)}) " : string.Empty) + npc.GetRealName();
             SendMessage(txt, player.PlayerId);
             return;
         }
@@ -240,7 +240,7 @@ internal class Retributionist : RoleBase
     {
         foreach (var pva in __instance.playerStates.ToArray())
         {
-            var pc = GetPlayerById(pva.TargetPlayerId);
+            var pc = GetPlayerById(pva.PlayerId);
             if (pc == null || !pc.IsAlive()) continue;
 
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
@@ -251,7 +251,8 @@ internal class Retributionist : RoleBase
             renderer.sprite = CustomButton.Get("MeetingKillButton");
             PassiveButton button = targetBox.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => RetributionistOnClick(pva.TargetPlayerId/*, __instance*/)));
+            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => RetributionistOnClick(pva.PlayerId/*, __instance*/)));
         }
     }
 }
+

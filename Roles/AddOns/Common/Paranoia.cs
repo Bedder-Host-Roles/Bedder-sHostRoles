@@ -1,4 +1,4 @@
-using static TOHE.Options;
+﻿using static TOHE.Options;
 
 namespace TOHE.Roles.AddOns.Common;
 
@@ -38,9 +38,10 @@ public class Paranoia : IAddon
 
         statesList.Add(new MeetingHud.VoterState()
         {
-            VoterId = votedPlayer.TargetPlayerId,
-            VotedForId = votedPlayer.VotedFor
+            VoterId = votedPlayer.PlayerId,
+            VotedForId = votedPlayer.VotedForId
         });
     }
 }
+
 

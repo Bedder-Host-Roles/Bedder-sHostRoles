@@ -45,31 +45,6 @@ class ExileControllerWrapUpPatch
             }
         }
     }
-
-    [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), nameof(AirshipExileController._WrapUpAndSpawn_d__11.MoveNext))]
-    class AirshipExileControllerPatch
-    {
-        public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance, ref bool __result)
-        {
-            var instance = __instance.__4__this;
-            if (!__result)
-            {
-                Logger.Info("AirshipExileController WrapUpAndSpawn Postfix", "AirshipExileControllerPatch");
-                try
-                {
-                    WrapUpPostfix(instance.initData.networkedPlayer);
-                }
-                catch (Exception error)
-                {
-                    Logger.Error($"Error after exiled: {error}", "WrapUpAndSpawn");
-                }
-                finally
-                {
-                    WrapUpFinalizer(instance.initData.networkedPlayer);
-                }
-            }
-        }
-    }
     private static void CheckAndDoRandomSpawn()
     {
         if (!AmongUsClient.Instance.AmHost) return;
@@ -197,12 +172,22 @@ class ExileControllerWrapUpPatch
                 Main.AfterMeetingDeathPlayers.Clear();
 
                 Utils.AfterMeetingTasks();
-                Utils.SyncAllSettings();
+
+                // Vanilla/official servers should not receive TOHE custom-settings
+                // synchronization after a meeting. This RPC burst can trigger the
+                // vanilla anti-cheat rate/packet checks.
+                if (!Main.CurrentServerIsVanilla)
+                {
+                    Utils.SyncAllSettings();
+                }
+
                 Utils.CheckAndSetVentInteractions();
 
                 if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
                 {
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 5));
+                    // Spread SetName RPCs across frames. A full NotifyRoles(seer)
+                    // dump in one frame is what official AC flags as hacking.
+                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 2));
                 }
                 else
                 {

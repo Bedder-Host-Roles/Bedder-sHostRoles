@@ -133,7 +133,7 @@ public static class Options
         "CamouflageMode.OnlyRandomColor",
         "CamouflageMode.Karpe",
         "CamouflageMode.Lauryn",
-        "CamouflageMode.Moe",
+        "CamouflageMode.ItIsSimon",
         "CamouflageMode.Pyro",
         "CamouflageMode.ryuk",
         "CamouflageMode.Gurge44",
@@ -1353,7 +1353,7 @@ public static class Options
         UseQuickChatSpamCheat = StringOptionItem.Create(60695, "UseQuickChatSpamCheat", EnumHelper.GetAllNames<QuickChatSpamMode>(), 0, TabGroup.SystemSettings, false)
             .SetColor(Color.cyan)
             .SetHeader(true);
-        
+
         CrossLanguageGetRole = BooleanOptionItem.Create(60260, "CrossLanguageGetRole", false, TabGroup.SystemSettings, false)
             .SetColor(Color.cyan);
 
@@ -1423,7 +1423,7 @@ public static class Options
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true);
 
-        DraftableCount = IntegerOptionItem.Create(61001, "DraftableCount", new(1, 10, 1), 3, TabGroup.ModSettings, false)
+        DraftableCount = IntegerOptionItem.Create(61001, "DraftableCount", new(1, 20, 1), 5, TabGroup.ModSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetParent(DraftMode);
 

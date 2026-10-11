@@ -1,4 +1,4 @@
-using AmongUs.InnerNet.GameDataMessages;
+﻿using AmongUs.InnerNet.GameDataMessages;
 using Assets.CoreScripts;
 using Hazel;
 using System;
@@ -191,7 +191,7 @@ internal class Command(string commandKey, string arguments, string description, 
     public string ToHelpString()
     {
         var names = GetString(CommandKey).Split("|");
-        return $"\n  ○ /{names[0]} {Description}";
+        return $"\n  â—‹ /{names[0]} {Description}";
     }
 
     public static Command Create(string commandKey, string arguments, string description, UsageLevels usageLevel, UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null)
@@ -243,55 +243,55 @@ internal class ChatCommands
     public static void LoadCommands()
     {
 #region Commands
-        Command.Create("Command.Dump", "", GetString("CommandDescription.Dump"), Command.UsageLevels.Modded, Command.UsageTimes.Always, DumpCommand, false, false); // ["dump", "дамп", "лог", "导出日志", "日志", "导出"]
-        Command.Create("Command.Version", "", GetString("CommandDescription.Version"), Command.UsageLevels.Modded, Command.UsageTimes.Always, VersionCommand, false, false); // ["v", "version", "в", "версия", "检查版本", "versão", "版本"]
+        Command.Create("Command.Dump", "", GetString("CommandDescription.Dump"), Command.UsageLevels.Modded, Command.UsageTimes.Always, DumpCommand, false, false); // ["dump", "Ð´Ð°Ð¼Ð¿", "Ð»Ð¾Ð³", "å¯¼å‡ºæ—¥å¿—", "æ—¥å¿—", "å¯¼å‡º"]
+        Command.Create("Command.Version", "", GetString("CommandDescription.Version"), Command.UsageLevels.Modded, Command.UsageTimes.Always, VersionCommand, false, false); // ["v", "version", "Ð²", "Ð²ÐµÑ€ÑÐ¸Ñ", "æ£€æŸ¥ç‰ˆæœ¬", "versÃ£o", "ç‰ˆæœ¬"]
         Command.Create("Command.Save", "[filePath]", GetString("CommandDescription.Save"), Command.UsageLevels.Modded, Command.UsageTimes.InLobby, SaveCommand, false, false, [GetString("CommandArgs.Save.Path")]); // ["save", "savepreset"]
         Command.Create("Command.Load", "[filePath]", GetString("CommandDescription.Load"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, LoadCommand, false, false, [GetString("CommandArgs.Load.Path")]); // ["load", "loadpreset"]
         Command.Create("Command.Docs", "{role}", GetString("CommandDescription.Docs"), Command.UsageLevels.Developer, Command.UsageTimes.InLobby, DocsCommand, false, false, [GetString("CommandArgs.Docs.Role")]); // ["docs"]
-        Command.Create("Command.Winner", "", GetString("CommandDescription.Winner"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, WinnerCommand, true, false); // ["win", "winner", "победители", "获胜者", "vencedor", "胜利", "获胜", "赢", "获胜的人", "赢家"]
-        Command.Create("Command.LastResult", "", GetString("CommandDescription.LastResult"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, LastResultCommand, true, false); // ["l", "lastresult", "л", "对局职业信息", "resultados", "ultimoresultado", "fimdejogo", "上局信息", "信息", "情况"]
-        Command.Create("Command.GameResult", "", GetString("CommandDescription.GameResult"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, GameResultCommand, true, false); // ["gr", "gameresults", "resultados", "对局结果", "上局结果", "结果"]
-        Command.Create("Command.KillLog", "", GetString("CommandDescription.KillLog"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, KillLogCommand, true, false); // ["kh", "killlog", "击杀日志", "击杀情况"]
-        Command.Create("Command.RoleSummary", "", GetString("CommandDescription.RoleSummary"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, RoleSummaryCommand, true, false); // ["rs", "sum", "rolesummary", "sumario", "sumário", "summary", "результат", "上局职业", "职业信息", "对局职业"]
-        Command.Create("Command.GhostInfo", "", GetString("CommandDescription.GhostInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, GhostInfoCommand, true, false); // ["ghostinfo", "幽灵职业介绍", "鬼魂职业介绍", "幽灵职业", "鬼魂职业"]
-        Command.Create("Command.ApocInfo", "", GetString("CommandDescription.ApocInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, ApocInfoCommand, true, false); // ["apocinfo", "apocalypseinfo", "末日中立职业介绍", "末日中立介绍", "末日类中立职业介绍", "末日类中立介绍"]
-        Command.Create("Command.CovenInfo", "", GetString("CommandDescription.CovenInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, CovenInfoCommand, true, false); // ["coveninfo", "covinfo", "巫师阵营职业介绍", "巫师阵营介绍", "巫师介绍"]
-        Command.Create("Command.Rename", "{name}", GetString("CommandDescription.Rename"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, RenameCommand, true, false, [GetString("CommandArgs.Rename.Name")]); // ["rn", "rename", "name", "рн", "ренейм", "переименовать", "修改名称", "renomear", "重命名", "命名为"] 
-        Command.Create("Command.HideName", "", GetString("CommandDescription.HideName"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, HideNameCommand, true, false); // ["hn", "hidename", "хн", "спрник", "隐藏姓名", "semnome", "escondernome", "隐藏名字", "藏名"]
-        Command.Create("Command.Level", "{level}", GetString("CommandDescription.Level"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, LevelCommand, true, false, [GetString("CommandArgs.Level.Level")]); // ["level", "лвл", "уровень", "修改等级", "nível", "nivel", "等级", "等级设置为"] 
-        Command.Create("Command.Now", "", GetString("CommandDescription.Now"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, NowCommand, true, false); // ["n", "now", "н", "当前设置", "atual", "设置", "系统设置", "模组设置"] 
-        Command.Create("Command.Disconnect", "{team}", GetString("CommandDescription.Disconnect"), Command.UsageLevels.Host, Command.UsageTimes.InGame, DisconnectCommand, true, false, [GetString("CommandArgs.Disconnect.Team")]); // ["dis", "disconnect", "дис", "断连", "desconectar", "断连"]
-        Command.Create("Command.R", "[role]", GetString("CommandDescription.R"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, RCommand, true, false, [GetString("CommandArgs.R.Role")]); // ["r", "р", "função", "role", "роль"] 
+        Command.Create("Command.Winner", "", GetString("CommandDescription.Winner"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, WinnerCommand, true, false); // ["win", "winner", "Ð¿Ð¾Ð±ÐµÐ´Ð¸Ñ‚ÐµÐ»Ð¸", "èŽ·èƒœè€…", "vencedor", "èƒœåˆ©", "èŽ·èƒœ", "èµ¢", "èŽ·èƒœçš„äºº", "èµ¢å®¶"]
+        Command.Create("Command.LastResult", "", GetString("CommandDescription.LastResult"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, LastResultCommand, true, false); // ["l", "lastresult", "Ð»", "å¯¹å±€èŒä¸šä¿¡æ¯", "resultados", "ultimoresultado", "fimdejogo", "ä¸Šå±€ä¿¡æ¯", "ä¿¡æ¯", "æƒ…å†µ"]
+        Command.Create("Command.GameResult", "", GetString("CommandDescription.GameResult"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, GameResultCommand, true, false); // ["gr", "gameresults", "resultados", "å¯¹å±€ç»“æžœ", "ä¸Šå±€ç»“æžœ", "ç»“æžœ"]
+        Command.Create("Command.KillLog", "", GetString("CommandDescription.KillLog"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, KillLogCommand, true, false); // ["kh", "killlog", "å‡»æ€æ—¥å¿—", "å‡»æ€æƒ…å†µ"]
+        Command.Create("Command.RoleSummary", "", GetString("CommandDescription.RoleSummary"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, RoleSummaryCommand, true, false); // ["rs", "sum", "rolesummary", "sumario", "sumÃ¡rio", "summary", "Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚", "ä¸Šå±€èŒä¸š", "èŒä¸šä¿¡æ¯", "å¯¹å±€èŒä¸š"]
+        Command.Create("Command.GhostInfo", "", GetString("CommandDescription.GhostInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, GhostInfoCommand, true, false); // ["ghostinfo", "å¹½çµèŒä¸šä»‹ç»", "é¬¼é­‚èŒä¸šä»‹ç»", "å¹½çµèŒä¸š", "é¬¼é­‚èŒä¸š"]
+        Command.Create("Command.ApocInfo", "", GetString("CommandDescription.ApocInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, ApocInfoCommand, true, false); // ["apocinfo", "apocalypseinfo", "æœ«æ—¥ä¸­ç«‹èŒä¸šä»‹ç»", "æœ«æ—¥ä¸­ç«‹ä»‹ç»", "æœ«æ—¥ç±»ä¸­ç«‹èŒä¸šä»‹ç»", "æœ«æ—¥ç±»ä¸­ç«‹ä»‹ç»"]
+        Command.Create("Command.CovenInfo", "", GetString("CommandDescription.CovenInfo"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, CovenInfoCommand, true, false); // ["coveninfo", "covinfo", "å·«å¸ˆé˜µè¥èŒä¸šä»‹ç»", "å·«å¸ˆé˜µè¥ä»‹ç»", "å·«å¸ˆä»‹ç»"]
+        Command.Create("Command.Rename", "{name}", GetString("CommandDescription.Rename"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, RenameCommand, true, false, [GetString("CommandArgs.Rename.Name")]); // ["rn", "rename", "name", "Ñ€Ð½", "Ñ€ÐµÐ½ÐµÐ¹Ð¼", "Ð¿ÐµÑ€ÐµÐ¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ñ‚ÑŒ", "ä¿®æ”¹åç§°", "renomear", "é‡å‘½å", "å‘½åä¸º"] 
+        Command.Create("Command.HideName", "", GetString("CommandDescription.HideName"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, HideNameCommand, true, false); // ["hn", "hidename", "Ñ…Ð½", "ÑÐ¿Ñ€Ð½Ð¸Ðº", "éšè—å§“å", "semnome", "escondernome", "éšè—åå­—", "è—å"]
+        Command.Create("Command.Level", "{level}", GetString("CommandDescription.Level"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, LevelCommand, true, false, [GetString("CommandArgs.Level.Level")]); // ["level", "Ð»Ð²Ð»", "ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ", "ä¿®æ”¹ç­‰çº§", "nÃ­vel", "nivel", "ç­‰çº§", "ç­‰çº§è®¾ç½®ä¸º"] 
+        Command.Create("Command.Now", "", GetString("CommandDescription.Now"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, NowCommand, true, false); // ["n", "now", "Ð½", "å½“å‰è®¾ç½®", "atual", "è®¾ç½®", "ç³»ç»Ÿè®¾ç½®", "æ¨¡ç»„è®¾ç½®"] 
+        Command.Create("Command.Disconnect", "{team}", GetString("CommandDescription.Disconnect"), Command.UsageLevels.Host, Command.UsageTimes.InGame, DisconnectCommand, true, false, [GetString("CommandArgs.Disconnect.Team")]); // ["dis", "disconnect", "Ð´Ð¸Ñ", "æ–­è¿ž", "desconectar", "æ–­è¿ž"]
+        Command.Create("Command.R", "[role]", GetString("CommandDescription.R"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, RCommand, true, false, [GetString("CommandArgs.R.Role")]); // ["r", "Ñ€", "funÃ§Ã£o", "role", "Ñ€Ð¾Ð»ÑŒ"] 
         Command.Create("Command.Factions", "", GetString("CommandDescription.Factions"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, FactionsCommand, true, false); // ["f", "factions", "faction"]
-        Command.Create("Command.MyRole", "", GetString("CommandDescription.MyRole"), Command.UsageLevels.Everyone, Command.UsageTimes.InGame, MyRoleCommand, true, false); // ["m", "myrole", "м", "мояроль", "我的职业", "minhafunção", "м", "身份", "我", "我的身份"]
-        Command.Create("Command.Help", "", GetString("CommandDescription.Help"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, HelpCommand, true, false); // ["h", "help", "хэлп", "хелп", "помощь", "帮助", "ajuda", "教程"] 
-        Command.Create("Command.SetRole", "{id} {role}", GetString("CommandDescription.SetRole"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]); // ["setrole", "setaddon", "сетроль", "预设职业", "definir-função"]
-        Command.Create("Command.Fix", "{id}", "CommandDescription.Fix", Command.UsageLevels.HostOrModerator, Command.UsageTimes.InGame, FixCommand, true, false, ["CommandArgs.Fix.Id"]); // ["fix|blackscreenfix|fixblackscreen|фикс|исправить"]
-        Command.Create("Command.AFKExempt", "{id}", GetString("CommandDescription.AFKExempt"), Command.UsageLevels.HostOrModerator, Command.UsageTimes.Always, AFKExemptCommand, true, false, [GetString("CommandArgs.AFKExempt.Id")]); // ["afkexempt", "освафк", "афкосв", "挂机检测器不会检测", "afk-isentar"]
-        Command.Create("Command.TPOut", "", GetString("CommandDescription.TPOut"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TPOutCommand, true, false); // ["tpout", "тпаут", "传送出", "传出"]
-        Command.Create("Command.TPIn", "", GetString("CommandDescription.TPIn"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TPInCommand, true, false); // ["tpin", "тпин", "传送进", "传进"]
-        Command.Create("Command.KCount", "", GetString("CommandDescription.KCount"), Command.UsageLevels.Everyone, Command.UsageTimes.InGame, KCountCommand, true, false); // ["gamestate", "gstate", "gs", "kcount", "kc", "кубийц", "гс", "статигры", "对局状态", "estadojogo", "status", "количество", "убийцы", "存活阵营", "阵营", "存货阵营信息", "阵营信息"] 
-        Command.Create("Command.Template", "{tag}", GetString("CommandDescription.Template"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, TemplateCommand, true, false, [GetString("CommandArgs.Template.Tag")]); // ["t", "template", "т", "темплейт", "模板", "шаблон", "пример", "模板信息"] 
-        Command.Create("Command.MessageWait", "{duration}", GetString("CommandDescription.MessageWait"), Command.UsageLevels.Host, Command.UsageTimes.Always, MessageWaitCommand, true, false, [GetString("CommandArgs.MessageWait.Duration")]); // ["mw", "messagewait", "мв", "медленныйрежим", "消息冷却", "espera-mensagens", "消息等待时间"]
-        Command.Create("Command.Death", "[id]", GetString("CommandDescription.Death"), Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, DeathCommand, true, false, [GetString("CommandArgs.Death.Id")]); // ["death", "d", "д", "смерть", "死亡原因", "abate", "morto", "умер", "причина", "死亡"]
-        Command.Create("Command.Say", "{message}", GetString("CommandDescription.Say"), Command.UsageLevels.HostOrSayPerm, Command.UsageTimes.Always, SayCommand, true, false, [GetString("CommandArgs.Say.Message")]); // ["say", "s", "сказать", "с", "说", "falar", "dizer"]
-        Command.Create("Command.Vote", "{id}", GetString("CommandDescription.Vote"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, VoteCommand, true, true, [GetString("CommandArgs.Vote.Id")]); // ["vote", "голос", "投票给", "votar", "投票", "票"]
-        Command.Create("Command.Ban", "{id} [reason]", GetString("CommandDescription.Ban"), Command.UsageLevels.HostOrBanPerm, Command.UsageTimes.Always, BanKickCommand, true, false, [GetString("CommandArgs.Ban.Id"), GetString("CommandArgs.Ban.Reason")]); // ["ban", "kick", "бан", "кик", "забанить", "кикнуть", "封禁", "踢出", "banir", "expulsar", "выгнать", "踢"] 
-        Command.Create("Command.Warn", "{id} [reason]", GetString("CommandDescription.Warn"), Command.UsageLevels.HostOrWarnPerm, Command.UsageTimes.Always, WarnCommand, true, false, [GetString("CommandArgs.Warn.Id"), GetString("CommandArgs.Warn.Reason")]); // ["warn", "aviso", "варн", "пред", "предупредить", "警告", "提醒"]
-        Command.Create("Command.Exe", "{id}", GetString("CommandDescription.Exe"), Command.UsageLevels.HostOrExePerm, Command.UsageTimes.InGame, ExeCommand, true, false, [GetString("CommandArgs.Exe.Id")]); // ["exe", "выкинуть", "驱逐", "executar", "уничтожить", "повесить", "казнить", "казнь", "мут", "驱赶"]
-        Command.Create("Command.Color", "{color}", GetString("CommandDescription.Color"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, ColorCommand, true, false, [GetString("CommandArgs.Color.Color")]); // ["colour", "color", "cor", "цвет", "颜色", "更改颜色", "修改颜色", "换颜色"]
-        Command.Create("Command.Start", "[duration]", GetString("CommandDescription.Start"), Command.UsageLevels.HostOrStartPerm, Command.UsageTimes.InLobby, StartCommand, true, false, [GetString("CommandArgs.Start.Time")]); // ["start", "开始", "старт"]
-        Command.Create("Command.End", "", GetString("CommandDescription.End"), Command.UsageLevels.HostOrEndPerm, Command.UsageTimes.InGame, EndCommand, true, false); // ["end", "encerrar", "завершить", "结束", "结束游戏"]
-        Command.Create("Command.ID", "", GetString("CommandDesciption.ID"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, IDCommand, true, true); // ["id", "айди", "编号", "玩家编号", "mid", "玩家列表", "玩家信息", "玩家编号列表", "guesslist", "gl编号", "玩家id", "id列表", "列表", "所有id", "全部id", "編號", "玩家編號"]
-        Command.Create("Command.SetPlayers", "{number}", "CommandDescription.SetPlayers", Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetPlayersCommand, true, false, ["CommandArgs.SetPlayers.Num"]); // ["setplayers", "maxjogadores", "设置最大玩家数", "设置最大玩家数量", "设置玩家数", "设置玩家数量", "玩家数", "玩家数量", "玩家"]
-        Command.Create("Command.Icons", "", "CommandDescription.Icons", Command.UsageLevels.Everyone, Command.UsageTimes.Always, IconsCommand, true, false); // ["icon", "icons", "符号", "标志"]
-        // "Command.IconHelp": ["iconhelp", "符号帮助", "标志帮助"]
-        Command.Create("Command.Me", "[id]", "CommandDescription.Me", Command.UsageLevels.Everyone, Command.UsageTimes.Always, MeCommand, true, false, ["CommandArgs.Me.Id"]); // ["me", "我的权限", "权限"]
-        Command.Create("Command.TagColor", "{color}", "CommandDescription.TagColor", Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TagColorCommand, true, false, ["CommandArgs.TagColor.Color"]); // ["tagcolor", "tagcolour", "标签颜色", "附加名称颜色"]
-        Command.Create("Command.Kill", "{id}", "CommandDescription.Kill", Command.UsageLevels.Host, Command.UsageTimes.InGame, KillCommand, true, false, ["CommandArgs.Kill.Id"]); // ["kill", "matar", "убить", "击杀", "杀死"]
-        Command.Create("Command.Quit", "{?}", "CommandDescription.Quit", Command.UsageLevels.Everyone, Command.UsageTimes.Always, QuitCommand, true, false, ["CommandArgs.Quit.Arg1"]); // ["quit", "qt", "sair", "退出", "退"]
-        Command.Create("Command.FixNames", "", "CommandDescription.FixNames", Command.UsageLevels.Everyone, Command.UsageTimes.InGame, FixNamesCommand, true, false); // ["xf", "修复", "修"]
-        Command.Create("Command.ChangeRole", "{role}", "CommandDescription.ChangeRole", Command.UsageLevels.Debug, Command.UsageTimes.InGame, ChangeRoleCommand, true, true, ["CommandArgs.ChangeRole.Role"]); // ["changerole", "mudarfunção", "改变职业", "修改职业"]
+        Command.Create("Command.MyRole", "", GetString("CommandDescription.MyRole"), Command.UsageLevels.Everyone, Command.UsageTimes.InGame, MyRoleCommand, true, false); // ["m", "myrole", "Ð¼", "Ð¼Ð¾ÑÑ€Ð¾Ð»ÑŒ", "æˆ‘çš„èŒä¸š", "minhafunÃ§Ã£o", "Ð¼", "èº«ä»½", "æˆ‘", "æˆ‘çš„èº«ä»½"]
+        Command.Create("Command.Help", "", GetString("CommandDescription.Help"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, HelpCommand, true, false); // ["h", "help", "Ñ…ÑÐ»Ð¿", "Ñ…ÐµÐ»Ð¿", "Ð¿Ð¾Ð¼Ð¾Ñ‰ÑŒ", "å¸®åŠ©", "ajuda", "æ•™ç¨‹"] 
+        Command.Create("Command.SetRole", "{id} {role}", GetString("CommandDescription.SetRole"), Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetRoleCommand, true, false, [GetString("CommandArgs.SetRole.Id"), GetString("CommandArgs.SetRole.Role")]); // ["setrole", "setaddon", "ÑÐµÑ‚Ñ€Ð¾Ð»ÑŒ", "é¢„è®¾èŒä¸š", "definir-funÃ§Ã£o"]
+        Command.Create("Command.Fix", "{id}", "CommandDescription.Fix", Command.UsageLevels.HostOrModerator, Command.UsageTimes.InGame, FixCommand, true, false, ["CommandArgs.Fix.Id"]); // ["fix|blackscreenfix|fixblackscreen|Ñ„Ð¸ÐºÑ|Ð¸ÑÐ¿Ñ€Ð°Ð²Ð¸Ñ‚ÑŒ"]
+        Command.Create("Command.AFKExempt", "{id}", GetString("CommandDescription.AFKExempt"), Command.UsageLevels.HostOrModerator, Command.UsageTimes.Always, AFKExemptCommand, true, false, [GetString("CommandArgs.AFKExempt.Id")]); // ["afkexempt", "Ð¾ÑÐ²Ð°Ñ„Ðº", "Ð°Ñ„ÐºÐ¾ÑÐ²", "æŒ‚æœºæ£€æµ‹å™¨ä¸ä¼šæ£€æµ‹", "afk-isentar"]
+        Command.Create("Command.TPOut", "", GetString("CommandDescription.TPOut"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TPOutCommand, true, false); // ["tpout", "Ñ‚Ð¿Ð°ÑƒÑ‚", "ä¼ é€å‡º", "ä¼ å‡º"]
+        Command.Create("Command.TPIn", "", GetString("CommandDescription.TPIn"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TPInCommand, true, false); // ["tpin", "Ñ‚Ð¿Ð¸Ð½", "ä¼ é€è¿›", "ä¼ è¿›"]
+        Command.Create("Command.KCount", "", GetString("CommandDescription.KCount"), Command.UsageLevels.Everyone, Command.UsageTimes.InGame, KCountCommand, true, false); // ["gamestate", "gstate", "gs", "kcount", "kc", "ÐºÑƒÐ±Ð¸Ð¹Ñ†", "Ð³Ñ", "ÑÑ‚Ð°Ñ‚Ð¸Ð³Ñ€Ñ‹", "å¯¹å±€çŠ¶æ€", "estadojogo", "status", "ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾", "ÑƒÐ±Ð¸Ð¹Ñ†Ñ‹", "å­˜æ´»é˜µè¥", "é˜µè¥", "å­˜è´§é˜µè¥ä¿¡æ¯", "é˜µè¥ä¿¡æ¯"] 
+        Command.Create("Command.Template", "{tag}", GetString("CommandDescription.Template"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, TemplateCommand, true, false, [GetString("CommandArgs.Template.Tag")]); // ["t", "template", "Ñ‚", "Ñ‚ÐµÐ¼Ð¿Ð»ÐµÐ¹Ñ‚", "æ¨¡æ¿", "ÑˆÐ°Ð±Ð»Ð¾Ð½", "Ð¿Ñ€Ð¸Ð¼ÐµÑ€", "æ¨¡æ¿ä¿¡æ¯"] 
+        Command.Create("Command.MessageWait", "{duration}", GetString("CommandDescription.MessageWait"), Command.UsageLevels.Host, Command.UsageTimes.Always, MessageWaitCommand, true, false, [GetString("CommandArgs.MessageWait.Duration")]); // ["mw", "messagewait", "Ð¼Ð²", "Ð¼ÐµÐ´Ð»ÐµÐ½Ð½Ñ‹Ð¹Ñ€ÐµÐ¶Ð¸Ð¼", "æ¶ˆæ¯å†·å´", "espera-mensagens", "æ¶ˆæ¯ç­‰å¾…æ—¶é—´"]
+        Command.Create("Command.Death", "[id]", GetString("CommandDescription.Death"), Command.UsageLevels.Everyone, Command.UsageTimes.AfterDeath, DeathCommand, true, false, [GetString("CommandArgs.Death.Id")]); // ["death", "d", "Ð´", "ÑÐ¼ÐµÑ€Ñ‚ÑŒ", "æ­»äº¡åŽŸå› ", "abate", "morto", "ÑƒÐ¼ÐµÑ€", "Ð¿Ñ€Ð¸Ñ‡Ð¸Ð½Ð°", "æ­»äº¡"]
+        Command.Create("Command.Say", "{message}", GetString("CommandDescription.Say"), Command.UsageLevels.HostOrSayPerm, Command.UsageTimes.Always, SayCommand, true, false, [GetString("CommandArgs.Say.Message")]); // ["say", "s", "ÑÐºÐ°Ð·Ð°Ñ‚ÑŒ", "Ñ", "è¯´", "falar", "dizer"]
+        Command.Create("Command.Vote", "{id}", GetString("CommandDescription.Vote"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, VoteCommand, true, true, [GetString("CommandArgs.Vote.Id")]); // ["vote", "Ð³Ð¾Ð»Ð¾Ñ", "æŠ•ç¥¨ç»™", "votar", "æŠ•ç¥¨", "ç¥¨"]
+        Command.Create("Command.Ban", "{id} [reason]", GetString("CommandDescription.Ban"), Command.UsageLevels.HostOrBanPerm, Command.UsageTimes.Always, BanKickCommand, true, false, [GetString("CommandArgs.Ban.Id"), GetString("CommandArgs.Ban.Reason")]); // ["ban", "kick", "Ð±Ð°Ð½", "ÐºÐ¸Ðº", "Ð·Ð°Ð±Ð°Ð½Ð¸Ñ‚ÑŒ", "ÐºÐ¸ÐºÐ½ÑƒÑ‚ÑŒ", "å°ç¦", "è¸¢å‡º", "banir", "expulsar", "Ð²Ñ‹Ð³Ð½Ð°Ñ‚ÑŒ", "è¸¢"] 
+        Command.Create("Command.Warn", "{id} [reason]", GetString("CommandDescription.Warn"), Command.UsageLevels.HostOrWarnPerm, Command.UsageTimes.Always, WarnCommand, true, false, [GetString("CommandArgs.Warn.Id"), GetString("CommandArgs.Warn.Reason")]); // ["warn", "aviso", "Ð²Ð°Ñ€Ð½", "Ð¿Ñ€ÐµÐ´", "Ð¿Ñ€ÐµÐ´ÑƒÐ¿Ñ€ÐµÐ´Ð¸Ñ‚ÑŒ", "è­¦å‘Š", "æé†’"]
+        Command.Create("Command.Exe", "{id}", GetString("CommandDescription.Exe"), Command.UsageLevels.HostOrExePerm, Command.UsageTimes.InGame, ExeCommand, true, false, [GetString("CommandArgs.Exe.Id")]); // ["exe", "Ð²Ñ‹ÐºÐ¸Ð½ÑƒÑ‚ÑŒ", "é©±é€", "executar", "ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ñ‚ÑŒ", "Ð¿Ð¾Ð²ÐµÑÐ¸Ñ‚ÑŒ", "ÐºÐ°Ð·Ð½Ð¸Ñ‚ÑŒ", "ÐºÐ°Ð·Ð½ÑŒ", "Ð¼ÑƒÑ‚", "é©±èµ¶"]
+        Command.Create("Command.Color", "{color}", GetString("CommandDescription.Color"), Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, ColorCommand, true, false, [GetString("CommandArgs.Color.Color")]); // ["colour", "color", "cor", "Ñ†Ð²ÐµÑ‚", "é¢œè‰²", "æ›´æ”¹é¢œè‰²", "ä¿®æ”¹é¢œè‰²", "æ¢é¢œè‰²"]
+        Command.Create("Command.Start", "[duration]", GetString("CommandDescription.Start"), Command.UsageLevels.HostOrStartPerm, Command.UsageTimes.InLobby, StartCommand, true, false, [GetString("CommandArgs.Start.Time")]); // ["start", "å¼€å§‹", "ÑÑ‚Ð°Ñ€Ñ‚"]
+        Command.Create("Command.End", "", GetString("CommandDescription.End"), Command.UsageLevels.HostOrEndPerm, Command.UsageTimes.InGame, EndCommand, true, false); // ["end", "encerrar", "Ð·Ð°Ð²ÐµÑ€ÑˆÐ¸Ñ‚ÑŒ", "ç»“æŸ", "ç»“æŸæ¸¸æˆ"]
+        Command.Create("Command.ID", "", GetString("CommandDesciption.ID"), Command.UsageLevels.Everyone, Command.UsageTimes.Always, IDCommand, true, true); // ["id", "Ð°Ð¹Ð´Ð¸", "ç¼–å·", "çŽ©å®¶ç¼–å·", "mid", "çŽ©å®¶åˆ—è¡¨", "çŽ©å®¶ä¿¡æ¯", "çŽ©å®¶ç¼–å·åˆ—è¡¨", "guesslist", "glç¼–å·", "çŽ©å®¶id", "idåˆ—è¡¨", "åˆ—è¡¨", "æ‰€æœ‰id", "å…¨éƒ¨id", "ç·¨è™Ÿ", "çŽ©å®¶ç·¨è™Ÿ"]
+        Command.Create("Command.SetPlayers", "{number}", "CommandDescription.SetPlayers", Command.UsageLevels.Host, Command.UsageTimes.InLobby, SetPlayersCommand, true, false, ["CommandArgs.SetPlayers.Num"]); // ["setplayers", "maxjogadores", "è®¾ç½®æœ€å¤§çŽ©å®¶æ•°", "è®¾ç½®æœ€å¤§çŽ©å®¶æ•°é‡", "è®¾ç½®çŽ©å®¶æ•°", "è®¾ç½®çŽ©å®¶æ•°é‡", "çŽ©å®¶æ•°", "çŽ©å®¶æ•°é‡", "çŽ©å®¶"]
+        Command.Create("Command.Icons", "", "CommandDescription.Icons", Command.UsageLevels.Everyone, Command.UsageTimes.Always, IconsCommand, true, false); // ["icon", "icons", "ç¬¦å·", "æ ‡å¿—"]
+        // "Command.IconHelp": ["iconhelp", "ç¬¦å·å¸®åŠ©", "æ ‡å¿—å¸®åŠ©"]
+        Command.Create("Command.Me", "[id]", "CommandDescription.Me", Command.UsageLevels.Everyone, Command.UsageTimes.Always, MeCommand, true, false, ["CommandArgs.Me.Id"]); // ["me", "æˆ‘çš„æƒé™", "æƒé™"]
+        Command.Create("Command.TagColor", "{color}", "CommandDescription.TagColor", Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, TagColorCommand, true, false, ["CommandArgs.TagColor.Color"]); // ["tagcolor", "tagcolour", "æ ‡ç­¾é¢œè‰²", "é™„åŠ åç§°é¢œè‰²"]
+        Command.Create("Command.Kill", "{id}", "CommandDescription.Kill", Command.UsageLevels.Host, Command.UsageTimes.InGame, KillCommand, true, false, ["CommandArgs.Kill.Id"]); // ["kill", "matar", "ÑƒÐ±Ð¸Ñ‚ÑŒ", "å‡»æ€", "æ€æ­»"]
+        Command.Create("Command.Quit", "{?}", "CommandDescription.Quit", Command.UsageLevels.Everyone, Command.UsageTimes.Always, QuitCommand, true, false, ["CommandArgs.Quit.Arg1"]); // ["quit", "qt", "sair", "é€€å‡º", "é€€"]
+        Command.Create("Command.FixNames", "", "CommandDescription.FixNames", Command.UsageLevels.Everyone, Command.UsageTimes.InGame, FixNamesCommand, true, false); // ["xf", "ä¿®å¤", "ä¿®"]
+        Command.Create("Command.ChangeRole", "{role}", "CommandDescription.ChangeRole", Command.UsageLevels.Debug, Command.UsageTimes.InGame, ChangeRoleCommand, true, true, ["CommandArgs.ChangeRole.Role"]); // ["changerole", "mudarfunÃ§Ã£o", "æ”¹å˜èŒä¸š", "ä¿®æ”¹èŒä¸š"]
         Command.Create("Command.Deck", "", "CommandDescription.Deck", Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, DeckCommand, true, false); // ["deck"]
         Command.Create("Command.Draft", "[start|desc|add|reset|number]", "CommandDescription.Draft", Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, DraftCommand, true, false, ["CommandArgs.Draft.Arg1"]); // ["draft"]
         Command.Create("Command.DraftDesc", "{number}", "CommandDescription.DraftDesc", Command.UsageLevels.Everyone, Command.UsageTimes.InLobby, DraftDescCommand, false, false, ["CommandArgs.DraftDesc.Number"]); //["dd", "draftdescription"]
@@ -312,23 +312,23 @@ internal class ChatCommands
 
 #endregion
 #region Role Commands
-        Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]); // ["shoot", "guess", "bet", "st", "gs", "bt", "猜", "赌", "賭"]
-        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Judge.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Judge, CustomRoles.Councillor]); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
-        Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President]); // ["finish", "结束", "结束会议", "結束", "結束會議"]
-        Command.Create("Command.Reveal", "", GetString("CommandDescription.Reveal"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.RevealCommand, false, false, requiredRole: [CustomRoles.President]); // ["reveal","展示"]
-        Command.Create("Command.Inspect", "{id1} {id2}", GetString("CommandDescription.Inspect"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Inspector.InspectCommand, false, false, [GetString("CommandArgs.Inspect.Id1"), GetString("CommandArgs.Inspect.Id2")], [CustomRoles.Inspector]); // ["compare", "cmp", "比较", "比較"]
+        Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]); // ["shoot", "guess", "bet", "st", "gs", "bt", "çŒœ", "èµŒ", "è³­"]
+        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Judge.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Judge, CustomRoles.Councillor]); // ["sp", "jj","tl", "trial", "å®¡åˆ¤", "åˆ¤", "å®¡", "å¯©åˆ¤", "å¯©", "Murder"]
+        Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President]); // ["finish", "ç»“æŸ", "ç»“æŸä¼šè®®", "çµæŸ", "çµæŸæœƒè­°"]
+        Command.Create("Command.Reveal", "", GetString("CommandDescription.Reveal"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.RevealCommand, false, false, requiredRole: [CustomRoles.President]); // ["reveal","å±•ç¤º"]
+        Command.Create("Command.Inspect", "{id1} {id2}", GetString("CommandDescription.Inspect"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Inspector.InspectCommand, false, false, [GetString("CommandArgs.Inspect.Id1"), GetString("CommandArgs.Inspect.Id2")], [CustomRoles.Inspector]); // ["compare", "cmp", "æ¯”è¾ƒ", "æ¯”è¼ƒ"]
         Command.Create("Command.Duel", "{number}", GetString("CommandDescription.Duel"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Pirate.DuelCommand, false, false, [GetString("CommandArgs.Duel.Num")]); // ["duel"]
         Command.Create("Command.Revenge", "{id}", GetString("CommandDescription.Revenge"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InGame, Nemesis.RevengeCommand, false, false, [GetString("CommandArgs.Revenge.Id")], [CustomRoles.Nemesis]); // ["rv"]
         Command.Create("Command.Retribution", "{id}", GetString("CommandDescription.Retribution"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InGame, Retributionist.RetributionCommand, false, false, [GetString("CommandArgs.Retribution.Id")], [CustomRoles.Retributionist]); // ["ret"]
         Command.Create("Command.Exorcism", "", GetString("CommandDescription.Exorcism"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Exorcist.ExorcismCommand, false, false, [GetString("CommandArgs.Exorcism")], [CustomRoles.Exorcist]); // ["exorcise", "exorcism", "ex"]
-        Command.Create("Command.Ritual", "{id} {role}", GetString("CommandDescription.Ritual"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Ritualist.RitualCommand, false, false, [GetString("CommandArgs.Ritual.Id"), GetString("CommandArgs.Ritual.Role")], [CustomRoles.Ritualist]); // ["rt", "rit", "ritual", "bloodritual", "鲜血仪式", "仪式", "献祭", "举行", "附魔"]
-        Command.Create("Command.Medium", "{letter}", "CommandDescription.Medium", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Medium.MediumCommand, false, false, ["CommandArgs.Medium.YN"]); // ["通灵", "ms", "mediumship", "medium"]
+        Command.Create("Command.Ritual", "{id} {role}", GetString("CommandDescription.Ritual"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Ritualist.RitualCommand, false, false, [GetString("CommandArgs.Ritual.Id"), GetString("CommandArgs.Ritual.Role")], [CustomRoles.Ritualist]); // ["rt", "rit", "ritual", "bloodritual", "é²œè¡€ä»ªå¼", "ä»ªå¼", "çŒ®ç¥­", "ä¸¾è¡Œ", "é™„é­”"]
+        Command.Create("Command.Medium", "{letter}", "CommandDescription.Medium", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Medium.MediumCommand, false, false, ["CommandArgs.Medium.YN"]); // ["é€šçµ", "ms", "mediumship", "medium"]
         Command.Create("Command.Summon", "{id}", "CommandDescription.Summon", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Summoner.SummonCommand, false, false, ["CommandArgs.Summon.Id"], [CustomRoles.Summoner]); // ["summon", "sm"]
-        Command.Create("Command.Swap", "{id}", "CommandDescription.Swap", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Swapper.SwapCommand, false, false, ["CommandArgs.Swap.Id"], [CustomRoles.Swapper]); // ["sw", "换票", "换", "換票", "換", "swap", "st"]
-        Command.Create("Command.Expel", "{id}", "CommandDescription.Expel", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Dictator.ExpelCommand, false, false, ["CommandArgs.Expel.Id"], [CustomRoles.Dictator]); // ["exp", "expel", "独裁", "獨裁"]
+        Command.Create("Command.Swap", "{id}", "CommandDescription.Swap", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Swapper.SwapCommand, false, false, ["CommandArgs.Swap.Id"], [CustomRoles.Swapper]); // ["sw", "æ¢ç¥¨", "æ¢", "æ›ç¥¨", "æ›", "swap", "st"]
+        Command.Create("Command.Expel", "{id}", "CommandDescription.Expel", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Dictator.ExpelCommand, false, false, ["CommandArgs.Expel.Id"], [CustomRoles.Dictator]); // ["exp", "expel", "ç‹¬è£", "ç¨è£"]
         Command.Create("Command.Daybreak", "", "CommandDescription.Daybreak", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Starspawn.DaybreakCommand, false, false, requiredRole: [CustomRoles.Starspawn]); // ["db", "daybreak"]
-        Command.Create("Command.Answer", "{letter}", "CommandDescription.Answer", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.AnswerCommand, false, false, ["CommandArgs.Answer.ABC"]); // ["ans", "asw", "answer", "回答"]
-        Command.Create("Command.ShowQuestion", "", "CommandDescription.ShowQuestion", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.ShowQuestionCommand, false, false); // ["qmquiz", "提问"]
+        Command.Create("Command.Answer", "{letter}", "CommandDescription.Answer", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.AnswerCommand, false, false, ["CommandArgs.Answer.ABC"]); // ["ans", "asw", "answer", "å›žç­”"]
+        Command.Create("Command.ShowQuestion", "", "CommandDescription.ShowQuestion", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.ShowQuestionCommand, false, false); // ["qmquiz", "æé—®"]
 #endregion            
 
             /*
@@ -494,7 +494,7 @@ internal class ChatCommands
 
         var commandEntered = false;
 
-        if (text.StartsWith('/') && !player.IsModded() && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.VoteStates.Results and not MeetingHud.VoteStates.Proceeding))
+        if (text.StartsWith('/') && !player.IsModded() && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.MeetingStates.Results and not MeetingHud.MeetingStates.Proceeding))
         {
             foreach ((string key, Command command) in Command.AllCommands)
             {
@@ -535,10 +535,10 @@ internal class ChatCommands
 
     public static string FixRoleNameInput(string text)
     {
-        text = text.Replace("着", "者").Trim().ToLower();
+        text = text.Replace("ç€", "è€…").Trim().ToLower();
         return text switch
         {
-            "Schrödinger's Cat" or "cat" => "schrodingerscat",
+            "SchrÃ¶dinger's Cat" or "cat" => "schrodingerscat",
             _ => text
         };
     }
@@ -556,10 +556,10 @@ internal class ChatCommands
             string result = string.Empty;
             for (int i = 0; i < mc.Count; i++)
             {
-                if (mc[i].ToString() == "是") continue;
-                result += mc[i]; //匹配结果是完整的数字，此处可以不做拼接的
+                if (mc[i].ToString() == "æ˜¯") continue;
+                result += mc[i]; //åŒ¹é…ç»“æžœæ˜¯å®Œæ•´çš„æ•°å­—ï¼Œæ­¤å¤„å¯ä»¥ä¸åšæ‹¼æŽ¥çš„
             }
-            name = FixRoleNameInput(result.Replace("是", string.Empty).Trim());
+            name = FixRoleNameInput(result.Replace("æ˜¯", string.Empty).Trim());
         }
         else name = name.Trim().ToLower();
 
@@ -722,7 +722,7 @@ internal class ChatCommands
 
 
         var Des = result.GetInfoLong();
-        var title = "▲" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
+        var title = "â–²" + $"<color=#ffffff>" + result.GetRoleTitle() + "</color>\n";
         var Conf = new StringBuilder();
         string rlHex = Utils.GetRoleColorCode(result);
         if (Options.CustomRoleSpawnChances.ContainsKey(result))
@@ -1019,13 +1019,13 @@ internal class ChatCommands
         var subArgs = args.Length < 2 ? string.Empty : args[1];
         switch (subArgs)
         {
-            case var _ when CheckArg("CommandArgs.Disconnect.Crew", subArgs): // ["crew", "tripulante", "船员"]
+            case var _ when CheckArg("CommandArgs.Disconnect.Crew", subArgs): // ["crew", "tripulante", "èˆ¹å‘˜"]
                 GameManager.Instance.enabled = false;
                 // Utils.NotifyGameEnding();
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmateDisconnect, false);
                 break;
             
-            case var _ when CheckArg("CommandArgs.Disconnect.Imp", subArgs): // ["imp", "impostor", "内鬼", "伪装者"]
+            case var _ when CheckArg("CommandArgs.Disconnect.Imp", subArgs): // ["imp", "impostor", "å†…é¬¼", "ä¼ªè£…è€…"]
                 GameManager.Instance.enabled = false;
                 // Utils.NotifyGameEnding();
                 GameManager.Instance.RpcEndGame(GameOverReason.ImpostorDisconnect, false);
@@ -1415,7 +1415,7 @@ internal class ChatCommands
             return;
         }
 
-        bool isBan = GetString("Command.Ban.Ban").Split("|").Contains(args[0][1..]); // ["ban", "banir", "бан", "забанить", "封禁"]
+        bool isBan = GetString("Command.Ban.Ban").Split("|").Contains(args[0][1..]); // ["ban", "banir", "Ð±Ð°Ð½", "Ð·Ð°Ð±Ð°Ð½Ð¸Ñ‚ÑŒ", "å°ç¦"]
 
         var permLvl = TagManager.ReadPermission(player.FriendCode);
 
@@ -1656,7 +1656,7 @@ internal class ChatCommands
         foreach (var pc in Main.EnumeratePlayerControls())
         {
             if (pc == null) continue;
-            msgText += "\n" + pc.PlayerId.ToString() + " → " + pc.GetRealName().RemoveHtmlTags();
+            msgText += "\n" + pc.PlayerId.ToString() + " â†’ " + pc.GetRealName().RemoveHtmlTags();
         }
         Utils.SendMessage(msgText, player.PlayerId);
     }
@@ -1710,8 +1710,8 @@ internal class ChatCommands
             return;
         }
 
-        const string yes = "<#10e341><b>✓</b></color>";
-        const string no = "<#e31010><b>〤</b></color>";
+        const string yes = "<#10e341><b>âœ“</b></color>";
+        const string no = "<#e31010><b>ã€¤</b></color>";
 
         var subArgs = text.Length == 3 ? string.Empty : text[3..];
         string Devbox = player.FriendCode.GetDevUser().DeBug ? yes : no;
@@ -2222,7 +2222,7 @@ internal class ChatCommands
         {
             msg += Utils.ColorString(RndCLR(), $"{char.ToUpper((char)(i + 65))}) {Questions[i]}\n");
             Pollvotes[char.ToUpper((char)(i + 65))] = 0;
-            PollQuestions[char.ToUpper((char)(i + 65))] = $"<size=45%>〖 {Questions[i]} 〗</size>";
+            PollQuestions[char.ToUpper((char)(i + 65))] = $"<size=45%>ã€– {Questions[i]} ã€—</size>";
         }
         msg += $"\n{GetString("Poll.Begin")}";
         msg += $"\n<size=55%><i>{GetString("Poll.TimeInfo")}</i></size>";
@@ -2704,3 +2704,4 @@ class RpcSendChatPatch
         return false;
     }
 }
+

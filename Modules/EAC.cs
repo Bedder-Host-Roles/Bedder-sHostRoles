@@ -457,7 +457,7 @@ internal class EAC
             //Normal clients will never directly send MushroomMixupSabotage
         }
 
-        if (GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.VoteStates.Animating || GameStates.IsExilling)
+        if (GameStates.IsMeeting && MeetingHud.Instance.state != MeetingHud.MeetingStates.Animating || GameStates.IsExilling)
         {
             WarnHost();
             Report(player, "Bad Sabotage D : In Meeting");
@@ -669,6 +669,17 @@ internal class EAC
         if (pc == null)
         {
             Logger.Warn("Target PlayerControl is null", "EAC HandleCheat");
+            return;
+        }
+
+        // TOHE is a host-side mod. Some legitimate host-generated/custom RPCs
+        // can pass through the same EAC checks used for untrusted clients.
+        // Never ban/kick the local modded host from its own lobby.
+        if (AmongUsClient.Instance.AmHost &&
+            PlayerControl.LocalPlayer != null &&
+            pc.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        {
+            Logger.Warn($"Ignoring EAC action against local host: {text}", "EAC");
             return;
         }
 

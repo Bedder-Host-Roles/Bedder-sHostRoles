@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
 using static TOHE.Options;
@@ -44,20 +44,20 @@ internal class Pickpocket : RoleBase
 
     public override int AddRealVotesNum(PlayerVoteArea ps)
     {
-        return (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == ps.TargetPlayerId) * VotesPerKill.GetFloat());
+        return (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == ps.PlayerId) * VotesPerKill.GetFloat());
     }
     public override void AddVisualVotes(PlayerVoteArea votedPlayer, ref List<MeetingHud.VoterState> statesList)
     {
         if (HideAdditionalVotes.GetBool()) return;
 
-        var additionalVotes = (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == votedPlayer.TargetPlayerId) * VotesPerKill.GetFloat());
+        var additionalVotes = (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == votedPlayer.PlayerId) * VotesPerKill.GetFloat());
 
         for (var i = 0; i < additionalVotes; i++)
         {
             statesList.Add(new MeetingHud.VoterState()
             {
-                VoterId = votedPlayer.TargetPlayerId,
-                VotedForId = votedPlayer.VotedFor
+                VoterId = votedPlayer.PlayerId,
+                VotedForId = votedPlayer.VotedForId
             });
         }
     }
@@ -73,3 +73,4 @@ internal class Pickpocket : RoleBase
         }, target.Is(CustomRoles.Burst) ? Burst.BurstKillDelay.GetFloat() : 0f, "BurstKillCheck");
     }
 }
+

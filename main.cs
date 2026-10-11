@@ -55,14 +55,15 @@ public class Main : BasePlugin
 
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
-    public const string PluginGuid = "com.0xdrmoe.townofhostenhanced";
+    public const string PluginGuid = "com.itissimonttv.townofhostenhanced";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
     public const string PluginVersion = "2026.0213.300.00028"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "3.0.0 Alpha 28";
+    public const string PluginDisplayVersion = "5.0.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
-    [
-        (2025, 11, 18, 0) // 2025.11.18 & 17.1
-    ];
+    new List<(int year, int month, int day, int revision)>
+    {
+        (2026, 9, 29, 0) // 2026.9.29 & 19.0.0
+    };
 
     // Change this to change alpha/beta/full release
     public static readonly Release RELEASE = Release.ALPHA;
@@ -84,16 +85,16 @@ public class Main : BasePlugin
 
     public static readonly bool ShowUpdateButton = true;
 
-    public static readonly bool ShowGitHubButton = true;
+    public static readonly bool ShowGitHubButton = false;
     public static readonly string GitHubInviteUrl = "https://github.com/EnhancedNetwork/TownofHost-Enhanced";
 
-    public static readonly bool ShowDiscordButton = true;
+    public static readonly bool ShowDiscordButton = false;
     public static readonly string DiscordInviteUrl = "https://discord.gg/ten";
 
-    public static readonly bool ShowWebsiteButton = true;
+    public static readonly bool ShowWebsiteButton = false;
     public static readonly string WebsiteInviteUrl = "https://weareten.ca/";
 
-    public static readonly bool ShowDonationButton = true;
+    public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "https://weareten.ca/TOHE";
 
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
@@ -106,8 +107,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV10 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV10 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV12 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV12 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -670,9 +671,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV10.RecommendedImpostors = NormalGameOptionsV10.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
-        NormalGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV10.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV12.RecommendedImpostors = NormalGameOptionsV12.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
+        NormalGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -810,6 +811,7 @@ public enum CustomRoles
     Warden,
 
     //Crewmate
+    Car,
     Addict,
     Admirer,
     Alchemist,
@@ -834,6 +836,7 @@ public enum CustomRoles
     Enigma,
     FortuneTeller,
     Grenadier,
+    Goose,
     Guardian,
     GuessMaster,
     Inspector,

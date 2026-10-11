@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
@@ -325,10 +325,10 @@ internal class Sacrifist : CovenManager
         if (exiled != _Player) return;
 
         List<PlayerControl> killPotentials = [];
-        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedFor == exiled.PlayerId && a.TargetPlayerId != exiled.PlayerId).ToArray();
+        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedForId == exiled.PlayerId && a.PlayerId != exiled.PlayerId).ToArray();
         foreach (var playerVote in votedForExiled)
         {
-            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.TargetPlayerId);
+            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.PlayerId);
             if (crewPlayer == null || crewPlayer.GetCustomRole().IsCoven() || crewPlayer.GetCustomRole().IsTNA()) return;
             killPotentials.Add(crewPlayer);
         }
@@ -360,3 +360,4 @@ internal class Sacrifist : CovenManager
         }
     }
 }
+

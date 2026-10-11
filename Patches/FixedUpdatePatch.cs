@@ -5,6 +5,7 @@ using TOHE.Roles.AddOns.Common;
 using TOHE.Roles.Core;
 using UnityEngine;
 using static TOHE.Translator;
+   using TOHE.Patches; // Corrected namespace import
 
 namespace TOHE.Patches;
 

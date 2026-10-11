@@ -277,12 +277,12 @@ public static class Translator
 
     public static string GetString(string str, SupportedLangs langId)
     {
-        var res = $"*{str}";
+        var res = str;
 
         try
         {
             if (translateMaps.TryGetValue(str, out Dictionary<int, string> dic) && (!dic.TryGetValue((int)langId, out res) || string.IsNullOrEmpty(res) || (langId is not SupportedLangs.SChinese and not SupportedLangs.TChinese && Regex.IsMatch(res, @"[\u4e00-\u9fa5]") && res == GetString(str, SupportedLangs.SChinese))))
-                res = langId == SupportedLangs.English ? $"*{str}" : GetString(str, SupportedLangs.English);
+                res = langId == SupportedLangs.English ? str : GetString(str, SupportedLangs.English);
 
             if (!translateMaps.ContainsKey(str) && Enum.GetValues<StringNames>().FindFirst(x => x.ToString() == str, out StringNames stringNames))
                 res = GetString(stringNames);

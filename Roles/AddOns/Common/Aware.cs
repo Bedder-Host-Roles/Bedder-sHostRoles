@@ -1,4 +1,4 @@
-using TOHE.Roles.Coven;
+﻿using TOHE.Roles.Coven;
 using TOHE.Roles.Neutral;
 using static TOHE.Options;
 using static TOHE.Translator;
@@ -94,9 +94,10 @@ public class Aware : IAddon
             case CustomRoles.FortuneTeller:
             case CustomRoles.Oracle:
             case CustomRoles.Inspector:
-                AwareInteracted[pva.VotedFor].Add(Utils.GetRoleName(pc.GetCustomRole()));
+                AwareInteracted[pva.VotedForId].Add(Utils.GetRoleName(pc.GetCustomRole()));
                 break;
         }
     }
 }
+
 

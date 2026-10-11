@@ -139,6 +139,9 @@ internal class Medic : RoleBase
     private static bool CheckKillButton(byte playerId) => playerId.GetAbilityUseLimit() > 0;
 
     public override bool CanUseKillButton(PlayerControl pc) => CheckKillButton(pc.PlayerId);
+    // Medic's Impostor base is only an implementation detail for the shield ability.
+    public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
+    public override bool CanUseSabotage(PlayerControl pc) => false;
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = CheckKillButton(id) ? 5f : 300f;
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

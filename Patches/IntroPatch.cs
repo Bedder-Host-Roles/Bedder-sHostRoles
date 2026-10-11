@@ -33,10 +33,13 @@ class CoShowIntroPatch
 
             DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
 
-            // foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
-            // {
-            //     pc.SetCustomIntro();
-            // }
+            // Show custom intro information to unmodded clients during the intro.
+            SetUpRoleTextPatch.IsInIntro = true;
+            foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
+            {
+                if (pc == null || pc.IsModded()) continue;
+                pc.SetCustomIntro();
+            }
         }, 0.6f, "Set Disconnected");
 
         _ = new LateTask(() =>
@@ -73,7 +76,6 @@ class CoShowIntroPatch
 
             __instance.IsIntroDisplayed = true;
             __instance.LobbyTimerExtensionUI.HideAll();
-            __instance.SetMapButtonEnabled(false);
             __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -250f);
 
             yield return __instance.ShowEmblem(true);
@@ -90,11 +92,10 @@ class CoShowIntroPatch
             yield return __instance.CoFadeFullScreen(Color.black, Color.clear);
             __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -500f);
             __instance.IsIntroDisplayed = false;
-            __instance.SetMapButtonEnabled(true);
             __instance.SetHudActive(true);
             __instance.CrewmatesKilled.gameObject.SetActive(GameManager.Instance.ShowCrewmatesKilled());
             GameManager.Instance.StartGame();
-            
+
             RPC.RpcVersionCheck();
         }
 

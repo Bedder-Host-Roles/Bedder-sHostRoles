@@ -244,17 +244,17 @@ internal class Swapper : RoleBase
 
         foreach (var pva in __instance.playerStates.ToArray())
         {
-            if (pva.VotedFor != target1.PlayerId || pva.AmDead) continue;
-            templist.Add(pva.TargetPlayerId);
-            pva.VotedFor = target2.PlayerId;
+            if (pva.VotedForId != target1.PlayerId || pva.AmDead) continue;
+            templist.Add(pva.PlayerId);
+            pva.VotedForId = target2.PlayerId;
             ReturnChangedPva(pva);
         }
 
         foreach (var pva in __instance.playerStates.ToArray())
         {
-            if (pva.VotedFor != target2.PlayerId || pva.AmDead) continue;
-            if (templist.Contains(pva.TargetPlayerId)) continue;
-            pva.VotedFor = target1.PlayerId;
+            if (pva.VotedForId != target2.PlayerId || pva.AmDead) continue;
+            if (templist.Contains(pva.PlayerId)) continue;
+            pva.VotedForId = target1.PlayerId;
             ReturnChangedPva(pva);
         }
 
@@ -359,7 +359,7 @@ internal class Swapper : RoleBase
         {
             if (pva.transform.Find("SwapButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("SwapButton").gameObject);
 
-            var pc = pva.TargetPlayerId.GetPlayer();
+            var pc = ((byte)pva.PlayerId).GetPlayer();
             var local = PlayerControl.LocalPlayer;
             if (pc == null || !pc.IsAlive()) continue;
 
@@ -374,7 +374,7 @@ internal class Swapper : RoleBase
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
             {
-                SwapperOnClick(pva.TargetPlayerId, __instance);
+                SwapperOnClick(pva.PlayerId, __instance);
             }));
         }
     }

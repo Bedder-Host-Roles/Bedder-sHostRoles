@@ -1,4 +1,4 @@
-using Hazel;
+﻿using Hazel;
 using TOHE.Modules;
 using TOHE.Modules.Rpc;
 using TOHE.Roles.Core;
@@ -254,7 +254,7 @@ internal class DoubleAgent : RoleBase
         }
     }
 
-    // Players go bye bye ¯\_(ツ)_/¯
+    // Players go bye bye Â¯\_(ãƒ„)_/Â¯
     private void BoomBoom(PlayerControl player)
     {
         if (player.inVent) player.MyPhysics.RpcBootFromVent(player.GetPlayerVentId());
@@ -280,7 +280,7 @@ internal class DoubleAgent : RoleBase
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
         if (seen == null) return string.Empty;
-        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "Ⓑ"); // L Rizz :)
+        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "â’·"); // L Rizz :)
         return string.Empty;
     }
 
@@ -330,7 +330,7 @@ internal class DoubleAgent : RoleBase
     {
         foreach (var pva in __instance.playerStates)
         {
-            var pc = GetPlayerById(pva.TargetPlayerId);
+            var pc = GetPlayerById(pva.PlayerId);
             if (pc == null || !pc.IsAlive()) continue;
             if (pc.GetCustomRole().GetCustomRoleTeam() == Custom_Team.Impostor || PlayerControl.LocalPlayer == pc) continue;
             GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
@@ -343,7 +343,7 @@ internal class DoubleAgent : RoleBase
             PassiveButton button = targetBox.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => DestroyButtons(targetBox)));
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => PlantBombOnClick(pva.TargetPlayerId /*, __instance*/)));
+            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => PlantBombOnClick(pva.PlayerId /*, __instance*/)));
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CustomSoundsManager.Play("Line")));
         }
     }
@@ -369,6 +369,7 @@ internal class DoubleAgent : RoleBase
         highlightObject?.SetActive(false);
     }
 }
-// FieryFlower was here ඞ
+// FieryFlower was here à¶ž
 // Drakos wasn't here, 100% not
 // Niko is here, what dog shxt has you guys code
+
