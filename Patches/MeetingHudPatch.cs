@@ -2,6 +2,7 @@ using AmongUs.GameOptions;
 using Hazel;
 using System;
 using System.Text;
+using System.Reflection;
 using TMPro;
 using BHR.Modules;
 using BHR.Patches;
@@ -65,6 +66,64 @@ class CheckForEndVotingPatch
                 if (pva.DidVote && pva.VotedForId < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedForId);
+                    if (Dictator.CheckVotingForTarget(pc, pva)
+                        && !Dictator.ChangeCommandToExpel.GetBool()
+                        && voteTarget != null
+                        && voteTarget.IsAlive()
+                        && !voteTarget.Data.Disconnected)
+                    {
+                    TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
+
+                    statesList.Add(new()
+                    {
+                        VoterId = pva.PlayerId,
+                        VotedForId = pva.VotedForId
+                    });
+                    states = [.. statesList];
+
+                    var exiled = voteTarget.Data;
+
+                    ExileControllerWrapUpPatch.AntiBlackout_LastExiled = exiled;
+                    Main.LastVotedPlayerInfo = exiled;
+                    AntiBlackout.ExilePlayerId = exiled.PlayerId;
+
+                    if (AntiBlackout.BlackOutIsActive)
+                    {
+                        // Need check BlackOutIsActive again
+                        var isBlackOut = AntiBlackout.BlackOutIsActive;
+
+                        if (exiled != null)
+                        {
+                            AntiBlackout.ShowExiledInfo = isBlackOut;
+                            ConfirmEjections(exiled, isBlackOut);
+                        }
+
+                        if (isBlackOut)
+                            __instance.AntiBlackRpcVotingComplete(states, exiled, false);
+                        else
+                            __instance.RpcVotingComplete(states, exiled, false, false, 0);
+                    }
+                    else
+                    {
+
+                        if (exiled != null)
+                        {
+                            ConfirmEjections(exiled);
+                        }
+
+                        __instance.RpcVotingComplete(states, exiled, false, false, 0);
+                    }
+
+                    Logger.Info($"{voteTarget.GetNameWithRole()} expelled by Dictator", "Dictator");
+
+                    CheckForDeathOnExile(PlayerState.DeathReason.Vote, pva.VotedForId);
+
+                    Logger.Info("Dictatorial vote, forced closure of the meeting", "Special Phase");
+
+                    voteTarget.SetRealKiller(pc);
+
+                    return true;
+                }
 
                     if (voteTarget == null || !voteTarget.IsAlive() || voteTarget.Data.Disconnected)
                     {
@@ -98,12 +157,22 @@ class CheckForEndVotingPatch
                 }
             }
 
+
             if (!shouldSkip)
             {
                 foreach (var ps in __instance.playerStates)
                 {
-                    //Players who are not dead have not voted
-                    if (!ps.DidVote && GetPlayerById(ps.PlayerId)?.IsAlive() == true)
+                    if (ps == null)
+                        continue;
+
+                    var player = GetPlayerById(ps.PlayerId);
+
+                    // Ignore dead or disconnected players when checking remaining votes.
+                    if (!ps.DidVote
+                        && player != null
+                        && player.Data != null
+                        && !player.Data.Disconnected
+                        && player.IsAlive())
                     {
                         return false;
                     }
@@ -341,10 +410,6 @@ class CheckForEndVotingPatch
                     ConfirmEjections(exiledPlayer, isBlackOut);
                 }
 
-                // if (isBlackOut)
-                //     __instance.AntiBlackRpcVotingComplete(states, exiledPlayer, tie);
-                // else
-                //     __instance.RpcVotingComplete(states, exiledPlayer, tie, false, 0);
             }
             else
             {
@@ -353,7 +418,6 @@ class CheckForEndVotingPatch
                     ConfirmEjections(exiledPlayer);
                 }
 
-                // __instance.RpcVotingComplete(states, exiledPlayer, tie, false, 0); // Normal processing
             }
 
             // Vanilla Judge code
@@ -381,7 +445,10 @@ class CheckForEndVotingPatch
                 }
             }
 
-            __instance.RpcVotingComplete(states, exiledPlayer, tie, wasOverruled, overruleNonce);
+            if (AntiBlackout.BlackOutIsActive)
+                __instance.AntiBlackRpcVotingComplete(states, exiledPlayer, tie);
+            else
+                __instance.RpcVotingComplete(states, exiledPlayer, tie, wasOverruled, overruleNonce);
 
             CheckForDeathOnExile(PlayerState.DeathReason.Vote, exileId);
 
@@ -666,8 +733,14 @@ class CheckForEndVotingPatch
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CastVote))]
 class CastVotePatch
 {
-    public static bool Prefix(MeetingHud __instance, PlayerId srcPlayerId, PlayerId suspectPlayerId)
+    // Read CastVote arguments through Harmony's __args array instead of naming
+    // PlayerId directly: some game/reference builds expose that type differently.
+    // This also avoids generating a mismatched method signature for the patch.
+    public static bool Prefix(MeetingHud __instance, object[] __args)
     {
+        byte srcPlayerId = GetPlayerIdByte(__args[0]);
+        byte suspectPlayerId = GetPlayerIdByte(__args[1]);
+
         if (!AmongUsClient.Instance.AmHost) return true;
         var voter = GetPlayerById(srcPlayerId);
         if (voter == null || !voter.IsAlive()) return false;
@@ -798,6 +871,21 @@ class CastVotePatch
         return true;
     }
 
+    private static byte GetPlayerIdByte(object value)
+    {
+        if (value == null) return byte.MaxValue;
+        if (value is byte id) return id;
+
+        // Newer game builds may wrap the byte in a PlayerId value type. Read its
+        // byte-backed field without requiring that wrapper type at compile time.
+        var valueType = value.GetType();
+        var byteField = valueType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(field => field.FieldType == typeof(byte));
+        if (byteField != null) return (byte)byteField.GetValue(value);
+
+        return Convert.ToByte(value);
+    }
+
     public static void Postfix(MeetingHud __instance)
     {
         // Prevent double check end voting
@@ -825,7 +913,7 @@ static class ExtendedMeetingHud
             if (ps == null) continue;
 
             // whether this player is voted for in the player panel
-            if (ps.VotedForId.Value is not 252 and not byte.MaxValue and not 254)
+            if (((byte)ps.VotedForId) is not 252 and not byte.MaxValue and not 254)
             {
                 // Default number of votes 1
                 int VoteNum = 1;
@@ -845,7 +933,7 @@ static class ExtendedMeetingHud
                 var pc = GetPlayerById(ps.PlayerId);
                 if (pc != null && CheckForEndVotingPatch.CheckRole(ps.PlayerId, pc.GetCustomRole())
                     && ps.PlayerId != ps.VotedForId && ps != null)
-                    VoteNum += ps.PlayerId.Value.GetRoleClassById().AddRealVotesNum(ps); // returns + 0 or given role value (+/-)
+                    VoteNum += ((byte)ps.PlayerId).GetRoleClassById().AddRealVotesNum(ps); // returns + 0 or given role value (+/-)
 
                 if (CheckForEndVotingPatch.CheckRole(ps.PlayerId, CustomRoles.Knighted) // not doing addons lol, so this stays
                     && ps.PlayerId != ps.VotedForId
@@ -1072,6 +1160,21 @@ class MeetingHudStartPatch
         CheckForEndVotingPatch.TempExiledPlayer = null;
         CheckForEndVotingPatch.TempExileMsg = string.Empty;
     }
+    private static byte GetPlayerIdByte(object value)
+    {
+        if (value == null) return byte.MaxValue;
+        if (value is byte id) return id;
+
+        // Newer game builds may wrap the byte in a PlayerId value type. Read its
+        // byte-backed field without requiring that wrapper type at compile time.
+        var valueType = value.GetType();
+        var byteField = valueType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(field => field.FieldType == typeof(byte));
+        if (byteField != null) return (byte)byteField.GetValue(value);
+
+        return Convert.ToByte(value);
+    }
+
     public static void Postfix(MeetingHud __instance)
     {
         SoundManager.Instance.ChangeAmbienceVolume(0f);
@@ -1083,7 +1186,7 @@ class MeetingHudStartPatch
         foreach (var pva in __instance.playerStates)
         {
             var player = PlayerControl.LocalPlayer;
-            var target = pva.PlayerId.Value.GetPlayer();
+            var target = ((byte)pva.PlayerId).GetPlayer();
             if (target == null || player == null) continue;
 
             var playerId = player.PlayerId;
@@ -1130,7 +1233,7 @@ class MeetingHudStartPatch
             var IdNumber = LevelDisplay.transform.Find("LevelNumber");
             UnityEngine.Object.Destroy(IdLabel.GetComponent<TextTranslatorTMP>());
             IdLabel.GetComponent<TextMeshPro>().text = "ID";
-            IdNumber.GetComponent<TextMeshPro>().text = pva.PlayerId.Value.ToString();
+            IdNumber.GetComponent<TextMeshPro>().text = pva.PlayerId.ToString();
             IdLabel.name = "IdLabel";
             IdNumber.name = "IdNumber";
 
@@ -1274,7 +1377,7 @@ class MeetingHudStartPatch
         foreach (var pva in __instance.playerStates)
         {
             if (pva == null) continue;
-            PlayerControl target = pva.PlayerId.Value.GetPlayer();
+            PlayerControl target = ((byte)pva.PlayerId).GetPlayer();
             if (target == null) continue;
 
             PlayerControl seer = PlayerControl.LocalPlayer;
@@ -1349,7 +1452,7 @@ class MeetingHudUpdatePatch
 {
     private static int bufferTime = 10;
     private static void ClearShootButton(MeetingHud __instance, bool forceAll = false)
-     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || !Main.PlayerStates.TryGetValue(x.PlayerId, out var ps) || ps.IsDead) && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
+     => __instance.playerStates.ToList().ForEach(x => { if ((forceAll || (!Main.PlayerStates.TryGetValue(x.PlayerId, out var ps) || ps.IsDead)) && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
 
     // Force call RpcClose here
     public static bool Prefix(MeetingHud __instance)
@@ -1371,6 +1474,21 @@ class MeetingHudUpdatePatch
         }
 
         return false;
+    }
+
+    private static byte GetPlayerIdByte(object value)
+    {
+        if (value == null) return byte.MaxValue;
+        if (value is byte id) return id;
+
+        // Newer game builds may wrap the byte in a PlayerId value type. Read its
+        // byte-backed field without requiring that wrapper type at compile time.
+        var valueType = value.GetType();
+        var byteField = valueType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .FirstOrDefault(field => field.FieldType == typeof(byte));
+        if (byteField != null) return (byte)byteField.GetValue(value);
+
+        return Convert.ToByte(value);
     }
 
     public static void Postfix(MeetingHud __instance)
@@ -1414,10 +1532,10 @@ class MeetingHudUpdatePatch
             bufferTime = 10;
             var myRole = PlayerControl.LocalPlayer.GetCustomRole();
 
-            //__instance.playerStates.Where(x => !x.TargetPlayerId.GetPlayer().IsAlive() && !x.AmDead)
+            //__instance.playerStates.Where(x => !x.PlayerId.GetPlayer().IsAlive() && !x.AmDead)
             //    .Do(x => x.SetDead(x.DidReport, true, x.GAIcon));
 
-            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Prosecutor or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper && !PlayerControl.LocalPlayer.IsAlive())
+            if (myRole is CustomRoles.NiceGuesser or CustomRoles.EvilGuesser or CustomRoles.Doomsayer or CustomRoles.Judge or CustomRoles.Councillor or CustomRoles.Guesser or CustomRoles.Swapper && !PlayerControl.LocalPlayer.IsAlive())
                 ClearShootButton(__instance, true);
 
             if (myRole is CustomRoles.Nemesis && !PlayerControl.LocalPlayer.IsAlive() && GameObject.Find("ShootButton") == null)
@@ -1495,6 +1613,15 @@ class MeetingHudRpcClosePatch
     public static bool Prefix(MeetingHud __instance)
     {
         Logger.Info("MeetingHud.RpcClose is being called", "MeetingHudRpcClosePatch");
+
+        // On official/vanilla servers, let Among Us send its
+        // normal RpcClose message. Do not construct a custom
+        // CloseMeeting RPC, as the vanilla server may flag it.
+        if (Main.CurrentServerIsVanilla || GameStates.IsVanillaServer)
+        {
+            return true;
+        }
+
         // Send SetName rpc together with Close rpc
         // Official/vanilla regionsuse default ejection screen modded uses custom
         if (Options.CurrentGameMode is CustomGameMode.Standard
@@ -1544,6 +1671,7 @@ class MeetingHudRpcClosePatch
         }
     }
 }
+
 
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.HandleRpc))]
 class MeetingHudHandleRpcPatch

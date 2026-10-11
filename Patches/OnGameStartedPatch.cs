@@ -37,6 +37,7 @@ internal class ChangeRoleSettings
             if (GameStates.IsNormalGame)
             {
                 Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.GuardianAngel, 0, 0);
+                Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.SpiritGuide, 0, 0);
                 if (Options.DisableVanillaRoles.GetBool())
                 {
                     Main.NormalOptions.roleOptions.SetRoleRate(RoleTypes.Scientist, 0, 0);
@@ -273,7 +274,7 @@ internal class StartGameHostPatch
 {
     private static AmongUsClient thiz;
 
-    private static RoleOptionsCollectionV11 RoleOpt => Main.NormalOptions.roleOptions;
+    private static RoleOptionsCollectionV12 RoleOpt => Main.NormalOptions.roleOptions;
     private static Dictionary<RoleTypes, int> RoleTypeNums = [];
     public static void UpdateRoleTypeNums()
     {
@@ -451,6 +452,7 @@ internal class StartGameHostPatch
                     RoleTypes.Scientist => CustomRoles.Scientist,
                     RoleTypes.Engineer => CustomRoles.Engineer,
                     RoleTypes.GuardianAngel => CustomRoles.GuardianAngel,
+                    RoleTypes.SpiritGuide => CustomRoles.SpiritGuide,
                     RoleTypes.Shapeshifter => CustomRoles.Shapeshifter,
                     RoleTypes.Noisemaker => CustomRoles.Noisemaker,
                     RoleTypes.Phantom => CustomRoles.Phantom,

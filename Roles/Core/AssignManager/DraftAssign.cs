@@ -218,111 +218,52 @@ public static class DraftAssign
 
         SetMinAssignTypes();
 
-        Logger.Info("Always Roles Assign Started", "StartDraft");
+        bool PoolsFull() => PoolIds.All(id => GetPool(id).Count >= maxDraftRoles);
 
-        bool twiceOver = false;
-
-        int slotId = 0;
-        bool assignedAny = false;
-
-        if (!AssignAlwaysRoles()) goto AfterPoolsAssigned;
-
-        bool AssignAlwaysRoles()
+        // Deals roles round-robin into every pool until each pool holds maxDraftRoles,
+        // or until a full pass hands out nothing (no enabled role fits any remaining slot).
+        void DealRoles(List<CustomRoles> source, bool isAlways)
         {
-            while (AlwaysRoles.Any())
+            bool progress = true;
+            while (progress && source.Any() && !PoolsFull())
             {
-                var id = PoolIds[slotId];
-                var slot = GetSlot(id);
-                if (slot == null) continue;
-
-                var slotRole = GetRoleFromSlot(AlwaysRoles, slot);
-
-                if (slotRole != CustomRoles.NotAssigned)
+                progress = false;
+                foreach (var id in PoolIds)
                 {
-                    var info = Roles.FirstOrDefault(x => x.Role == slotRole);
-                    // Logger.Info($"{info.Role}::{info.SpawnChance}::{info.MaxCount}::{info.MaxCount}", "RoleInfo");
-                    assignedAny = true;
-                    GetPool(id).Add(slotRole);
+                    if (!source.Any()) break;
 
-                    AlwaysRoles.Remove(slotRole);
+                    var pool = GetPool(id);
+                    if (pool.Count >= maxDraftRoles) continue;
+
+                    var slot = GetSlot(id);
+                    if (slot == null) continue;
+
+                    // Never offer the same role twice in one pool
+                    var slotRole = GetRoleFromSlot([.. source.Where(x => !pool.Contains(x))], slot);
+                    if (slotRole == CustomRoles.NotAssigned) continue;
+
+                    var info = Roles.FirstOrDefault(x => x.Role == slotRole);
+                    pool.Add(slotRole);
+                    progress = true;
+
+                    if (isAlways) source.Remove(slotRole);
+                    else for (int j = 0; j < info.SpawnChance / 5; j++) source.Remove(slotRole);
 
                     info.AssignedCount++;
-                    if (info.AssignedCount >= info.MaxCount) while (AlwaysRoles.Contains(slotRole)) AlwaysRoles.Remove(slotRole);
+                    if (info.AssignedCount >= info.MaxCount) source.RemoveAll(x => x == slotRole);
                 }
-
-                Logger.Info($"Assigned {slotRole} to pool {id}", "StartDraft");
-
-                slotId++;
-                if (slotId >= poolCount)
-                {
-                    slotId = 0;
-                    if (PoolLookup.Any(x => x.Count >= maxDraftRoles) || !assignedAny)
-                    {
-                        if (!twiceOver && assignedAny) twiceOver = true;
-                        else if (!assignedAny) break;
-                        else return true;
-                    }
-                    assignedAny = false;
-                }
-
-                if (PoolLookup.All(x => x.Count >= maxDraftRoles)) return false;
             }
-
-            Logger.Info("Always Roles Assign Finished", "StartDraft");
-            return true;
         }
-        
-        twiceOver = false;
 
-        Dictionary<int, bool> hasRolesFound = PoolIds.ToDictionary(x => x, x => true);
-        while (ChanceRoles.Any())
+        Logger.Info("Always Roles Assign Started", "StartDraft");
+        DealRoles(AlwaysRoles, true);
+        Logger.Info("Always Roles Assign Finished", "StartDraft");
+        DealRoles(ChanceRoles, false);
+
+        foreach (var id in PoolIds.Where(id => GetPool(id).Count < maxDraftRoles))
         {
-            var id = PoolIds[slotId];
-            var slot = GetSlot(id);
-            if (slot == null) continue;
-
-            var slotRole = GetRoleFromSlot(ChanceRoles, slot);
-
-            if (slotRole != CustomRoles.NotAssigned)
-            {
-                GetPool(id).Add(slotRole);
-
-                var info = Roles.FirstOrDefault(x => x.Role == slotRole);
-
-                for (int j = 0; j < info.SpawnChance / 5; j++)
-                    ChanceRoles.Remove(slotRole);
-
-                info.AssignedCount++;
-                if (info.AssignedCount >= info.MaxCount) while (ChanceRoles.Contains(slotRole)) ChanceRoles.Remove(slotRole);
-            }
-            else
-            {
-                hasRolesFound[id] = false;
-            }
-
-            slotId++;
-            if (slotId >= poolCount)
-            {
-                slotId = 0;
-                if (PoolLookup.Any(x => x.Count >= maxDraftRoles))
-                {
-                    if (!twiceOver) twiceOver = true;
-                    else goto AfterPoolsAssigned;
-                }
-            }
-
-            if (PoolLookup.All(x => x.Count >= maxDraftRoles)) goto AfterPoolsAssigned;
-            if (hasRolesFound.Any(x => !x.Value)) break;
+            Logger.SendInGame($"Slot {GetSlot(id)} only got {GetPool(id).Count}/{maxDraftRoles} roles: not enough enabled roles fit it.");
         }
-
-        foreach (var id in hasRolesFound.Where(x => !x.Value))
-        {
-            var slot = GetSlot(id.Key);
-
-            Logger.SendInGame($"Not enough enabled roles in slot {slot} to assign.");
-        }
-
-    AfterPoolsAssigned:
 
         FixSlotDistribution();
 
@@ -547,7 +488,7 @@ public static class DraftAssign
 
         foreach (var deck in PremadeDecks)
         {
-            string fileName = string.Concat(string.Join("_",deck.Key.Split(Path.GetInvalidFileNameChars())), ".roledeck");
+            string fileName = string.Concat(string.Join("_", deck.Key.Split(Path.GetInvalidFileNameChars())), ".roledeck");
             string filePath = Path.Combine(ROLEDECK_FOLDER_NAME, fileName);
             if (!File.Exists(filePath))
             {
@@ -981,6 +922,6 @@ public class RoleSlot(HashSet<RoleBucket> buckets, HashSet<CustomRoles> roles)
         NEVER
     }
 
-    public Evil IsEvil => !Types.Contains(RoleAssign.RoleAssignType.Crewmate) ? Evil.ALWAYS : 
+    public Evil IsEvil => !Types.Contains(RoleAssign.RoleAssignType.Crewmate) ? Evil.ALWAYS :
         Types.Any(x => x != RoleAssign.RoleAssignType.Crewmate) ? Evil.SOMETIMES : Evil.NEVER;
 }

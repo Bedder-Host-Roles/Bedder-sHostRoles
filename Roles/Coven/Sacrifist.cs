@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using Hazel;
 using BHR.Modules;
 using BHR.Modules.Rpc;
@@ -360,3 +360,4 @@ internal class Sacrifist : CovenManager
         }
     }
 }
+

@@ -18,52 +18,27 @@ public class dbConnect
 
     public static IEnumerator Init()
     {
-        Logger.Info("Begin dbConnect Login flow", "dbConnect.init");
+        // The original TOHE API is no longer required for the mod to start.
+        // Keep this coroutine so ClientPatch can continue to call dbConnect.Init(),
+        // but do not block startup on the old API endpoints.
+        //
+        // Without the API, the optional online data is unavailable:
+        // - Booster status from UserType is unavailable.
+        // - The remote EAC list is unavailable.
+        // Local/static DevManager data remains available as normal.
+        Logger.Info("TOHE API initialization skipped; running without the legacy API.", "dbConnect.init");
 
         if (!InitOnce)
         {
-            yield return GetRoleTable();
-
-            if (!(Main.devRelease || Main.canaryRelease || Main.fullRelease))
-            {
-                HandleFailure(FailedConnectReason.Build_Not_Specified);
-                yield break;
-            }
-
-            if (GetToken() is "" or null)
-            {
-                HandleFailure(FailedConnectReason.API_Token_Is_Empty);
-                yield break;
-            }
-
-            if (UserType.Count < 1)
-            {
-                HandleFailure(FailedConnectReason.Error_Getting_User_Role_Table);
-                yield break;
-            }
-
-            yield return GetEACList();
-            if (BanManager.EACDict.Count < 1)
-            {
-                HandleFailure(FailedConnectReason.Error_Getting_EAC_List);
-                yield break;
-            }
-        }
-        else
-        {
-            yield return GetRoleTable();
-            yield return GetEACList();
-        }
-
-        if (!InitOnce)
-        {
-            Logger.Info("Finished first init flow.", "dbConnect.init");
             InitOnce = true;
+            Logger.Info("Finished first init flow without legacy API.", "dbConnect.init");
         }
         else
         {
-            Logger.Info("Finished Sync flow.", "dbConnect.init");
+            Logger.Info("Finished Sync flow without legacy API.", "dbConnect.init");
         }
+
+        yield break;
     }
 
     private static void HandleFailure(FailedConnectReason errorReason)

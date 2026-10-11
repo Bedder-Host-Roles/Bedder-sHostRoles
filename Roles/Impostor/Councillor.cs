@@ -1,4 +1,4 @@
-using Hazel;
+﻿using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using BHR.Modules;

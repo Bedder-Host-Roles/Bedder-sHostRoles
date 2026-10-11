@@ -62,7 +62,7 @@ public class Main : BasePlugin
     public const string PluginDisplayVersion = "1.0.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
     [
-        (2025, 8, 18, 0) // 2025.8.18 & 18.0
+        (2026, 9, 29, 0) // 2026.9.29 & 19.0.0
     ];
 
     // Change this to change alpha/beta/full release
@@ -86,7 +86,7 @@ public class Main : BasePlugin
     public static readonly bool ShowUpdateButton = true;
 
     public static readonly bool ShowGitHubButton = true;
-    public static readonly string GitHubInviteUrl = "https://github.com/BatmenzDW/TownofHost-Enhanced/";
+    public static readonly string GitHubInviteUrl = "https://github.com/Bedder-Host-Roles/Bedder-sHostRoles";
 
     public static readonly bool ShowDiscordButton = true;
     public static readonly string DiscordInviteUrl = "WIP";
@@ -107,8 +107,8 @@ public class Main : BasePlugin
     public static string credentialsText;
     public Coroutines coroutines;
     public Dispatcher dispatcher;
-    public static NormalGameOptionsV11 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
-    public static HideNSeekGameOptionsV11 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
+    public static NormalGameOptionsV12 NormalOptions => GameOptionsManager.Instance.currentNormalGameOptions;
+    public static HideNSeekGameOptionsV12 HideNSeekOptions => GameOptionsManager.Instance.currentHideNSeekGameOptions;
     //Client Options
     public static ConfigEntry<string> HideName { get; private set; }
     public static ConfigEntry<string> HideColor { get; private set; }
@@ -683,9 +683,9 @@ public class Main : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<ShapeShifterPagingBehaviour>();
         ClassInjector.RegisterTypeInIl2Cpp<VitalsPagingBehaviour>();
 
-        NormalGameOptionsV11.RecommendedImpostors = NormalGameOptionsV11.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
-        NormalGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
-        HideNSeekGameOptionsV11.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        NormalGameOptionsV12.RecommendedImpostors = NormalGameOptionsV12.MaxImpostors = Enumerable.Repeat(128, 128).ToArray();
+        NormalGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
+        HideNSeekGameOptionsV12.MinPlayers = Enumerable.Repeat(4, 128).ToArray();
         DisconnectPopup.ErrorMessages[DisconnectReasons.Hacking] = StringNames.ErrorHacking;
 
         Harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -825,6 +825,7 @@ public enum CustomRoles
     Warden,
 
     //Crewmate
+    Car,
     Addict,
     Admirer,
     Alchemist,
@@ -849,6 +850,7 @@ public enum CustomRoles
     Enigma,
     FortuneTeller,
     Grenadier,
+    Goose,
     Guardian,
     GuessMaster,
     Inspector,
@@ -885,6 +887,7 @@ public enum CustomRoles
     Snitch,
     Socialite,
     SpeedBooster,
+    SpiritGuide,
     Spiritualist,
     Spy,
     SuperStar,

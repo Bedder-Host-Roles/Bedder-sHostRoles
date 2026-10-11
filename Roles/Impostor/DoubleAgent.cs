@@ -280,7 +280,7 @@ internal class DoubleAgent : RoleBase
     public override string GetMark(PlayerControl seer, PlayerControl seen = null, bool isForMeeting = false)
     {
         if (seen == null) return string.Empty;
-        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "Ⓑ"); // L Rizz :)
+        if (CurrentBombedPlayers.Contains(seen.PlayerId)) return ColorString(Color.red, "- Ⓑ"); // L Rizz :)
         return string.Empty;
     }
 

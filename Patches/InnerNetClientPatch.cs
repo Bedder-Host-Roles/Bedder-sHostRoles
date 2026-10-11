@@ -163,6 +163,12 @@ internal class HostGamePatch
 {
     public static bool Prefix(InnerNetClient __instance, IGameOptions settings, GameFilterOptions filterOpts)
     {
+        // Official Among Us regions treat HostModdedGame (tag 25) as invalid
+        // and disconnect the host with DisconnectReasons.Hacking.
+        // Keep the vanilla HostGame packet on those servers.
+        if (GameStates.IsVanillaServer)
+            return true;
+
         // Standard HostGame method body
         MessageWriter msg = MessageWriter.Get(SendOption.Reliable);
         msg.StartMessage(25); // TODO: replace with Tags.HostModdedGame once possible
@@ -207,41 +213,35 @@ internal class StartGameHostPatch
 }
 
 #if !ANDROID
-[HarmonyPatch]
-internal class AuthTimeoutPatch
+[HarmonyPatch(typeof(AuthManager), "CoConnect")]
+internal class AuthConnectTimeoutPatch
 {
-    [HarmonyPatch(typeof(AuthManager._CoConnect_d__4), nameof(AuthManager._CoConnect_d__4.MoveNext))]
-    [HarmonyPatch(typeof(AuthManager._CoWaitForNonce_d__6), nameof(AuthManager._CoWaitForNonce_d__6.MoveNext))]
-    [HarmonyPrefix]
-    // From Reactor.gg
-    // https://github.com/NuclearPowered/Reactor/blob/master/Reactor/Patches/Miscellaneous/CustomServersPatch.cs
-    public static bool CoWaitforNoncePrefix(ref bool __result)
+    // From Reactor.gg: skip the custom-server authentication coroutine when using a vanilla server.
+    public static bool Prefix(ref Il2CppSystem.Collections.IEnumerator __result)
     {
-        if (GameStates.IsVanillaServer)
-        {
-            return true;
-        }
-        __result = false;
+        if (GameStates.IsVanillaServer) return true;
+
+        __result = null;
         return false;
     }
+}
 
-    // If you dont patch this, u still need to wait for 5s
-    // I have no idea why this is happening
-    [HarmonyPatch(typeof(AmongUsClient._CoJoinOnlinePublicGame_d__49), nameof(AmongUsClient._CoJoinOnlinePublicGame_d__49.MoveNext))]
-    [HarmonyPrefix]
-    public static void EnableUdpMatchmakingPrefix(AmongUsClient._CoJoinOnlinePublicGame_d__49 __instance)
+[HarmonyPatch(typeof(AuthManager), "CoWaitForNonce")]
+internal class AuthWaitForNonceTimeoutPatch
+{
+    public static bool Prefix(ref Il2CppSystem.Collections.IEnumerator __result)
     {
-        // Skip to state 1 which just calls CoJoinOnlineGameDirect
-        if (__instance.__1__state == 0 && !ServerManager.Instance.IsHttp)
-        {
-            __instance.__1__state = 1;
-            __instance.__8__1 = new AmongUsClient.__c__DisplayClass49_0
-            {
-                matchmakerToken = string.Empty,
-            };
-        }
+        if (GameStates.IsVanillaServer) return true;
+
+        __result = null;
+        return false;
     }
 }
+
+// Among Us 2026.9.29 no longer exposes the compiler-generated
+// _CoJoinOnlinePublicGame_d__49 state-machine type. The old patch only
+// skipped the matchmaking delay, so it is intentionally disabled here.
+// Public matchmaking will use the game's normal coroutine path.
 #endif
 
 [HarmonyPatch(typeof(NetworkedPlayerInfo), nameof(NetworkedPlayerInfo.UpdateName))]

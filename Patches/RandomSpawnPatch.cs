@@ -1,6 +1,7 @@
 using Hazel;
 using System;
 using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
 using BHR.Roles.Impostor;
 using UnityEngine;
 
@@ -138,6 +139,10 @@ class RandomSpawn
             if (player.GetRoleClass() is Penguin pg)
             {
                 pg.OnSpawnAirship();
+            }
+            if (player.GetRoleClass() is Goose goose)
+            {
+                goose.OnSpawnAirship();
             }
             if (GameStates.IsNormalGame)
             {

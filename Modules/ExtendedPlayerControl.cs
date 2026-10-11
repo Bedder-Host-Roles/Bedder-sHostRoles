@@ -1063,7 +1063,7 @@ public static class ExtendedPlayerControl
     }
 
     public static float GetKillDistances(bool ovverideValue = false, int newValue = 2)
-        => NormalGameOptionsV11.KillDistances[GetKillDistanceIndex(ovverideValue, newValue, Main.NormalOptions.KillDistance)];
+        => NormalGameOptionsV12.KillDistances[GetKillDistanceIndex(ovverideValue, newValue, Main.NormalOptions.KillDistance)];
 
     public static int GetKillDistanceIndex(bool overrideValue, int newValue, int configuredValue)
     {

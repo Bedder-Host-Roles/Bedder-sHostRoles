@@ -228,16 +228,12 @@ class CheckMurderPatch
             return false;
         }
 
-        // Penguin's victim unable to kill
-        List<Penguin> penguins = Utils.GetRoleBasesByType<Penguin>()?.ToList();
-        if (Penguin.HasEnabled && penguins != null)
+        // Penguin/Goose victims are unable to kill while being abducted.
+        if (Penguin.IsVictim(killer))
         {
-            if (penguins.Any(x => killer.PlayerId == x?.AbductVictim?.PlayerId))
-            {
-                killer.Notify(GetString("PenguinTargetOnCheckMurder"));
-                killer.SetKillCooldown(5);
-                return false;
-            }
+            killer.Notify(GetString("PenguinTargetOnCheckMurder"));
+            killer.SetKillCooldown(5);
+            return false;
         }
 
         return true;
@@ -1614,13 +1610,12 @@ class PlayerClientInitializePatch
     }
 }
 
-[HarmonyPatch(typeof(PlayerControl._Start_d__82), nameof(PlayerControl._Start_d__82.MoveNext))]
-class PlayerStart_MoveNextPatch
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.Start))]
+class PlayerStartPatch
 {
-    public static void Postfix(PlayerControl._Start_d__82 __instance, ref bool __result)
+    public static void Postfix(PlayerControl __instance)
     {
-        if (__result) return;
-        var instance = __instance.__4__this;
+        var instance = __instance;
 
         if (GameStates.IsHideNSeek || instance.notRealPlayer) return;
 
@@ -1636,17 +1631,14 @@ class PlayerStart_MoveNextPatch
     }
 }
 // Player press vent button
-[HarmonyPatch(typeof(PlayerPhysics._CoEnterVent_d__47), nameof(PlayerPhysics._CoEnterVent_d__47.MoveNext))]
+[HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoEnterVent))]
 class CoEnterVentPatch
 {
-    public static bool Prefix(PlayerPhysics._CoEnterVent_d__47 __instance)
+    public static bool Prefix(PlayerPhysics __instance, [HarmonyArgument(0)] int id)
     {
-        if (__instance.__1__state >= 1) return true; // track the start of function
-
         if (MeetingHud.Instance) return true; // vent action will be canceled if a meeting is called
 
-        var instance = __instance.__4__this;
-        var id = __instance.id;
+        var instance = __instance;
 
         if (!AmongUsClient.Instance.AmHost || GameStates.IsHideNSeek) return true;
         Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoEnterVent");
@@ -1765,37 +1757,64 @@ class RpcEnterVentPatch
     }
 }
 
-[HarmonyPatch(typeof(PlayerPhysics._CoExitVent_d__48), nameof(PlayerPhysics._CoExitVent_d__48.MoveNext))]
+[HarmonyPatch(typeof(PlayerPhysics), nameof(PlayerPhysics.CoExitVent))]
 class CoExitVentPatch
 {
-    public static void Postfix(PlayerPhysics._CoExitVent_d__48 __instance, ref bool __result)
+    public static void Postfix(
+        PlayerPhysics __instance,
+        [HarmonyArgument(0)] int id,
+        ref Il2CppSystem.Collections.IEnumerator __result)
     {
-        if (__result) return; // false is end of co
+        var original = __result;
 
-        var instance = __instance.__4__this;
-        var id = __instance.id;
-        if (GameStates.IsHideNSeek) return;
-        Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoExitVent");
-
-        var player = instance.myPlayer;
-        if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.FFA_DisableVentingWhenKCDIsUp.GetBool())
+        var enumerator = new CoExitVentEnumerator
         {
-            FFAManager.CoExitVent(player);
-        }
+            enumerator = original,
+            instance = __instance,
+            id = id
+        };
 
-        if (!AmongUsClient.Instance.AmHost) return;
+        __result = enumerator.GetEnumerator().WrapToIl2Cpp();
+    }
 
-        player.GetRoleClass()?.OnExitVent(player, id);
+    private class CoExitVentEnumerator : IEnumerable
+    {
+        public Il2CppSystem.Collections.IEnumerator enumerator;
+        public PlayerPhysics instance;
+        public int id;
 
-        foreach (var ventId in player.GetRoleClass().LastBlockedMoveInVentVents)
+        public IEnumerator GetEnumerator()
         {
-            CustomRoleManager.BlockedVentsList[player.PlayerId].Remove(ventId);
-        }
-        player.GetRoleClass().LastBlockedMoveInVentVents.Clear();
+            while (enumerator.MoveNext())
+            {
+                yield return enumerator.Current;
+            }
 
-        _ = new LateTask(() => { player?.RpcSetVentInteraction(); }, 0.8f, $"Set vent interaction after exit vent {player?.PlayerId}", shoudLog: false);
+            if (GameStates.IsHideNSeek) yield break;
+
+            Logger.Info($" {instance.myPlayer.GetNameWithRole().RemoveHtmlTags()}, Vent ID: {id}", "CoExitVent");
+
+            var player = instance.myPlayer;
+            if (Options.CurrentGameMode == CustomGameMode.FFA && FFAManager.FFA_DisableVentingWhenKCDIsUp.GetBool())
+            {
+                FFAManager.CoExitVent(player);
+            }
+
+            if (!AmongUsClient.Instance.AmHost) yield break;
+
+            player.GetRoleClass()?.OnExitVent(player, id);
+
+            foreach (var ventId in player.GetRoleClass().LastBlockedMoveInVentVents)
+            {
+                CustomRoleManager.BlockedVentsList[player.PlayerId].Remove(ventId);
+            }
+            player.GetRoleClass().LastBlockedMoveInVentVents.Clear();
+
+            _ = new LateTask(() => { player?.RpcSetVentInteraction(); }, 0.8f, $"Set vent interaction after exit vent {player?.PlayerId}", shoudLog: false);
+        }
     }
 }
+
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CompleteTask))]
 class PlayerControlCompleteTaskPatch
 {

@@ -141,7 +141,7 @@ class EndGamePatch
             if (Options.DefaultKillCooldown <= 150f)
                 Main.NormalOptions.KillCooldown = Options.DefaultKillCooldown;
 
-        //winnerListÒâ¬Òé╗ÒââÒâê
+        // winnerList
         EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
         var winner = new List<PlayerControl>();
         foreach (var pc in Main.EnumeratePlayerControls())

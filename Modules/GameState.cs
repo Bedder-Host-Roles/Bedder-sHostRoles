@@ -1,4 +1,4 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using System;
 using BHR.Modules;
 using BHR.Modules.Rpc;
@@ -723,3 +723,4 @@ public static class MeetingStates
     public static bool MeetingCalled = false;
     public static bool FirstMeeting = true;
 }
+

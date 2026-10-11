@@ -672,6 +672,17 @@ internal class EAC
             return;
         }
 
+        // TOHE is a host-side mod. Some legitimate host-generated/custom RPCs
+        // can pass through the same EAC checks used for untrusted clients.
+        // Never ban/kick the local modded host from its own lobby.
+        if (AmongUsClient.Instance.AmHost &&
+            PlayerControl.LocalPlayer != null &&
+            pc.PlayerId == PlayerControl.LocalPlayer.PlayerId)
+        {
+            Logger.Warn($"Ignoring EAC action against local host: {text}", "EAC");
+            return;
+        }
+
         switch (Options.CheatResponses.GetInt())
         {
             case 0:

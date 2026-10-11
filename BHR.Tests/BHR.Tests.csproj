@@ -23,19 +23,19 @@
   </ItemGroup>
 
   <ItemGroup>
-		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.8.18" PrivateAssets="all" />
+		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.9.29" PrivateAssets="all" />
 		
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.692" Private="false" ExcludeAssets="runtime;native" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" Private="false" ExcludeAssets="runtime;native" />
 	</ItemGroup>
 
   <Target Name="CopyAssemblyCSharpForTests" AfterTargets="Build">
     <ItemGroup>
-      <GameInteropAssemblies Include="$(NuGetPackageRoot)amongus.gamelibs.steam/2026.8.18/build/*.dll" />
-      <GameInteropAssemblies Remove="$(NuGetPackageRoot)amongus.gamelibs.steam/2026.8.18/build/Newtonsoft.Json.dll" />
+      <GameInteropAssemblies Include="$(NuGetPackageRoot)amongus.gamelibs.steam/2026.9.29/build/*.dll" />
+      <GameInteropAssemblies Remove="$(NuGetPackageRoot)amongus.gamelibs.steam/2026.9.29/build/Newtonsoft.Json.dll" />
     </ItemGroup>
     <Copy SourceFiles="@(GameInteropAssemblies)" DestinationFolder="$(OutDir)" />
   </Target>

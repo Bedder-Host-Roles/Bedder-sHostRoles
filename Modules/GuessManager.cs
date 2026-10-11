@@ -241,6 +241,12 @@ public static class GuessManager
                 pc.ShowInfoMessage(isUI, GetString("GuessRainbow"));
                 return true;
             }
+            if (role == CustomRoles.Goose && !Goose.CanBeGuessed.GetBool())
+            {
+                pc.ShowInfoMessage(isUI, GetString("GuessObviousAddon"));
+                return true;
+            }
+
             if (role is CustomRoles.LastImpostor or CustomRoles.Mare or CustomRoles.Cyber or CustomRoles.Flash or CustomRoles.Glow or CustomRoles.Sloth)
             {
                 pc.ShowInfoMessage(isUI, GetString("GuessObviousAddon"));

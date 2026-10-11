@@ -96,7 +96,7 @@ internal class Collector : RoleBase
         foreach (var pva in __instance.playerStates)
         {
             if (pva == null) continue;
-            PlayerControl pc = pva.PlayerId.Value.GetPlayer();
+            PlayerControl pc = ((byte)pva.PlayerId).GetPlayer();
             if (pc == null) continue;
             foreach (var data in VotingData)
             {

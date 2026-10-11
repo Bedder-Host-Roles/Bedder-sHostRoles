@@ -1,4 +1,4 @@
-using AmongUs.Data;
+﻿using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
@@ -2191,19 +2191,19 @@ public static class Utils
     {
         try
         {
-            var cache = Main.PlayerStates.Values.Where(x => x.RoleClass != null);
-
-            if (cache.Any())
-            {
-                var Get = cache.Select(x => x.RoleClass);
-                return Get.OfType<t>().Any() ? Get.OfType<t>() : null;
-            }
+            // Optional role types may not be present in a lobby. Always return an
+            // enumerable so callers can safely use foreach without null checks.
+            return Main.PlayerStates.Values
+                .Where(x => x.RoleClass != null)
+                .Select(x => x.RoleClass)
+                .OfType<t>()
+                .ToArray();
         }
         catch (Exception exx)
         {
             Logger.Exception(exx, "Utils.GetRoleBasesByType");
+            return Enumerable.Empty<t>();
         }
-        return null;
     }
 
     public static bool IsMethodOverridden(this RoleBase roleInstance, string methodName)

@@ -6,7 +6,7 @@ using BHR.Roles.Impostor;
 
 namespace BHR;
 
-//ÕÅé×Çâ
+// Sabotage system patch
 //https://github.com/Koke1024/Town-Of-Moss/blob/main/TownOfMoss/Patches/MeltDownBoost.cs
 
 public class SabotageSystemPatch

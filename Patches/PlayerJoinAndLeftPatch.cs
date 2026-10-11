@@ -1,4 +1,4 @@
-using AmongUs.Data;
+﻿using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
@@ -915,3 +915,4 @@ class InnerNetClientSpawnPatch
         }
     }
 }
+

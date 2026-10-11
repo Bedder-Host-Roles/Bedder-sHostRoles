@@ -18,7 +18,7 @@ namespace BHR;
 [HarmonyPatch]
 public class ModUpdater
 {
-    private static readonly string URL_Github = "https://api.github.com/repos/BatmenzDW/TownofHost-Enhanced";
+    private static readonly string URL_Github = "https://api.github.com/repos/Bedder-Host-Roles/Bedder-sHostRoles";
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
     public static bool forceUpdate = false;

@@ -26,6 +26,9 @@ internal class Dictator : RoleBase
         ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
     }
 
+    public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
+        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedForId && pva.VotedForId < 253 && !pc.Data.IsDead && pc.IsAlive();
+
     public static void ExpelCommand(PlayerControl pc, string commandKey, string msg, string[] args)
     {
         if (!AmongUsClient.Instance.AmHost)
@@ -178,7 +181,7 @@ internal class Dictator : RoleBase
         {
             if (pva.transform.Find("DictatorButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
 
-            var pc = pva.PlayerId.Value.GetPlayer();
+            var pc = ((byte)pva.PlayerId).GetPlayer();
             var local = PlayerControl.LocalPlayer;
             if (pc == null || !pc.IsAlive()) continue;
 
