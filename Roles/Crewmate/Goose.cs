@@ -14,7 +14,7 @@ internal class Goose : RoleBase
 {
     public override CustomRoles Role => CustomRoles.Goose;
 
-    private const int Id = 641820;
+    private const int Id = 33000;
 
     public static bool HasEnabled =>
         CustomRoleManager.HasEnabled(CustomRoles.Goose);
@@ -178,11 +178,10 @@ internal class Goose : RoleBase
         writer.Write(
             AbductVictim?.PlayerId ?? 255);
 
-        RpcUtils.LateBroadcastReliableMessage(
-            new RpcSyncRoleSkill(
+        LegacyRpcSenders.SendSyncRoleSkill(
                 PlayerControl.LocalPlayer.NetId,
                 GoosePlayer.NetId,
-                writer));
+                writer);
     }
 
     public override void ReceiveRPC(

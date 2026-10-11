@@ -46,7 +46,7 @@ public class Main : BasePlugin
 
     public static readonly string ModName = "BHR";
     public static readonly string ForkId = "BHR";
-    public static readonly string ModColor = "#ffc0cb";
+    public static readonly string ModColor = "#75f580";
     public static readonly bool AllowPublicRoom = true;
 
     public static HashAuth DebugKeyAuth { get; private set; }
@@ -58,7 +58,7 @@ public class Main : BasePlugin
 
     public const string PluginGuid = "com.batmenzdw.bedderhostroles";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
-    public const string PluginVersion = "2026.0825.100.00000"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginVersion = "2026.1011.100.00000"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.0.0";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
     [
@@ -89,12 +89,12 @@ public class Main : BasePlugin
     public static readonly string GitHubInviteUrl = "https://github.com/Bedder-Host-Roles/Bedder-sHostRoles";
 
     public static readonly bool ShowDiscordButton = true;
-    public static readonly string DiscordInviteUrl = "WIP";
+    public static readonly string DiscordInviteUrl = "https://discord.gg/Y6gWeFU24z";
 
-    public static readonly bool ShowWebsiteButton = true;
+    public static readonly bool ShowWebsiteButton = false;
     public static readonly string WebsiteInviteUrl = "WIP";
 
-    public static readonly bool ShowDonationButton = true;
+    public static readonly bool ShowDonationButton = false;
     public static readonly string DonationInviteUrl = "WIP";
 
     public Harmony Harmony { get; } = new Harmony(PluginGuid);
