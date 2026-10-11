@@ -1,7 +1,7 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Opportunist : RoleBase
 {

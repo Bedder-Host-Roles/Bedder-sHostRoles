@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Fireworker : RoleBase
 {
@@ -77,8 +77,7 @@ internal class Fireworker : RoleBase
     private static void SendRPC(byte playerId)
     {
         Logger.Info($"Player{playerId}:SendRPC nowFireworkerCount:{nowFireworkerCount[playerId]} state:{state[playerId]}", "Fireworker");
-        var msg = new RpcSendFireworkerState(PlayerControl.LocalPlayer.NetId, playerId, nowFireworkerCount[playerId], (int)state[playerId]);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendFireworkerState(PlayerControl.LocalPlayer.NetId, playerId, nowFireworkerCount[playerId], (int)state[playerId]);
     }
 
     public static void ReceiveRPC(MessageReader msg)

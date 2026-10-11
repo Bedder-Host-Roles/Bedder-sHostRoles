@@ -1,5 +1,5 @@
 
-namespace TOHE;
+namespace BHR;
 
 internal class DefaultSetup : RoleBase
 {

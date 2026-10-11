@@ -1,14 +1,14 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Double;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Double;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Ninja : RoleBase
 {
@@ -48,8 +48,7 @@ internal class Ninja : RoleBase
     private static void SendRPC(byte playerId)
     {
         var targetId = MarkedPlayer.ContainsKey(playerId) ? MarkedPlayer[playerId] : byte.MaxValue;
-        var msg = new RpcSetMarkedPlayer(PlayerControl.LocalPlayer.NetId, playerId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetMarkedPlayer(PlayerControl.LocalPlayer.NetId, playerId, targetId);
 
     }
     public static void ReceiveRPC(MessageReader reader)

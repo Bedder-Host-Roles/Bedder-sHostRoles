@@ -1,11 +1,11 @@
 using Hazel;
 using System;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
+using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 // Thanks: https://github.com/tukasa0001/TownOfHost/blob/main/Patches/RandomSpawnPatch.cs
 class RandomSpawn

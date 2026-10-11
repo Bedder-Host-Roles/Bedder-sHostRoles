@@ -2,9 +2,9 @@ using System;
 using AmongUs.GameOptions;
 using Hazel;
 using InnerNet;
-using TOHE.Modules;
+using BHR.Modules;
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 [Obfuscation(Exclude = true)]
 public enum GameDataTag : byte
@@ -177,7 +177,7 @@ internal class HostGamePatch
         filterOpts.Serialize(msg);
 
         // Serializing your GUID as bytes in the message 
-        bool guidSucceeded = Guid.TryParse(Main.PluginGuid4, out Guid guid); // example GUID
+        bool guidSucceeded = Guid.TryParse(Main.PluginGuid4, out Guid guid);
         if (!guidSucceeded)
         {
             Logger.Error("Whoa guid failed to generate", "HostGamePatch");

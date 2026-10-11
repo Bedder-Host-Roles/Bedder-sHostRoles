@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class QuickShooter : RoleBase
 {
@@ -61,7 +61,7 @@ internal class QuickShooter : RoleBase
         writer.Write(timer);
         if (timer)
             writer.Write(_Player.GetKillTimer());
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)

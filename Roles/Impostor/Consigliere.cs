@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using static BHR.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Consigliere : RoleBase
 {
@@ -48,8 +48,7 @@ internal class Consigliere : RoleBase
 
     private static void SendRPC(byte playerId, byte targetId)
     {
-        var msg = new RpcSetConsigliere(PlayerControl.LocalPlayer.NetId, playerId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetConsigliere(PlayerControl.LocalPlayer.NetId, playerId, targetId);
 
     }
     public static void ReceiveRPC(MessageReader reader)

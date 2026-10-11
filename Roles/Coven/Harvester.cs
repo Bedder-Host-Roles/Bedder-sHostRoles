@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using BHR.Roles.Core;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class Harvester : CovenManager
 {

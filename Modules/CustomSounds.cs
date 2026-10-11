@@ -3,11 +3,11 @@ using Hazel;
 using System;
 using System.Collections;
 using System.IO;
-using TOHE.Modules.Rpc;
+using BHR.Modules.Rpc;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace TOHE.Modules;
+namespace BHR.Modules;
 
 public static class CustomSoundsManager
 {
@@ -19,19 +19,19 @@ public static class CustomSoundsManager
             Play(sound);
             return;
         }
-        RpcUtils.LateSpecificSendMessage(new RpcPlayCustomSound(pc.NetId, sound, volume, pitch), pc.GetClientId());
+        LegacyRpcSenders.SendPlayCustomSound(pc.NetId, sound, volume, pitch, pc.GetClientId());
     }
 
     public static void RPCPlayCustomSoundAll(string sound, float volume = 1f, float pitch = 1f)
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        RpcUtils.LateBroadcastReliableMessage(new RpcPlayCustomSound(PlayerControl.LocalPlayer.NetId, sound, volume, pitch));
+        LegacyRpcSenders.SendPlayCustomSound(PlayerControl.LocalPlayer.NetId, sound, volume, pitch);
         Play(sound);
     }
 
     public static void ReceiveRPC(MessageReader reader) => Play(reader.ReadString(), reader.ReadSingle(), reader.ReadSingle());
 
-    private static readonly string SOUNDS_PATH = OperatingSystem.IsAndroid() ? Path.Combine(Application.persistentDataPath, "TOHE-DATA", "resources") : Path.Combine(Environment.CurrentDirectory, "BepInEx", "resources");
+    private static readonly string SOUNDS_PATH = OperatingSystem.IsAndroid() ? Path.Combine(Application.persistentDataPath, "BHR-DATA", "resources") : Path.Combine(Environment.CurrentDirectory, "BepInEx", "resources");
 
     public static void Play(string sound, float volume = 1f, float pitch = 1f)
     {
@@ -48,7 +48,7 @@ public static class CustomSoundsManager
 
         if (!File.Exists(path))
         {
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("TOHE.Resources.Sounds." + sound + ".wav");
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BHR.Resources.Sounds." + sound + ".wav");
             if (stream == null)
             {
                 Logger.Warn($"Sound file missing: {sound}", "CustomSounds");

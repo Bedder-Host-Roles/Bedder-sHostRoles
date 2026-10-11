@@ -2,21 +2,21 @@ using Hazel;
 using System;
 using System.Text.RegularExpressions;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Double;
+using BHR.Roles.Impostor;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 public static class GuessManager
 {
@@ -104,7 +104,7 @@ public static class GuessManager
         if (!pc.Is(CustomRoles.NiceGuesser)
             && !pc.Is(CustomRoles.EvilGuesser)
             && !pc.Is(CustomRoles.Doomsayer)
-            && !pc.Is(CustomRoles.Judge)
+            && !pc.Is(CustomRoles.Prosecutor)
             && !pc.Is(CustomRoles.Councillor)
             && !pc.Is(CustomRoles.Guesser)
             && !Options.GuesserMode.GetBool()) return false;
@@ -471,8 +471,7 @@ public static class GuessManager
                 if (playerVoteArea.VotedForId != pc.PlayerId) continue;
                 playerVoteArea.UnsetVote();
                 var voteAreaPlayer = Utils.GetPlayerById(playerVoteArea.PlayerId);
-                if (!voteAreaPlayer.AmOwner) continue;
-                meetingHud.ClearVote(voteAreaPlayer.PlayerId, true);
+                meetingHud.ClearVote(playerVoteArea.PlayerId, voteAreaPlayer.AmOwner);
             }
             Swapper.CheckSwapperTarget(pc.PlayerId);
 
@@ -482,8 +481,7 @@ public static class GuessManager
                 meetingHud.CheckForEndVoting();
             }
             _ = new LateTask(() => hudManager.SetHudActive(false), 0.3f, "SetHudActive in GuesserMurderPlayer", shoudLog: false);
-            var msg = new RpcGuessKill(pc.NetId, pc.PlayerId);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendGuessKill(pc.NetId, pc.PlayerId);
 
             GameEndCheckerForNormal.ShouldNotCheck = false;
         }
@@ -527,7 +525,7 @@ public static class GuessManager
             playerVoteArea.UnsetVote();
             var voteAreaPlayer = Utils.GetPlayerById(playerVoteArea.PlayerId);
             if (!voteAreaPlayer.AmOwner) continue;
-            meetingHud.ClearVote(voteAreaPlayer.PlayerId, true);
+            meetingHud.ClearVote(playerVoteArea.PlayerId, voteAreaPlayer.AmOwner);
         }
         hudManager.SetHudActive(false);
         _ = new LateTask(() => hudManager.SetHudActive(false), 0.3f, "SetHudActive in ClientGuess", shoudLog: false);
@@ -541,7 +539,7 @@ public static class GuessManager
         string result = string.Empty;
         for (int i = 0; i < mc.Count; i++)
         {
-            result += mc[i];//匹配结果是完整的数字，此处可以不做拼接的
+            result += mc[i];
         }
 
         Logger.Info($"result: {result}", "MsgToPlayerAndRole");
@@ -553,16 +551,13 @@ public static class GuessManager
         else
         {
             Logger.Warn($"{msg}::{result} could not be parsed as a byte", "MsgToPlayerAndRole");
-            //并不是玩家编号，判断是否颜色
             //byte color = GetColorFromMsg(msg);
-            //好吧我不知道怎么取某位玩家的颜色，等会了的时候再来把这里补上
             id = byte.MaxValue;
             error = GetString("GuessHelp");
             role = new();
             return false;
         }
 
-        //判断选择的玩家是否合理
         PlayerControl target = Utils.GetPlayerById(id);
         if (target == null || !target.IsAlive())
         {
@@ -687,7 +682,9 @@ public static class GuessManager
     static void GuesserOnClick(byte playerId, MeetingHud __instance)
     {
         var pc = Utils.GetPlayerById(playerId);
+        Logger.Info($"GuesserOnClick called for playerId: {playerId}", "GuesserOnClick");
         if (pc == null || !pc.IsAlive() || guesserUI != null || !GameStates.IsVoting) return;
+        Logger.Info($"Player character retrieved: {pc}", "GuesserOnClick");
 
         try
         {
@@ -877,32 +874,38 @@ public static class GuessManager
             if (Options.ShowOnlyEnabledRolesInGuesserUI.GetBool())
             {
 
-                List<CustomRoles> listOfRoles = CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && (role.IsEnable() || role.RoleExist(countDead: true))).ToList();
+                List<CustomRoles> listOfRoles = [.. CustomRolesHelper.AllRoles.Where(role => !role.IsGhostRole() && (role.IsEnable() || role.RoleExist(countDead: true)))];
 
                 // Always show
-                if (!listOfRoles.Contains(CustomRoles.ImpostorTOHE))
-                    listOfRoles.Add(CustomRoles.ImpostorTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ImpostorBHR))
+                    listOfRoles.Add(CustomRoles.ImpostorBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.ShapeshifterTOHE))
-                    listOfRoles.Add(CustomRoles.ShapeshifterTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ShapeshifterBHR))
+                    listOfRoles.Add(CustomRoles.ShapeshifterBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.CrewmateTOHE))
-                    listOfRoles.Add(CustomRoles.CrewmateTOHE);
+                if (!listOfRoles.Contains(CustomRoles.CrewmateBHR))
+                    listOfRoles.Add(CustomRoles.CrewmateBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.ScientistTOHE))
-                    listOfRoles.Add(CustomRoles.ScientistTOHE);
+                if (!listOfRoles.Contains(CustomRoles.ScientistBHR))
+                    listOfRoles.Add(CustomRoles.ScientistBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.EngineerTOHE))
-                    listOfRoles.Add(CustomRoles.EngineerTOHE);
+                if (!listOfRoles.Contains(CustomRoles.EngineerBHR))
+                    listOfRoles.Add(CustomRoles.EngineerBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.TrackerTOHE))
-                    listOfRoles.Add(CustomRoles.TrackerTOHE);
+                if (!listOfRoles.Contains(CustomRoles.TrackerBHR))
+                    listOfRoles.Add(CustomRoles.TrackerBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.PhantomTOHE))
-                    listOfRoles.Add(CustomRoles.PhantomTOHE);
+                if (!listOfRoles.Contains(CustomRoles.PhantomBHR))
+                    listOfRoles.Add(CustomRoles.PhantomBHR);
+                
+                if (!listOfRoles.Contains(CustomRoles.ViperBHR))
+                    listOfRoles.Add(CustomRoles.ViperBHR);
 
-                if (!listOfRoles.Contains(CustomRoles.DetectiveTOHE))
-                    listOfRoles.Add(CustomRoles.DetectiveTOHE);
+                if (!listOfRoles.Contains(CustomRoles.DetectiveBHR))
+                    listOfRoles.Add(CustomRoles.DetectiveBHR);
+                
+                if (!listOfRoles.Contains(CustomRoles.JudgeBHR))
+                    listOfRoles.Add(CustomRoles.JudgeBHR);
 
                 if (!listOfRoles.Contains(CustomRoles.Amnesiac))
                     listOfRoles.Add(CustomRoles.Amnesiac);
@@ -1104,8 +1107,7 @@ public static class GuessManager
     // Modded non-host client guess role/add-on
     private static void SendRPC(byte playerId, CustomRoles role)
     {
-        var msg = new RpcGuess(PlayerControl.LocalPlayer.NetId, playerId, role);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendGuess(PlayerControl.LocalPlayer.NetId, playerId, role);
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {

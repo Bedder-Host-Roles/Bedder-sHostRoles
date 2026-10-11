@@ -1,11 +1,11 @@
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 internal static class FFAManager
 {
@@ -125,8 +125,7 @@ internal static class FFAManager
     }
     private static void SendRPCSyncFFAPlayer(byte playerId)
     {
-        var msg = new RpcSyncFFAPlayer(PlayerControl.LocalPlayer.NetId, playerId, KBScore[playerId]);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        LegacyRpcSenders.SendSyncFFAPlayer(PlayerControl.LocalPlayer.NetId, playerId, KBScore[playerId]);
     }
     public static void ReceiveRPCSyncFFAPlayer(MessageReader reader)
     {
@@ -137,8 +136,7 @@ internal static class FFAManager
     {
         if (!pc.IsNonHostModdedClient()) return;
         var notif = NameNotify.ContainsKey(pc.PlayerId) ? NameNotify[pc.PlayerId].TEXT : string.Empty;
-        var msg = new RpcSyncFFANameNotify(PlayerControl.LocalPlayer.NetId, notif);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        LegacyRpcSenders.SendSyncFFANameNotify(PlayerControl.LocalPlayer.NetId, notif);
 
     }
     public static void ReceiveRPCSyncNameNotify(MessageReader reader)

@@ -1,13 +1,13 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Revolutionist : RoleBase
 {
@@ -107,8 +107,7 @@ internal class Revolutionist : RoleBase
     }
     private static void SetDrawPlayerRPC(PlayerControl player, PlayerControl target, bool isDrawed)
     {
-        var msg = new RpcSetDrawPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isDrawed);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetDrawPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isDrawed);
     }
     public static void ReceiveDrawPlayerRPC(MessageReader reader)
     {
@@ -126,8 +125,7 @@ internal class Revolutionist : RoleBase
         }
         else
         {
-            var msg = new RpcSetCurrentDrawTarget(PlayerControl.LocalPlayer.NetId, revoId, targetId);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendSetCurrentDrawTarget(PlayerControl.LocalPlayer.NetId, revoId, targetId);
         }
     }
     public static void ReceiveSetCurrentDrawTarget(MessageReader reader)

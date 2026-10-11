@@ -3,11 +3,11 @@ using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 using System;
 using System.Runtime.CompilerServices;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 
-namespace TOHE;
+namespace BHR;
 
 public static class AntiBlackout
 {
@@ -358,13 +358,11 @@ public static class AntiBlackout
         {
             int ownerId = pc.OwnerId;
 
-            var message1 = new RpcExiled(pc.NetId);
-            RpcUtils.LateSpecificSendMessage(message1, ownerId);
+            LegacyRpcSenders.SendExiled(pc.NetId, ownerId);
 
             if (!pc.IsModded() && pc.PlayerId == ExileControllerWrapUpPatch.AntiBlackout_LastExiled?.PlayerId)
             {
-                var message2 = new RpcMurderPlayer(pc.NetId, pc.NetId, MurderResultFlags.Succeeded);
-                RpcUtils.LateSpecificSendMessage(message2, ownerId);
+                LegacyRpcSenders.SendMurderPlayer(pc.NetId, pc.NetId, MurderResultFlags.Succeeded, ownerId);
 
                 pc.ReactorFlash(0.2f);
             }

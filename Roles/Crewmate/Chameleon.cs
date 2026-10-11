@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Chameleon : RoleBase
 {
@@ -57,8 +57,7 @@ internal class Chameleon : RoleBase
         if (!pc.IsNonHostModdedClient()) return;
         var cooldown = (InvisCooldown.TryGetValue(pc.PlayerId, out var y) ? y : -1).ToString();
         var duration = (InvisDuration.TryGetValue(pc.PlayerId, out var x) ? x : -1).ToString();
-        var msg = new RpcSetChameleonTimer(PlayerControl.LocalPlayer.NetId, pc.PlayerId, cooldown, duration);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetChameleonTimer(PlayerControl.LocalPlayer.NetId, pc.PlayerId, cooldown, duration);
     }
     public static void ReceiveRPC_Custom(MessageReader reader)
     {

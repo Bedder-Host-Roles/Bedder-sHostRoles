@@ -1,10 +1,10 @@
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Neutral;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class CopyCat : RoleBase
 {
@@ -131,10 +131,10 @@ internal class CopyCat : RoleBase
                 CustomRoles.Eraser or CustomRoles.Bandit => CustomRoles.Cleanser,
                 CustomRoles.Visionary => CustomRoles.Oracle,
                 CustomRoles.Workaholic => CustomRoles.Snitch,
-                CustomRoles.Sunnyboy => new[] { CustomRoles.Doctor, CustomRoles.ScientistTOHE }.RandomElement(),
-                CustomRoles.Councillor => CustomRoles.Judge,
+                CustomRoles.Sunnyboy => new[] { CustomRoles.Doctor, CustomRoles.ScientistBHR }.RandomElement(),
+                CustomRoles.Councillor => CustomRoles.Prosecutor,
                 CustomRoles.Taskinator => CustomRoles.Benefactor,
-                CustomRoles.EvilTracker => CustomRoles.TrackerTOHE,
+                CustomRoles.EvilTracker => CustomRoles.TrackerBHR,
                 CustomRoles.AntiAdminer => CustomRoles.Telecommunication,
                 CustomRoles.Pursuer => CustomRoles.Deceiver,
                 CustomRoles.CursedWolf => CustomRoles.Veteran,

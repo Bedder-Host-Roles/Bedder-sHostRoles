@@ -1,15 +1,15 @@
 using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules.ChatManager;
-using TOHE.Patches;
-using TOHE.Roles.Crewmate;
+using BHR.Modules.ChatManager;
+using BHR.Patches;
+using BHR.Roles.Crewmate;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class Ritualist : CovenManager
 {

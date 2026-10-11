@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Roles.Core;
+using BHR.Roles.Core;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 public abstract class RoleBase
 {
@@ -455,7 +455,11 @@ public abstract class RoleBase
     public virtual string PlayerKnowTargetColor(PlayerControl seer, PlayerControl target) => string.Empty;
     public virtual bool OthersKnowTargetRoleColor(PlayerControl seer, PlayerControl target) => false;
 
-
+    public virtual bool OnJudge(PlayerControl voter, PlayerControl target)
+    {
+        return false;
+    }
+    
     public virtual void ReceiveRPC(MessageReader reader, PlayerControl pc)
     { }
 
@@ -512,6 +516,7 @@ public abstract class RoleBase
         TrackerBase_TrackingDuration,
         TrackerBase_TrackingDelay,
         DetectiveBase_DetectiveSuspectLimit,
-        ViperBase_ViperDissolveTime
+        ViperBase_ViperDissolveTime,
+        JudgeBase_JudgeTaskRequirementPercentage,
     }
 }

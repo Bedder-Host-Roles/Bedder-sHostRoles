@@ -1,6 +1,6 @@
-using TOHE.Roles.Core;
+using BHR.Roles.Core;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(OneWayShadows), nameof(OneWayShadows.IsIgnored))]
 public static class OneWayShadowsIsIgnoredPatch

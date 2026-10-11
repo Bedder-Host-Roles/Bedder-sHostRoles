@@ -1,18 +1,18 @@
 using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
 using UnityEngine;
-using static TOHE.CheckForEndVotingPatch;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.CheckForEndVotingPatch;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Swapper : RoleBase
 {
@@ -57,6 +57,104 @@ internal class Swapper : RoleBase
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Swapper), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
 
+    public override bool OnJudge(PlayerControl pc, PlayerControl target)
+    {
+        if (pc.GetAbilityUseLimit() <= 0)
+        {
+            pc.ShowInfoMessage(false, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+            return false;
+        }
+        //Swapper skill limit is changed in after meeting task
+
+        if (!Vote.ContainsKey(pc.PlayerId) || !VoteTwo.ContainsKey(pc.PlayerId))
+        {
+            Vote.TryAdd(pc.PlayerId, 253);
+            VoteTwo.TryAdd(pc.PlayerId, 253);
+            Vote[pc.PlayerId] = 253;
+            VoteTwo[pc.PlayerId] = 253;
+
+            pc.ShowInfoMessage(false, GetString("SwapNull"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+
+            return false;
+        }
+
+        var dp = target;
+        if (pc.PlayerId == dp.PlayerId && !CanSwapSelf.GetBool())
+        {
+            pc.ShowInfoMessage(false, GetString("CantSwapSelf"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+            return false;
+        }
+        if (dp == null || !dp.IsAlive())
+        {
+            pc.ShowInfoMessage(false, GetString("SwapNull"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+            return false;
+        }
+
+        if (Vote[pc.PlayerId] != 253 && VoteTwo[pc.PlayerId] != 253)
+        {
+            var target1 = Vote[pc.PlayerId].GetPlayer();
+            var target2 = VoteTwo[pc.PlayerId].GetPlayer();
+
+            if (target1 == null || target2 == null || !target1.IsAlive() || !target2.IsAlive())
+            {
+                Vote.TryAdd(pc.PlayerId, 253);
+                VoteTwo.TryAdd(pc.PlayerId, 253);
+                Vote[pc.PlayerId] = 253;
+                VoteTwo[pc.PlayerId] = 253;
+
+                pc.ShowInfoMessage(false, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+            }
+            else pc.ShowInfoMessage(false, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+
+            return false;
+        }
+        else if (Vote[pc.PlayerId] == 253 && VoteTwo[pc.PlayerId] == 253)
+        {
+            Vote[pc.PlayerId] = dp.PlayerId;
+            pc.ShowInfoMessage(false, GetString("Swap1"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+
+            return true;
+        }
+        else if (Vote[pc.PlayerId] != 253 && VoteTwo[pc.PlayerId] == 253)
+        {
+            if (dp.PlayerId != Vote[pc.PlayerId])
+            {
+                VoteTwo[pc.PlayerId] = dp.PlayerId;
+                pc.ShowInfoMessage(false, GetString("Swap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+
+                var target1 = Vote[pc.PlayerId].GetPlayer();
+                var target2 = VoteTwo[pc.PlayerId].GetPlayer();
+
+                if (target1 == null || target2 == null || !target1.IsAlive() || !target2.IsAlive())
+                {
+                    Vote.TryAdd(pc.PlayerId, 253);
+                    VoteTwo.TryAdd(pc.PlayerId, 253);
+                    Vote[pc.PlayerId] = 253;
+                    VoteTwo[pc.PlayerId] = 253;
+
+                    pc.ShowInfoMessage(false, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+                    return false;
+                }
+                else pc.ShowInfoMessage(false, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+                return true;
+            }
+            else pc.ShowInfoMessage(false, GetString("Swap1=Swap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+
+            return false;
+        }
+        else if (Vote[pc.PlayerId] == 253 && VoteTwo[pc.PlayerId] != 253) //How could this happen
+        {
+            Vote.TryAdd(pc.PlayerId, 253);
+            VoteTwo.TryAdd(pc.PlayerId, 253);
+            Vote[pc.PlayerId] = 253;
+            VoteTwo[pc.PlayerId] = 253;
+
+            pc.ShowInfoMessage(false, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
+            return false;
+        }
+        return false;
+    }
+
     public static void SwapCommand(PlayerControl pc, string commandKey, string msg, string[] args)
     {
         if (!AmongUsClient.Instance.AmHost)
@@ -96,97 +194,7 @@ internal class Swapper : RoleBase
 
         if (target != null)
         {
-            if (pc.GetAbilityUseLimit() <= 0)
-            {
-                pc.ShowInfoMessage(isUI, GetString("SwapperTrialMax"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                return;
-            }
-            //Swapper skill limit is changed in after meeting task
-
-            if (!Vote.ContainsKey(pc.PlayerId) || !VoteTwo.ContainsKey(pc.PlayerId))
-            {
-                Vote.TryAdd(pc.PlayerId, 253);
-                VoteTwo.TryAdd(pc.PlayerId, 253);
-                Vote[pc.PlayerId] = 253;
-                VoteTwo[pc.PlayerId] = 253;
-
-                pc.ShowInfoMessage(isUI, GetString("SwapNull"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-
-                return;
-            }
-
-            var dp = target;
-            if (pc.PlayerId == dp.PlayerId && !CanSwapSelf.GetBool())
-            {
-                pc.ShowInfoMessage(isUI, GetString("CantSwapSelf"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                return;
-            }
-            if (dp == null || !dp.IsAlive())
-            {
-                pc.ShowInfoMessage(isUI, GetString("SwapNull"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                return;
-            }
-
-            if (Vote[pc.PlayerId] != 253 && VoteTwo[pc.PlayerId] != 253)
-            {
-                var target1 = Vote[pc.PlayerId].GetPlayer();
-                var target2 = VoteTwo[pc.PlayerId].GetPlayer();
-
-                if (target1 == null || target2 == null || !target1.IsAlive() || !target2.IsAlive())
-                {
-                    Vote.TryAdd(pc.PlayerId, 253);
-                    VoteTwo.TryAdd(pc.PlayerId, 253);
-                    Vote[pc.PlayerId] = 253;
-                    VoteTwo[pc.PlayerId] = 253;
-
-                    pc.ShowInfoMessage(isUI, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                }
-                else pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-
-                return;
-            }
-            else if (Vote[pc.PlayerId] == 253 && VoteTwo[pc.PlayerId] == 253)
-            {
-                Vote[pc.PlayerId] = dp.PlayerId;
-                pc.ShowInfoMessage(isUI, GetString("Swap1"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-
-                return;
-            }
-            else if (Vote[pc.PlayerId] != 253 && VoteTwo[pc.PlayerId] == 253)
-            {
-                if (dp.PlayerId != Vote[pc.PlayerId])
-                {
-                    VoteTwo[pc.PlayerId] = dp.PlayerId;
-                    pc.ShowInfoMessage(isUI, GetString("Swap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-
-                    var target1 = Vote[pc.PlayerId].GetPlayer();
-                    var target2 = VoteTwo[pc.PlayerId].GetPlayer();
-
-                    if (target1 == null || target2 == null || !target1.IsAlive() || !target2.IsAlive())
-                    {
-                        Vote.TryAdd(pc.PlayerId, 253);
-                        VoteTwo.TryAdd(pc.PlayerId, 253);
-                        Vote[pc.PlayerId] = 253;
-                        VoteTwo[pc.PlayerId] = 253;
-
-                        pc.ShowInfoMessage(isUI, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                    }
-                    else pc.ShowInfoMessage(isUI, string.Format(GetString("SwapperPreResult"), target1.GetRealName(), target2.GetRealName()), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                }
-                else pc.ShowInfoMessage(isUI, GetString("Swap1=Swap2"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-
-                return;
-            }
-            else if (Vote[pc.PlayerId] == 253 && VoteTwo[pc.PlayerId] != 253) //How could this happen
-            {
-                Vote.TryAdd(pc.PlayerId, 253);
-                VoteTwo.TryAdd(pc.PlayerId, 253);
-                Vote[pc.PlayerId] = 253;
-                VoteTwo[pc.PlayerId] = 253;
-
-                pc.ShowInfoMessage(isUI, GetString("CancelSwapDueToTarget"), ColorString(GetRoleColor(CustomRoles.Swapper), GetString("Swapper").ToUpper()));
-                return;
-            }
+            pc.GetRoleClass().OnJudge(pc, target);
         }
         else
         {
@@ -303,8 +311,7 @@ internal class Swapper : RoleBase
     
     private static void SendSwapRPC(byte playerId)
     {
-        var msg = new RpcSetSwapperVotes(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetSwapperVotes(PlayerControl.LocalPlayer.NetId, playerId);
     }
     public static void ReceiveSwapRPC(MessageReader reader, PlayerControl pc)
     {

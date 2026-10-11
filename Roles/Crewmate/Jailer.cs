@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Jailer : RoleBase
 {
@@ -76,8 +76,7 @@ internal class Jailer : RoleBase
 
     public static void SendRPC(byte jailerId)
     {
-        var msg = new RpcSyncJailerData(PlayerControl.LocalPlayer.NetId, jailerId, JailerTarget[jailerId], JailerHasExe[jailerId], JailerDidVote[jailerId]);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSyncJailerData(PlayerControl.LocalPlayer.NetId, jailerId, JailerTarget[jailerId], JailerHasExe[jailerId], JailerDidVote[jailerId]);
     }
 
     public static void ReceiveRPC(MessageReader reader)
@@ -133,12 +132,12 @@ internal class Jailer : RoleBase
         JailerTarget.Clear();
     }
 
-    public override void OnVote(PlayerControl voter, PlayerControl target)
+    public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {
-        if (voter == null || target == null) return;
-        if (!voter.Is(CustomRoles.Jailer)) return;
-        if (JailerDidVote.TryGetValue(voter.PlayerId, out var didVote) && didVote) return;
-        if (JailerTarget.TryGetValue(voter.PlayerId, out var jTarget) && jTarget == byte.MaxValue) return;
+        if (voter == null || target == null) return false;
+        if (!voter.Is(CustomRoles.Jailer)) return false;
+        if (JailerDidVote.TryGetValue(voter.PlayerId, out var didVote) && didVote) return false;
+        if (JailerTarget.TryGetValue(voter.PlayerId, out var jTarget) && jTarget == byte.MaxValue) return false;
 
         JailerDidVote[voter.PlayerId] = true;
         if (target.PlayerId == jTarget)
@@ -151,6 +150,7 @@ internal class Jailer : RoleBase
             else JailerHasExe[voter.PlayerId] = false;
         }
         SendRPC(voter.PlayerId);
+        return true;
     }
 
     public override string GetMark(PlayerControl seer, PlayerControl seen, bool isForMeeting)

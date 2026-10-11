@@ -1,7 +1,7 @@
-﻿using TOHE.Modules;
-using static TOHE.Options;
+using BHR.Modules;
+using static BHR.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Instigator : RoleBase
 {
@@ -71,4 +71,3 @@ internal class Instigator : RoleBase
         instigator.RpcRemoveAbilityUse();
     }
 }
-

@@ -1,9 +1,9 @@
-﻿using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Roles.Coven;
+using BHR.Roles.Neutral;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Aware : IAddon
 {
@@ -99,5 +99,4 @@ public class Aware : IAddon
         }
     }
 }
-
 

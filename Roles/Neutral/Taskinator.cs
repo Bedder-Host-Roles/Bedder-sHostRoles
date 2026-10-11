@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Roles.Core;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Taskinator : PariahManager
 {

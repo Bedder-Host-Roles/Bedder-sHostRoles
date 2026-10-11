@@ -3,12 +3,12 @@ using Hazel;
 using System;
 using UnityEngine;
 using System.Text;
-using static TOHE.Utils;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Core;
+using static BHR.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using BHR.Roles.Core;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Tracker : RoleBase
 {
@@ -67,7 +67,7 @@ internal class Tracker : RoleBase
         writer.Write(operate);
         if (operate == 0) writer.Write(targetId);
         if (operate == 2) writer.Write(AbilityLimit);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

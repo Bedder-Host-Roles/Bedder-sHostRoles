@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Double;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Double;
 using UnityEngine;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.MeetingHudStartPatch;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Nemesis : RoleBase
 {
@@ -185,8 +185,7 @@ internal class Nemesis : RoleBase
 
     private static void SendRPC(byte playerId)
     {
-        var msg = new RpcNemesisRevenge(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendNemesisRevenge(PlayerControl.LocalPlayer.NetId, playerId);
     }
     public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)
     {
@@ -214,7 +213,7 @@ internal class Nemesis : RoleBase
         return pc.Is(CustomRoles.Narc) ? !CustomRoles.Sheriff.RoleExist() : LivingImpostorsNum <= 0;
     }
 
-    private static void NemesisOnClick(byte playerId /*, MeetingHud __instance*/)
+    private static void NemesisOnClick(byte playerId)
     {
         Logger.Msg($"Click: ID {playerId}", "Nemesis UI");
         var pc = Utils.GetPlayerById(playerId);
@@ -257,8 +256,7 @@ internal class Nemesis : RoleBase
             renderer.sprite = CustomButton.Get("MeetingKillButton");
             PassiveButton button = targetBox.GetComponent<PassiveButton>();
             button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => NemesisOnClick(pva.PlayerId/*, __instance*/)));
+            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => NemesisOnClick(pva.PlayerId)));
         }
     }
 }
-

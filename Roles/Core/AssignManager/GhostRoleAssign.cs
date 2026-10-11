@@ -1,8 +1,8 @@
 using Hazel;
 using System.Text;
-using TOHE.Patches;
+using BHR.Patches;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace BHR.Roles.Core.AssignManager;
 
 public static class GhostRoleAssign
 {

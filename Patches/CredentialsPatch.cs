@@ -1,10 +1,10 @@
 using System.Text;
 using TMPro;
-using TOHE.Modules;
+using BHR.Modules;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
 class PingTrackerUpdatePatch
@@ -146,22 +146,22 @@ class VersionShowerStartPatch
         var buildtype = "";
 
 #if RELEASE
-            Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+            Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>BatmenzDW</color>";
             buildtype = "Release";
 #endif
 
 #if CANARY
         Main.credentialsText += $"\r\n<color=#ffc0cb>Canary:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>BatmenzDW</color>";
         buildtype = "Canary";
 #endif
 
 #if DEBUG
         Main.credentialsText += $"\r\n<color=#ffc0cb>Debug:</color><color=#f34c50>{ThisAssembly.Git.Branch}</color>(<color=#ffc0cb>{ThisAssembly.Git.Commit}</color>)";
-        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>The Enhanced Network</color>";
+        Main.credentialsText += $"\r\n<color=#a54aff>By <color=#f34c50>BatmenzDW</color>";
         buildtype = "Debug";
 #endif
-        Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "TOHE version");
+        Logger.Info($"v{Main.PluginVersion}, {buildtype}:{ThisAssembly.Git.Branch}:({ThisAssembly.Git.Commit}), link [{ThisAssembly.Git.RepositoryUrl}], dirty: [{ThisAssembly.Git.IsDirty}]", "BHR version");
 
         if (Main.IsAprilFools)
             Main.credentialsText = $"<color=#00bfff>Town Of Host</color> v11.45.14";
@@ -180,9 +180,9 @@ class VersionShowerStartPatch
 
         VersionChecker.Check();
 
-        if (SpecialEventText == null && MainMenuManagerStartPatch.ToheLogo != null)
+        if (SpecialEventText == null && MainMenuManagerStartPatch.BHRLogo != null)
         {
-            SpecialEventText = Object.Instantiate(__instance.text, MainMenuManagerStartPatch.ToheLogo.transform);
+            SpecialEventText = Object.Instantiate(__instance.text, MainMenuManagerStartPatch.BHRLogo.transform);
             SpecialEventText.name = "SpecialEventText";
             SpecialEventText.text = "";
             SpecialEventText.color = Color.white;

@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using System.Collections;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Car : RoleBase
 {

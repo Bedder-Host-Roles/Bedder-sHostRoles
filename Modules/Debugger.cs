@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using TOHE.Modules;
-using TOHE.Patches;
+using BHR.Modules;
+using BHR.Patches;
 using UnityEngine;
 using LogLevel = BepInEx.Logging.LogLevel;
 
-namespace TOHE;
+namespace BHR;
 
 class Webhook
 {
@@ -19,7 +19,7 @@ class Webhook
         Dictionary<string, string> strs = new()
         {
             { "content", text },
-            { "username", "TOHE-Debugger" },
+            { "username", "BHR-Debugger" },
             { "avatar_url", "https://npm.elemecdn.com/hexo-static@1.0.1/img/avatar.webp" }
         };
         TaskAwaiter<HttpResponseMessage> awaiter = httpClient.PostAsync(

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Linq.Expressions;
 
-namespace TOHE;
+namespace BHR;
 
 // Credit: https://github.com/dabao40/TheOtherRolesGMIA/blob/main/TheOtherRoles/Utilities/EnumerationHelpers.cs
 

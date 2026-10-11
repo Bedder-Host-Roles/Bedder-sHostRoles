@@ -1,10 +1,10 @@
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Cleanser : RoleBase
 {
@@ -38,7 +38,7 @@ internal class Cleanser : RoleBase
         DidVote = false;
     }
     public static bool CantGetAddon() => !CleansedCanGetAddon.GetBool();
-    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {
         if (DidVote) return true;
         DidVote = true;

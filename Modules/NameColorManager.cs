@@ -1,14 +1,14 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Impostor;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
+using BHR.Roles.Neutral;
 
-namespace TOHE;
+namespace BHR;
 
 public static class NameColorManager
 {
@@ -180,8 +180,7 @@ public static class NameColorManager
     private static void SendRPC(byte seerId, byte targetId = byte.MaxValue, string colorCode = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
-        var msg = new RpcSetNameColorData(PlayerControl.LocalPlayer.NetId, seerId, targetId, colorCode);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        LegacyRpcSenders.SendNameColorData(PlayerControl.LocalPlayer.NetId, seerId, targetId, colorCode);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

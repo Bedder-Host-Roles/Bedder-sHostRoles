@@ -1,11 +1,11 @@
 using System.Text;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Roles.Core;
+using BHR.Roles.Neutral;
+using static BHR.MeetingHudStartPatch;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Forensic : RoleBase
 {

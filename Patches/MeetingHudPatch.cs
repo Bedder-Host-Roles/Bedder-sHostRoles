@@ -4,21 +4,22 @@ using System;
 using System.Text;
 using System.Reflection;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Patches;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Crewmate;
+using BHR.Roles.AddOns.Impostor;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Translator;
+using static BHR.Utils;
+using InnerNet;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.CheckForEndVoting))]
 class CheckForEndVotingPatch
@@ -62,9 +63,15 @@ class CheckForEndVotingPatch
                     }
                 }
 
-                if (Dictator.CheckVotingForTarget(pc, pva) && !Dictator.ChangeCommandToExpel.GetBool())
+                if (pva.DidVote && pva.VotedForId < 253 && pc.IsAlive())
                 {
                     var voteTarget = GetPlayerById(pva.VotedForId);
+                    if (Dictator.CheckVotingForTarget(pc, pva)
+                        && !Dictator.ChangeCommandToExpel.GetBool()
+                        && voteTarget != null
+                        && voteTarget.IsAlive()
+                        && !voteTarget.Data.Disconnected)
+                    {
                     TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
 
                     statesList.Add(new()
@@ -118,14 +125,12 @@ class CheckForEndVotingPatch
                     return true;
                 }
 
-                if (pva.DidVote && pva.VotedForId < 253 && pc.IsAlive())
-                {
-                    var voteTarget = GetPlayerById(pva.VotedForId);
-
                     if (voteTarget == null || !voteTarget.IsAlive() || voteTarget.Data.Disconnected)
                     {
                         SendMessage(GetString("VoteDead"), pc.PlayerId);
-                        __instance.RpcClearVoteDelay(pc.GetClientId());
+                        __instance.UpdateForeground();
+                        // __instance.RpcClearVoteDelay(pc.GetClientId());
+                        __instance.RpcClearVote(pva.PlayerId);
                         Swapper.CheckSwapperTarget(pva.VotedForId);
                         continue;
                     }
@@ -405,10 +410,6 @@ class CheckForEndVotingPatch
                     ConfirmEjections(exiledPlayer, isBlackOut);
                 }
 
-                if (isBlackOut)
-                    __instance.AntiBlackRpcVotingComplete(states, exiledPlayer, tie);
-                else
-                    __instance.RpcVotingComplete(states, exiledPlayer, tie, false, 0);
             }
             else
             {
@@ -417,8 +418,37 @@ class CheckForEndVotingPatch
                     ConfirmEjections(exiledPlayer);
                 }
 
-                __instance.RpcVotingComplete(states, exiledPlayer, tie, false, 0); // Normal processing
             }
+
+            // Vanilla Judge code
+            bool wasOverruled = false;
+            ushort overruleNonce = 0;
+            if (__instance.TryGetWinningOverrule(out JudgeOverrule winningOverrule, out NetworkedPlayerInfo judgePlayerInfo, out NetworkedPlayerInfo overruledPlayerInfo))
+            {
+                wasOverruled = true;
+                overruleNonce = winningOverrule.OverruleNonce;
+
+                if (judgePlayerInfo.GetCustomRole() == CustomRoles.Judge || judgePlayerInfo.GetCustomRole() == CustomRoles.JudgeBHR)
+                {
+                    if (overruledPlayerInfo.Role.TeamType == RoleTeamTypes.Impostor) // Only vanilla impostor, need change code for BHR Impostors
+                    {
+                        exiledPlayer = GameData.Instance.GetPlayerById(winningOverrule.OverruledPlayerId);
+                    }
+                    else
+                    {
+                        exiledPlayer = judgePlayerInfo;
+                    }
+                }
+                else
+                {
+                    Logger.Warn($"JudgeOverrule: Judge {judgePlayerInfo.PlayerName} is not a Judge role, overruled player: {overruledPlayerInfo.PlayerName}", "CheckEndVotingPatch.JudgeOverrule");
+                }
+            }
+
+            if (AntiBlackout.BlackOutIsActive)
+                __instance.AntiBlackRpcVotingComplete(states, exiledPlayer, tie);
+            else
+                __instance.RpcVotingComplete(states, exiledPlayer, tie, wasOverruled, overruleNonce);
 
             CheckForDeathOnExile(PlayerState.DeathReason.Vote, exileId);
 
@@ -719,7 +749,7 @@ class CastVotePatch
         if (target == null && suspectPlayerId < 253)
         {
             SendMessage(GetString("VoteDead"), srcPlayerId);
-            __instance.RpcClearVoteDelay(voter.GetClientId());
+            __instance.RpcClearVoteDelay(voter.PlayerId);
             return false;
         } //Vote a disconnect player
 
@@ -730,7 +760,7 @@ class CastVotePatch
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                __instance.RpcClearVoteDelay(voter.PlayerId);
                 return false;
             }
         }
@@ -761,7 +791,7 @@ class CastVotePatch
                     covenLeader.RpcRemoveAbilityUse();
                 }
 
-            __instance.RpcClearVoteDelay(voter.GetClientId());
+            __instance.RpcClearVoteDelay(voter.PlayerId);
             return false;
         }
         else if (CustomRoles.CovenLeader.RoleExist() && target != voter && CovenLeader.retrainPlayer.ContainsKey(voter.PlayerId) && CovenLeader.retrainPlayer[voter.PlayerId].IsCoven())
@@ -770,7 +800,7 @@ class CastVotePatch
             SendMessage(string.Format(GetString("CovenLeaderDeclineRetrain"), CovenLeader.retrainPlayer[voter.PlayerId].ToColoredString()), CL.PlayerId);
             SendMessage(string.Format(GetString("RetrainDeclineOffer"), CustomRoles.CovenLeader.ToColoredString()), voter.PlayerId);
             CovenLeader.retrainPlayer.Clear();
-            __instance.RpcClearVoteDelay(voter.GetClientId());
+            __instance.RpcClearVoteDelay(voter.PlayerId);
             return false;
         }
 
@@ -785,7 +815,7 @@ class CastVotePatch
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                __instance.RpcClearVoteDelay(voter.PlayerId);
                 return false;
             }
         }
@@ -796,7 +826,7 @@ class CastVotePatch
                 voter.GetRoleClass().HasVoted = true;
                 CovenManager.necroVotes.Add(voter.PlayerId, target.PlayerId);
                 SendMessage(string.Format(GetString("NecronomiconVote"), target.GetRealName()), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                __instance.RpcClearVoteDelay(voter.PlayerId);
                 return false;
             }
         }
@@ -806,7 +836,7 @@ class CastVotePatch
             if (!target.IsAlive() || target.Data.Disconnected)
             {
                 SendMessage(GetString("VoteDead"), srcPlayerId);
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                __instance.RpcClearVoteDelay(voter.PlayerId);
                 Swapper.CheckSwapperTarget(suspectPlayerId);
                 return false;
             }
@@ -816,7 +846,7 @@ class CastVotePatch
             {
                 Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
                 voter.GetRoleClass().HasVoted = true;
-                __instance.RpcClearVoteDelay(voter.GetClientId());
+                __instance.RpcClearVoteDelay(voter.PlayerId);
 
                 // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
                 PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.PlayerId == target.PlayerId);
@@ -831,7 +861,7 @@ class CastVotePatch
                     if (target.Is(CustomRoles.Solsticer))
                     {
                         SendMessage(GetString("ExpelSolsticer"), srcPlayerId);
-                        __instance.RpcClearVoteDelay(voter.GetClientId());
+                        __instance.RpcClearVoteDelay(voter.PlayerId);
                         return false;
                     }
                     break;
@@ -1186,7 +1216,7 @@ class MeetingHudStartPatch
             deathReasonText.transform.transform.SetParent(textTemplate.transform);
             deathReasonText.transform.localPosition = new Vector3(0f, +0.18f, 0f);
             deathReasonText.fontSize = 1.4f;
-            deathReasonText.text = $"『{ColorString(GetRoleColor(CustomRoles.Doctor), GetVitalText(targetId))}』";
+            deathReasonText.text = $"『{ColorString(GetRoleColor(CustomRoles.Doctor), GetVitalsText(targetId))}』";
             deathReasonText.color = Color.white;
             deathReasonText.gameObject.name = "DeathReasonTextMeeting";
             deathReasonText.enableWordWrapping = false;
@@ -1313,7 +1343,19 @@ class MeetingHudStartPatch
         try
         {
             if (AmongUsClient.Instance.AmHost)
+            {
                 NotifyRoleSkillOnMeetingStart();
+
+                if (Options.UseJudgeAbilityAsTrigger.GetBool())
+                {
+                    LateTask.New(() =>
+                    {
+                        if (!MeetingHud.Instance || MeetingHud.Instance.state is MeetingHud.MeetingStates.Results or MeetingHud.MeetingStates.Proceeding) return;
+
+                        Main.EnumerateAlivePlayerControls().DoIf(x => x.UsesJudgeAbilityAsTrigger(), x => x.RpcSetRoleDesync(RoleTypes.Judge, x.OwnerId));
+                    }, 1f, "Set Judge Role For Meeting Use");
+                }
+            }
         }
         catch (Exception error)
         {
@@ -1551,6 +1593,16 @@ class MeetingHudOnDestroyPatch
 
             Main.LastVotedPlayerInfo = null;
             EAC.ReportTimes = [];
+
+            if (!AntiBlackout.SkipTasks)
+            {
+                if (Options.UseJudgeAbilityAsTrigger.GetBool())
+                {
+                    foreach (PlayerControl pc in Main.AllAlivePlayerControls)
+                        if (pc.UsesJudgeAbilityAsTrigger())
+                            pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.OwnerId);
+                }
+            }
         }
     }
 }
@@ -1565,13 +1617,15 @@ class MeetingHudRpcClosePatch
         // On official/vanilla servers, let Among Us send its
         // normal RpcClose message. Do not construct a custom
         // CloseMeeting RPC, as the vanilla server may flag it.
-        if (Main.CurrentServerIsVanilla)
+        if (Main.CurrentServerIsVanilla || GameStates.IsVanillaServer)
         {
             return true;
         }
 
         // Send SetName rpc together with Close rpc
-        if (Options.CurrentGameMode is CustomGameMode.Standard)
+        // Official/vanilla regionsuse default ejection screen modded uses custom
+        if (Options.CurrentGameMode is CustomGameMode.Standard
+            && !GameStates.IsVanillaServer)
         {
             if (AmongUsClient.Instance.AmClient)
             {
@@ -1624,34 +1678,50 @@ class MeetingHudHandleRpcPatch
 {
     public static bool Prefix(MeetingHud __instance, [HarmonyArgument(0)] byte callId, [HarmonyArgument(1)] MessageReader reader)
     {
-        if (callId == (byte)RpcCalls.CloseMeeting)
+        switch (callId)
         {
-            if (AmongUsClient.Instance.AmHost)
+            case (byte)RpcCalls.QueueOverruleVotes:
             {
-                EAC.WarnHost(4);
-                Logger.Warn("MeetingHud.HandleRpc CloseMeeting is being called, impossible to receive as host.", "MeetingHudHandleRpcPatch");
-                return false;
+                byte judgePlayerId = reader.ReadByte();
+                byte targetPlayerId = reader.ReadByte();
+
+                PlayerControl judge = judgePlayerId.GetPlayer();
+                PlayerControl target = targetPlayerId.GetPlayer();
+
+                if (judge && target && judge.UsesJudgeAbilityAsTrigger() && Main.PlayerStates.TryGetValue(judgePlayerId, out PlayerState state))
+                    return !state.RoleClass.OnJudge(judge, target);
+                break;
             }
-            else
+            case (byte)RpcCalls.CloseMeeting:
             {
-                Logger.Info("Received Close Meeting Rpc", "MeetingHudHandleRpcPatch");
-
-                if (reader.BytesRemaining > 6)
+                if (AmongUsClient.Instance.AmHost)
                 {
-                    try
-                    {
-                        var temp = reader.ReadString();
+                    EAC.WarnHost(4);
+                    Logger.Warn("MeetingHud.HandleRpc CloseMeeting is being called, impossible to receive as host.", "MeetingHudHandleRpcPatch");
+                    return false;
+                }
+                else
+                {
+                    Logger.Info("Received Close Meeting Rpc", "MeetingHudHandleRpcPatch");
 
-                        if (temp.Contains("<size"))
+                    if (reader.BytesRemaining > 6)
+                    {
+                        try
                         {
-                            Logger.Info($"Read Name From Rpc: {temp}", "MeetingHudHandleRpcPatch");
-                            CheckForEndVotingPatch.TempExileMsg = temp;
+                            var temp = reader.ReadString();
+
+                            if (temp.Contains("<size"))
+                            {
+                                Logger.Info($"Read Name From Rpc: {temp}", "MeetingHudHandleRpcPatch");
+                                CheckForEndVotingPatch.TempExileMsg = temp;
+                            }
+                        }
+                        catch
+                        {
                         }
                     }
-                    catch
-                    {
-                    }
                 }
+                break;
             }
         }
 

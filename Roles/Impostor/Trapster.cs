@@ -1,4 +1,4 @@
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Trapster : RoleBase
 {

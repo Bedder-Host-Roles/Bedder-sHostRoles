@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Translator;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using static BHR.MeetingHudStartPatch;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Blackmailer : RoleBase
 {
@@ -59,7 +59,7 @@ internal class Blackmailer : RoleBase
         if (!AmongUsClient.Instance.AmHost) return;
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(target);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

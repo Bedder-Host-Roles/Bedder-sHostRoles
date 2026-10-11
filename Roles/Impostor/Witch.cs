@@ -1,11 +1,11 @@
 using Hazel;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Witch : RoleBase
 {
@@ -64,13 +64,11 @@ internal class Witch : RoleBase
     {
         if (doSpell)
         {
-            var msg = new RpcDoSpell(PlayerControl.LocalPlayer.NetId, witchId, target);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendDoSpell(PlayerControl.LocalPlayer.NetId, witchId, target);
         }
         else
         {
-            var msg = new RpcSetKillOrSpell(PlayerControl.LocalPlayer.NetId, witchId, SpellMode[witchId]);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendSetKillOrSpell(PlayerControl.LocalPlayer.NetId, witchId, SpellMode[witchId]);
         }
     }
     public static void ReceiveRPC(MessageReader reader, bool doSpell)

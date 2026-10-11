@@ -1,12 +1,12 @@
 using Hazel;
 using System.Text;
-using TOHE.Modules.Rpc;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class PotionMaster : CovenManager
 {
@@ -77,7 +77,7 @@ internal class PotionMaster : CovenManager
         writer.Write(target.PlayerId);
         if (typeId == 0) writer.Write(RevealLimit[player.PlayerId]);
         else if (typeId == 1) writer.Write(BarrierLimit[player.PlayerId]);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Arsonist : RoleBase
 {
@@ -65,8 +65,7 @@ internal class Arsonist : RoleBase
         }
         else
         {
-            var msg = new RpcSetCurrentDousingTarget(PlayerControl.LocalPlayer.NetId, arsonistId, targetId);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendSetCurrentDousingTarget(PlayerControl.LocalPlayer.NetId, arsonistId, targetId);
         }
     }
     public static void ReceiveCurrentDousingTargetRPC(MessageReader reader)
@@ -80,8 +79,7 @@ internal class Arsonist : RoleBase
 
     private static void SendSetDousedPlayerRPC(PlayerControl player, PlayerControl target, bool isDoused)
     {
-        var msg = new RpcSetDousedPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isDoused);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetDousedPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isDoused);
     }
     public static void ReceiveSetDousedPlayerRPC(MessageReader reader)
     {

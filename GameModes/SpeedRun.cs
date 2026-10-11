@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE;
+namespace BHR;
 
 public static class SpeedRun
 {
@@ -179,8 +179,7 @@ public static class SpeedRun
                     writer.Write(false);
                 }
 
-                var sender = new RpcSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer);
-                RpcUtils.LateSpecificSendMessage(sender, player.OwnerId);
+                LegacyRpcSenders.SendSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer, player.OwnerId);
             }
 
             return;
@@ -208,8 +207,7 @@ public static class SpeedRun
                     writer.Write(false);
                 }
             }
-            var sender = new RpcSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer);
-            RpcUtils.LateBroadcastReliableMessage(sender);
+            LegacyRpcSenders.SendSyncSpeedRunStates(PlayerControl.LocalPlayer.NetId, writer);
         }
     }
 
@@ -467,7 +465,7 @@ public class Runner : RoleBase
         writer.Write(SpeedBoostState.Item2);
         writer.Write((byte)LastTaskCount.Item1);
         writer.Write((byte)LastTaskCount.Item2);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)

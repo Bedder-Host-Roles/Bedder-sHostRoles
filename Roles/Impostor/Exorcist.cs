@@ -1,13 +1,13 @@
 using Hazel;
 using TMPro;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Exorcist : RoleBase
 {
@@ -236,8 +236,7 @@ internal class Exorcist : RoleBase
 
     private static void SendExorcismRPC(byte exorcistId)
     {
-        var msg = new RpcExorcistExorcise(PlayerControl.LocalPlayer.NetId, exorcistId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendExorcistExorcise(PlayerControl.LocalPlayer.NetId, exorcistId);
     }
 
     public static void ReceiveRPC_Custom(MessageReader reader, PlayerControl pc)

@@ -5,12 +5,12 @@ using System.Text.Json;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using UnityEngine;
 
-namespace TOHE.Modules;
+namespace BHR.Modules;
 
 public static class OptionCopier
 {
     [Obfuscation(Exclude = true)]
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new("./TOHE-DATA/Presets/");
+    private static readonly DirectoryInfo SaveDataDirectoryInfo = new("./BHR-DATA/Presets/");
 
     private static FileInfo OptionCopierFileInfo(string fileName) => new($"{SaveDataDirectoryInfo.FullName}/{(fileName.EndsWith(".preset") ? fileName : fileName + ".preset")}");
 

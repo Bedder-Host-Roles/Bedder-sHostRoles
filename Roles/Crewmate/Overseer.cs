@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using InnerNet;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Neutral;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Overseer : RoleBase
 {
@@ -63,7 +63,7 @@ internal class Overseer : RoleBase
         CustomRoles.Oracle,
         CustomRoles.Tracefinder,
   //      CustomRoles.Glitch,
-        CustomRoles.Judge,
+        CustomRoles.Prosecutor,
         CustomRoles.Mortician,
         CustomRoles.Medium,
         CustomRoles.Observer,
@@ -109,8 +109,7 @@ internal class Overseer : RoleBase
 
     private static void SendTimerRPC(byte RpcType, byte overseertId, PlayerControl target = null, float timer = 0)
     {
-        var msg = new RpcSetOverseerTimer(PlayerControl.LocalPlayer.NetId, RpcType, overseertId, target, timer);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetOverseerTimer(PlayerControl.LocalPlayer.NetId, RpcType, overseertId, target, timer);
     }
     public static void ReceiveTimerRPC(MessageReader reader)
     {
@@ -134,8 +133,7 @@ internal class Overseer : RoleBase
     }
     private static void SetRevealPlayerRPC(PlayerControl player, PlayerControl target, bool isRevealed)
     {
-        var msg = new RpcSetOverseerRevealedPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isRevealed);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetOverseerRevealedPlayer(PlayerControl.LocalPlayer.NetId, player.PlayerId, target.PlayerId, isRevealed);
     }
     public static void ReceiveSetRevealedPlayerRPC(MessageReader reader)
     {

@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using BHR.Roles.Core;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Pitfall : RoleBase
 {

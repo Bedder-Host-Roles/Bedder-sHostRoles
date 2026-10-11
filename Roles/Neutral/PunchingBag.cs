@@ -1,11 +1,11 @@
 using System.Text;
-using TOHE.Modules;
+using BHR.Modules;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class PunchingBag : RoleBase
 {

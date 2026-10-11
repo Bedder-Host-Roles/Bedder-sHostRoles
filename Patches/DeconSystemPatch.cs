@@ -1,4 +1,4 @@
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 [HarmonyPatch(typeof(DeconSystem), nameof(DeconSystem.UpdateSystem))]
 public static class DeconSystemUpdateSystemPatch

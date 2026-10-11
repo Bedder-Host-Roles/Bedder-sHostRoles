@@ -1,5 +1,5 @@
 
-namespace TOHE;
+namespace BHR;
 
 public class MultipleStringOptionItem(int startId, int maxCount, int startingCount, string nameKey, string[] selections, int defaultIndex, TabGroup tab, bool isSingleValue, bool vanillaText, bool useGetString)
 {

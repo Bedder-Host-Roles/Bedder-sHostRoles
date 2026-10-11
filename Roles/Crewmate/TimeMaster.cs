@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using System;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class TimeMaster : RoleBase
 {

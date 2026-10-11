@@ -1,13 +1,13 @@
 using System;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using BHR.Modules;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Neutral;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class FortuneTeller : RoleBase
 {
@@ -47,7 +47,7 @@ internal class FortuneTeller : RoleBase
     {
         return roles != null ? string.Join("\n", roles.Select(role => $"    ★ {GetRoleName(role)}")) : "";
     }
-    public override bool CheckVote(PlayerControl player, PlayerControl target)
+    public override bool OnJudge(PlayerControl player, PlayerControl target)
     {
         if (player == null || target == null) return true;
         if (didVote.Contains(player.PlayerId)) return true;

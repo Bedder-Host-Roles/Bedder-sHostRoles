@@ -1,7 +1,7 @@
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [Obfuscation(Exclude = true, Feature = "renaming", ApplyToMembers = true)]
 public class ErrorText : MonoBehaviour

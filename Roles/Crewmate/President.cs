@@ -1,12 +1,12 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class President : RoleBase
 {
@@ -135,12 +135,10 @@ internal class President : RoleBase
 
         if (!isEnd)
         {
-            var msg1 = new RpcPresidentReveal(PlayerControl.LocalPlayer.NetId, playerId, CheckPresidentReveal[playerId]);
-            RpcUtils.LateBroadcastReliableMessage(msg1);
+            RoleRpcs.SendPresidentReveal(PlayerControl.LocalPlayer.NetId, playerId, CheckPresidentReveal[playerId]);
             return;
         }
-        var msg2 = new RpcPresidentEnd(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg2);
+        RoleRpcs.SendPresidentEnd(PlayerControl.LocalPlayer.NetId, playerId);
     }
     public static void ReceiveRPC(MessageReader reader, PlayerControl pc, bool isEnd = true)
     {
@@ -151,7 +149,6 @@ internal class President : RoleBase
             CheckPresidentReveal[PlayerId] = revealed;
             return;
         }
-        // FinishCommand(pc, "Command.Finish", "/finish", []);
     }
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {

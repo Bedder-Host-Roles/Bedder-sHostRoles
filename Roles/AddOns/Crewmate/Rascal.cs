@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Crewmate;
+namespace BHR.Roles.AddOns.Crewmate;
 
 public class Rascal : IAddon
 {

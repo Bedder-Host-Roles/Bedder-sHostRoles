@@ -3,7 +3,7 @@ using Discord;
 using InnerNet;
 using System;
 
-namespace TOHE.Patches
+namespace BHR.Patches
 {
     // Originally from Town of Us Rewritten, by Det
     [HarmonyPatch(typeof(ActivityManager), nameof(ActivityManager.UpdateActivity))]
@@ -15,13 +15,13 @@ namespace TOHE.Patches
         {
             if (activity == null) return;
 
-            var details = $"TOHE v{Main.PluginDisplayVersion}";
+            var details = $"BHR v{Main.PluginDisplayVersion}";
             activity.Details = details;
 
             activity.Assets = new ActivityAssets
             {
-                LargeImage = "https://tohe.weareten.ca/logo.png",
-                SmallImage = "https://tohe.weareten.ca/logo.png"
+                LargeImage = "",
+                SmallImage = ""
             };
 
             try
@@ -40,10 +40,10 @@ namespace TOHE.Patches
                         if (lobbycode != "" && region != "")
                         {
                             if (GameStates.IsNormalGame)
-                                details = $"TOHE - {lobbycode} ({region})";
+                                details = $"BHR - {lobbycode} ({region})";
 
                             else if (GameStates.IsHideNSeek)
-                                details = $"TOHE Hide & Seek - {lobbycode} ({region})";
+                                details = $"BHR Hide & Seek - {lobbycode} ({region})";
                         }
 
                         activity.Details = details;
@@ -51,12 +51,12 @@ namespace TOHE.Patches
                     else
                     {
                         if (GameStates.IsNormalGame)
-                            details = $"TOHE v{Main.PluginDisplayVersion}";
+                            details = $"BHR v{Main.PluginDisplayVersion}";
 
                         else if (GameStates.IsHideNSeek)
-                            details = $"TOHE v{Main.PluginDisplayVersion} - Hide & Seek";
+                            details = $"BHR v{Main.PluginDisplayVersion} - Hide & Seek";
 
-                        else details = $"TOHE v{Main.PluginDisplayVersion}";
+                        else details = $"BHR v{Main.PluginDisplayVersion}";
 
                         activity.Details = details;
                     }
@@ -67,7 +67,7 @@ namespace TOHE.Patches
             {
                 Logger.Error("Error in updating discord rpc", "DiscordPatch");
                 Logger.Exception(ex, "DiscordPatch");
-                details = $"TOHE v{Main.PluginDisplayVersion}";
+                details = $"BHR v{Main.PluginDisplayVersion}";
                 activity.Details = details;
             }
         }

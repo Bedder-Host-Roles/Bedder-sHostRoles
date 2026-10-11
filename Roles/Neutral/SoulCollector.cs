@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class SoulCollector : RoleBase
 {
@@ -57,7 +57,7 @@ internal class SoulCollector : RoleBase
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(TargetId);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

@@ -1,23 +1,28 @@
 using System;
 using InnerNet;
 using TMPro;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using BHR.Test;
 using UnityEngine;
-using static TOHE.Translator;
-   using TOHE.Patches; // Corrected namespace import
+using static BHR.Translator;
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 // Credit: EHR
 [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.FixedUpdate))]
 public static class FixedUpdatePatch
 {
     private static int NonLowLoadPlayerIndex;
+    
+    [HarmonyPostfix]
     public static void Postfix()
     {
         try
         {
+            ExperimentManager.OnFixedUpdate(Time.fixedDeltaTime);
+
             KickNotJoinedPlayers();
 
             var amongUsClient = AmongUsClient.Instance;
@@ -54,6 +59,9 @@ public static class FixedUpdatePatch
             //         EAC.TimeSinceLastTaskCompletion[key] += Time.fixedDeltaTime;
             // }
             // catch (Exception e) { Utils.ThrowException(e); }
+
+            try { DataFlagRateLimiter.OnFixedUpdate(); }
+            catch (Exception e) { Utils.ThrowException(e); }
 
             if (!PlayerControl.LocalPlayer) return;
 
@@ -217,7 +225,6 @@ public static class FixedUpdatePatch
 
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
-        //Õúüµè£Òüæ
         if (Input.GetKeyDown(KeyCode.LeftControl))
         {
             if ((!AmongUsClient.Instance.IsGameStarted || !GameStates.IsOnlineGame)
@@ -226,7 +233,6 @@ public static class FixedUpdatePatch
                 player.Collider.offset = new Vector2(0f, 127f);
             }
         }
-        //Õúüµè£Òüæ×ğúÚÖñ
         if (player.Collider.offset.y == 127f)
         {
             if (!Input.GetKey(KeyCode.LeftControl) || (AmongUsClient.Instance.IsGameStarted && GameStates.IsOnlineGame))
@@ -307,16 +313,16 @@ public static class FixedUpdatePatch
                     killButtonStateCache[player.PlayerId] = state;
                 }
                 
-                if (player.CanUseKillButton())
-                {
-                    __instance.KillButton.ToggleVisible(player.IsAlive() && GameStates.IsInTask);
-                    player.Data.Role.CanUseKillButton = true;
-                }
-                else
-                {
-                    __instance.KillButton.SetDisabled();
-                    __instance.KillButton.ToggleVisible(false);
-                }
+                // if (player.CanUseKillButton())
+                // {
+                //     __instance.KillButton.ToggleVisible(player.IsAlive() && GameStates.IsInTask);
+                //     player.Data.Role.CanUseKillButton = true;
+                // }
+                // else
+                // {
+                //     __instance.KillButton.SetDisabled();
+                //     __instance.KillButton.ToggleVisible(false);
+                // }
 
                 __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
                 player.Data.Role.CanVent = player.CanUseVents();

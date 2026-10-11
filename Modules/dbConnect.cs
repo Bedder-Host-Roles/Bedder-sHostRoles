@@ -3,17 +3,17 @@ using System;
 using System.IO;
 using System.Text.Json;
 using UnityEngine.Networking;
-using static TOHE.Translator;
+using static BHR.Translator;
 using IEnumerator = System.Collections.IEnumerator;
 
-namespace TOHE;
+namespace BHR;
 
 public class dbConnect
 {
     private static bool InitOnce = false;
     private static Dictionary<string, string> UserType = [];
 
-    private const string ApiUrl = "https://api.weareten.ca";
+    private const string ApiUrl = "";
     private const string FallBackUrl = "https://tohe.niko233.top"; // Mirror of Enhanced Api
 
     public static IEnumerator Init()
@@ -65,14 +65,14 @@ public class dbConnect
             shouldDisconnect = false;
 
             // Show waring message
-            if (GameStates.IsLobby || GameStates.IsInGame)
-            {
-                DestroyableSingleton<HudManager>.Instance.ShowPopUp(GetString("dbConnect.InitFailurePublic"));
-            }
-            else
-            {
-                DestroyableSingleton<DisconnectPopup>.Instance.ShowCustom(GetString("dbConnect.InitFailurePublic"));
-            }
+            // if (GameStates.IsLobby || GameStates.IsInGame)
+            // {
+            //     DestroyableSingleton<HudManager>.Instance.ShowPopUp(GetString("dbConnect.InitFailurePublic"));
+            // }
+            // else
+            // {
+            //     DestroyableSingleton<DisconnectPopup>.Instance.ShowCustom(GetString("dbConnect.InitFailurePublic"));
+            // }
         }
         else
         {
@@ -101,7 +101,7 @@ public class dbConnect
         Assembly assembly = Assembly.GetExecutingAssembly();
 
         // Specify the full name of the embedded resource
-        string resourceName = "TOHE.token.env";
+        string resourceName = "BHR.token.env";
         /*
          make a token.env file in the root folder and add `API_TOKEN=your_api_token_here`
         for example :- API_TOKEN=1234567890
@@ -257,7 +257,7 @@ public class dbConnect
             yield break;
         }
 
-        string[] apiUrls = { ApiUrl, FallBackUrl };
+        string[] apiUrls = [ApiUrl, FallBackUrl];
         int maxAttempts = !InitOnce ? 4 : 2;
         int attempt = 0;
         bool success = false;

@@ -1,14 +1,14 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.Double;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Romantic : RoleBase
 {
@@ -84,7 +84,7 @@ internal class Romantic : RoleBase
         writer.Write(playerId);
         writer.Write(BetTimes.TryGetValue(playerId, out var times) ? times : 1);
         writer.Write(BetPlayer.TryGetValue(playerId, out var player) ? player : byte.MaxValue);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -380,7 +380,7 @@ internal class VengefulRomantic : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable); //SyncVengefulRomanticTarget
         writer.Write(playerId);
         writer.Write(VengefulTarget.TryGetValue(playerId, out var player) ? player : byte.MaxValue);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

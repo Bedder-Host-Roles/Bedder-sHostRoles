@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Impostor;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Impostor;
 using UnityEngine;
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Crewpostor : RoleBase
 {
@@ -64,8 +64,7 @@ internal class Crewpostor : RoleBase
         }
         else
         {
-            var msg = new RpcSetCrewpostorTasksDone(PlayerControl.LocalPlayer.NetId, cpID, tasksDone);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendSetCrewpostorTasksDone(PlayerControl.LocalPlayer.NetId, cpID, tasksDone);
         }
     }
     public static void ReceiveRPC(MessageReader reader)

@@ -1,8 +1,8 @@
-using TOHE.Roles.AddOns.Common;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Roles.AddOns.Common;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Vigilante : RoleBase
 {

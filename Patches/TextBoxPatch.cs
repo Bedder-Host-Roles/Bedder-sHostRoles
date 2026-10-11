@@ -4,7 +4,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 // Originally code by Gurge44. Reference: https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/TextBoxPatch.cs
 

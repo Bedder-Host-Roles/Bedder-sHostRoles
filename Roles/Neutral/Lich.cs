@@ -1,16 +1,16 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.AddOns.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.AddOns.Common;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.AddOns.Impostor;
+using static BHR.Options;
+using static BHR.Translator;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.AddOns.Common;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Lich : RoleBase
 {
@@ -74,7 +74,7 @@ internal class Lich : RoleBase
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(TargetId);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -155,7 +155,7 @@ internal class Lich : RoleBase
             (LichPlayer.GetRoleClass() as Lich).OnTargetVote();
     }
 
-    public static bool IsCursed(byte playerId) => playerId == TargetId;
+    public static bool TargetIsCursed(byte playerId) => playerId == TargetId;
     public static bool IsCursed(PlayerControl player) => player.PlayerId == TargetId;
     public static bool IsDeceived(PlayerControl seer, PlayerControl target)
     {
@@ -228,7 +228,7 @@ internal class Lich : RoleBase
 
         return true;
     }
-    public static bool IsDeceived(byte seerId, byte targetId)
+    public static bool SeerIsDeceived(byte seerId, byte targetId)
     {
         try
         {

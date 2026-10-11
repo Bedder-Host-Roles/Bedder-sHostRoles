@@ -1,4 +1,4 @@
-﻿namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Vindicator : RoleBase
 {
@@ -36,4 +36,3 @@ internal class Vindicator : RoleBase
     }
     public override int AddRealVotesNum(PlayerVoteArea PVA) => VindicatorAdditionalVote.GetInt();
 }
-

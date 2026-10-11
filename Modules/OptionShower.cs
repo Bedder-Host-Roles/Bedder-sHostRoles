@@ -1,9 +1,9 @@
 using System;
 using System.Text;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [Obfuscation(Exclude = true, Feature = "renaming", ApplyToMembers = true)]
 public class OptionShower : MonoBehaviour
@@ -113,7 +113,7 @@ public class OptionShower : MonoBehaviour
                         // if (kvp.Key is CustomRoles.Lovers) mode = Utils.GetChance(Options.LoverSpawnChances.GetInt());
                         if (kvp.Key.IsAdditionRole() && Options.CustomAdtRoleSpawnRate.ContainsKey(kvp.Key))
                         {
-                            mode = Utils.GetChance(Options.CustomAdtRoleSpawnRate[kvp.Key].GetFloat());
+                            mode = Utils.GetColoredChanceText(Options.CustomAdtRoleSpawnRate[kvp.Key].GetFloat());
 
                         }
                         sb.Append($"{Utils.ColorString(Utils.GetRoleColor(kvp.Key), Utils.GetRoleName(kvp.Key))}: {mode}×{kvp.Key.GetCount()}\n");

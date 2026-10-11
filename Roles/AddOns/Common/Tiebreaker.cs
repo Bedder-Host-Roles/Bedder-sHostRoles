@@ -1,4 +1,4 @@
-﻿namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Tiebreaker : IAddon
 {
@@ -28,4 +28,3 @@ public class Tiebreaker : IAddon
             VoteFor.Add(target.PlayerId);
     }
 }
-

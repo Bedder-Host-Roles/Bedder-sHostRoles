@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(JoinGameButton), nameof(JoinGameButton.OnClick))]
 class JoinGameButtonPatch

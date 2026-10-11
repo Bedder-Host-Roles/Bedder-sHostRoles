@@ -1,18 +1,18 @@
 ﻿using Hazel;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Double;
-using TOHE.Roles.Impostor;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Coven;
+using BHR.Roles.Double;
+using BHR.Roles.Impostor;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Judge : RoleBase
 {
@@ -345,4 +345,3 @@ internal class Judge : RoleBase
         }
     }
 }
-

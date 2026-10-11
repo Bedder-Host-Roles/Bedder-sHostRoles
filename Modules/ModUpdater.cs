@@ -7,20 +7,18 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using TMPro;
-using TOHE.Modules;
+using BHR.Modules;
 using UnityEngine;
 using UnityEngine.Networking;
-using static TOHE.Translator;
+using static BHR.Translator;
 using IEnumerator = System.Collections.IEnumerator;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch]
 public class ModUpdater
 {
-    //private static readonly string URL_2018k = "http://api.tohre.dev";
-    private static readonly string URL_Github = "https://api.github.com/repos/EnhancedNetwork/TownofHost-Enhanced";
-    //public static readonly string downloadTest = "https://github.com/Pietrodjaowjao/TOHEN-Contributions/releases/download/v123123123/TOHE.dll";
+    private static readonly string URL_Github = "https://api.github.com/repos/Bedder-Host-Roles/Bedder-sHostRoles";
     public static bool hasUpdate = false;
     private static bool firstNotify = true;
     public static bool forceUpdate = false;
@@ -82,8 +80,8 @@ public class ModUpdater
     const string MiniRegionInstallPath = "./BepInEx/plugins/Mini.RegionInstall.dll";
 #endif
 
-    const string RegionConfigResource = "TOHE.Resources.at.duikbo.regioninstall.cfg";
-    const string MiniRegionInstallResource = "TOHE.Resources.Mini.RegionInstall.dll";
+    const string RegionConfigResource = "BHR.Resources.at.duikbo.regioninstall.cfg";
+    const string MiniRegionInstallResource = "BHR.Resources.Mini.RegionInstall.dll";
     private static void CheckCustomRegions()
     {
 #if ANDROID
@@ -253,7 +251,7 @@ public class ModUpdater
             for (int i = 0; i < assets.Count; i++)
             {
                 string assetName = assets[i]["name"].ToString();
-                if (assetName.ToLower() == "tohe.dll")
+                if (assetName.ToLower() == "BHR.dll")
                 {
                     downloadUrl = assets[i]["browser_download_url"].ToString();
                     Logger.Info($"Github downloadUrl is set to {downloadUrl}", "CheckRelease");
@@ -301,11 +299,11 @@ public class ModUpdater
             var fileName = Assembly.GetExecutingAssembly().Location;
 #if ANDROID
             if (Directory.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA")) &&
-                File.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "BanWords.txt")))
+                File.Exists(Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "BanWords.txt")))
             {
                 DirectoryInfo di = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOH_DATA"));
 #else
-        if (Directory.Exists("TOH_DATA") && File.Exists(@"./TOHE-DATA/BanWords.txt"))
+        if (Directory.Exists("TOH_DATA") && File.Exists(@"./BHR-DATA/BanWords.txt"))
         {
             DirectoryInfo di = new("TOH_DATA");
 #endif
@@ -342,7 +340,7 @@ public class ModUpdater
     public static void DeleteOldFiles()
     {
         string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        string searchPattern = "TOHE.dll*";
+        string searchPattern = "BHR.dll*";
         string[] files = Directory.GetFiles(path, searchPattern);
         try
         {
@@ -365,7 +363,7 @@ public class ModUpdater
 
     private static async Task DownloadDLLAsync(string url)
     {
-        var savePath = "BepInEx/plugins/TOHE.dll.temp";
+        var savePath = "BepInEx/plugins/BHR.dll.temp";
 
         // Delete the temporary file if it exists
         DeleteOldFiles();

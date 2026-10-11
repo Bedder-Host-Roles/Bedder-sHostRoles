@@ -1,16 +1,16 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 internal class DoubleAgent : RoleBase
 {
     //===========================SETUP================================\\
@@ -46,7 +46,7 @@ internal class DoubleAgent : RoleBase
     [
         0, // NoChange
         0, // Random
-        CustomRoles.ImpostorTOHE, // Team Crewmate
+        CustomRoles.ImpostorBHR, // Team Crewmate
         CustomRoles.Traitor, // Team Neutral
         CustomRoles.Trickster, // Team Impostor as Crewmate
     ];
@@ -121,7 +121,7 @@ internal class DoubleAgent : RoleBase
 
     public override bool CanUseKillButton(PlayerControl pc) => Main.AliveImpostorCount < 2;
 
-    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {
         if (voter.IsModded() || !CanBombInMeeting) return true;
 
@@ -230,8 +230,8 @@ internal class DoubleAgent : RoleBase
                         }
                     }
                 }
-                // If Role is ImpostorTOHE aka Admired Impostor opt give Admired Addon if player dose not already have it.
-                if (Role == CustomRoles.ImpostorTOHE && !player.Is(CustomRoles.Admired) && !player.Is(CustomRoles.Narc))
+                // If Role is ImpostorBHR aka Admired Impostor opt give Admired Addon if player dose not already have it.
+                if (Role == CustomRoles.ImpostorBHR && !player.Is(CustomRoles.Admired) && !player.Is(CustomRoles.Narc))
                     player.GetCustomSubRoles()?.Add(CustomRoles.Admired);
 
                 // If Double Agent is Narc and Role is Traitor,Double Agent turns into Parasite instead
@@ -245,8 +245,8 @@ internal class DoubleAgent : RoleBase
                 player.MarkDirtySettings();
 
                 string RoleName = ColorString(GetRoleColor(player.GetCustomRole()), GetRoleName(player.GetCustomRole()));
-                if (Role == CustomRoles.ImpostorTOHE && !player.Is(CustomRoles.Narc))
-                    RoleName = ColorString(GetRoleColor(CustomRoles.Admired), $"{GetString("Admired-")}{GetString("ImpostorTOHE")}");
+                if (Role == CustomRoles.ImpostorBHR && !player.Is(CustomRoles.Narc))
+                    RoleName = ColorString(GetRoleColor(CustomRoles.Admired), $"{GetString("Admired-")}{GetString("ImpostorBHR")}");
                 if (player.Is(CustomRoles.Narc))
                     RoleName = ColorString(GetRoleColor(CustomRoles.Narc), $"{GetString("Narc-")}{GetString(Role.ToString())}");
                 player.Notify(ColorString(GetRoleColor(player.GetCustomRole()), GetString("DoubleAgentRoleChange") + RoleName));
@@ -300,7 +300,7 @@ internal class DoubleAgent : RoleBase
         writer.Write(addData);
         writer.Write(targetId);
         writer.WritePacked((int)CurrentBombedTime);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     // Receive and set bomb timer from Host when active.
@@ -315,61 +315,7 @@ internal class DoubleAgent : RoleBase
 
         CurrentBombedTime = timer;
     }
-
-    // Use button for Modded!
-    [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.Start))]
-    class StartMeetingPatch
-    {
-        public static void Postfix(MeetingHud __instance)
-        {
-            if (PlayerControl.LocalPlayer.Is(CustomRoles.DoubleAgent) && PlayerControl.LocalPlayer.IsAlive() && CanBombInMeeting && !BombIsActive)
-                CreatePlantBombButton(__instance);
-        }
-    }
-    public static void CreatePlantBombButton(MeetingHud __instance)
-    {
-        foreach (var pva in __instance.playerStates)
-        {
-            var pc = GetPlayerById(pva.PlayerId);
-            if (pc == null || !pc.IsAlive()) continue;
-            if (pc.GetCustomRole().GetCustomRoleTeam() == Custom_Team.Impostor || PlayerControl.LocalPlayer == pc) continue;
-            GameObject template = pva.Buttons.transform.Find("CancelButton").gameObject;
-            GameObject targetBox = UnityEngine.Object.Instantiate(template, pva.transform);
-            targetBox.name = "PlantBombButton";
-            targetBox.transform.localPosition = new Vector3(-0.35f, 0.03f, -1.31f);
-            createdButtonsList.Add(targetBox);
-            SpriteRenderer renderer = targetBox.GetComponent<SpriteRenderer>();
-            renderer.sprite = CustomButton.Get("PocketBomb");
-            PassiveButton button = targetBox.GetComponent<PassiveButton>();
-            button.OnClick.RemoveAllListeners();
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => DestroyButtons(targetBox)));
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => PlantBombOnClick(pva.PlayerId /*, __instance*/)));
-            button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() => CustomSoundsManager.Play("Line")));
-        }
-    }
-
-    private static void PlantBombOnClick(byte targetId /*, MeetingHud __instance*/)
-    {
-        if (BombIsActive) return;
-
-        CurrentBombedTime = -1;
-        CurrentBombedPlayers.Add(targetId);
-        BombIsActive = true;
-    }
-
-    private static void DestroyButtons(GameObject pressedButton)
-    {
-        foreach (var button in createdButtonsList.Where(button => button != pressedButton))
-            UnityEngine.Object.Destroy(button);
-        createdButtonsList.Clear();
-
-        pressedButton.GetComponent<PassiveButton>().enabled = false;
-        Transform highlightTransform = pressedButton.transform.Find("ControllerHighlight");
-        GameObject highlightObject = highlightTransform?.gameObject;
-        highlightObject?.SetActive(false);
-    }
 }
 // FieryFlower was here ඞ
 // Drakos wasn't here, 100% not
 // Niko is here, what dog shxt has you guys code
-

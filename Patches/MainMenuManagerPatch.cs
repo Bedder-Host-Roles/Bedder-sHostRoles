@@ -2,27 +2,27 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static TOHE.Translator;
+using static BHR.Translator;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(MainMenuManager), nameof(MainMenuManager.Start)), HarmonyPriority(Priority.First)]
 public class MainMenuManagerStartPatch
 {
     public static GameObject amongUsLogo;
     public static GameObject Ambience;
-    public static SpriteRenderer ToheLogo { get; private set; }
+    public static SpriteRenderer BHRLogo { get; private set; }
 
     private static void Postfix(MainMenuManager __instance)
     {
         amongUsLogo = GameObject.Find("LOGO-AU");
 
         var rightpanel = __instance.gameModeButtons.transform.parent;
-        var logoObject = new GameObject("titleLogo_TOHE");
+        var logoObject = new GameObject("titleLogo_BHR");
         var logoTransform = logoObject.transform;
 
-        ToheLogo = logoObject.AddComponent<SpriteRenderer>();
+        BHRLogo = logoObject.AddComponent<SpriteRenderer>();
         logoTransform.parent = rightpanel;
         logoTransform.localPosition = new(-0.16f, 0f, 1f);
         logoTransform.localScale *= 1.2f;
@@ -142,10 +142,10 @@ public static class MainMenuManagerPatch
         GameObject splashArt = new("SplashArt");
         splashArt.transform.position = new Vector3(0, 0f, 600f); //= new Vector3(0, 0.40f, 600f);
         var spriteRenderer = splashArt.AddComponent<SpriteRenderer>();
-        string folder = "TOHE.Resources.Background.";
+        string folder = "BHR.Resources.Background.";
         IRandom rand = IRandom.Instance;
-        if (rand.Next(0, 100) < 30) folder += "PrevArtWinner";
-        else folder += "CurrentArtWinner";
+        /*if (rand.Next(0, 100) < 30)*/ folder += "PrevArtWinner";
+        // else folder += "CurrentArtWinner";
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
         string[] fileNames = assembly.GetManifestResourceNames().Where(resourceName => resourceName.StartsWith(folder) && resourceName.EndsWith(".png")).ToArray();
         int choice = rand.Next(0, fileNames.Length);
@@ -294,7 +294,7 @@ public static class MainMenuManagerPatch
 
     public static PassiveButton CreateButton(string name, Vector3 localPosition, Color32 normalColor, Color32 hoverColor, UnityEngine.Events.UnityAction action, string label, Vector2? scale = null)
     {
-        var button = Object.Instantiate(template, MainMenuManagerStartPatch.ToheLogo.transform);
+        var button = Object.Instantiate(template, MainMenuManagerStartPatch.BHRLogo.transform);
         button.name = name;
         Object.Destroy(button.GetComponent<AspectPosition>());
         button.transform.localPosition = localPosition;
@@ -365,11 +365,11 @@ public static class MainMenuManagerPatch
     [HarmonyPostfix]
     public static void OpenMenu_Postfix()
     {
-        if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(false);
+        if (MainMenuManagerStartPatch.BHRLogo != null) MainMenuManagerStartPatch.BHRLogo.gameObject.SetActive(false);
     }
     [HarmonyPatch(nameof(MainMenuManager.ResetScreen)), HarmonyPostfix]
     public static void ResetScreen_Postfix()
     {
-        if (MainMenuManagerStartPatch.ToheLogo != null) MainMenuManagerStartPatch.ToheLogo.gameObject.SetActive(true);
+        if (MainMenuManagerStartPatch.BHRLogo != null) MainMenuManagerStartPatch.BHRLogo.gameObject.SetActive(true);
     }
 }

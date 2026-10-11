@@ -1,4 +1,4 @@
-﻿namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Influenced : IAddon
 {
@@ -58,4 +58,3 @@ public class Influenced : IAddon
         }
     }
 }
-

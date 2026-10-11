@@ -1,17 +1,17 @@
 using AmongUs.GameOptions;
 using System;
 using System.Text;
-using TOHE.Roles.AddOns;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Crewmate;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
-using TOHE.Roles.Vanilla;
+using BHR.Roles.AddOns;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Crewmate;
+using BHR.Roles.AddOns.Impostor;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
+using BHR.Roles.Neutral;
+using BHR.Roles.Vanilla;
 
-namespace TOHE.Roles.Core;
+namespace BHR.Roles.Core;
 
 public static class CustomRoleManager
 {
@@ -119,7 +119,7 @@ public static class CustomRoleManager
 
         player.GetRoleClass()?.ApplyGameOptions(opt, player.PlayerId);
 
-        if (NoisemakerTOHE.HasEnabled) NoisemakerTOHE.ApplyGameOptionsForOthers(player);
+        if (NoisemakerBHR.HasEnabled) NoisemakerBHR.ApplyGameOptionsForOthers(player);
 
         if (DollMaster.HasEnabled && DollMaster.IsDoll(player.PlayerId))
         {

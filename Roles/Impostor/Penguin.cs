@@ -1,14 +1,14 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using TOHE.Roles.Crewmate;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Roles.Crewmate;
+using static BHR.Options;
+using static BHR.Translator;
 
 // https://github.com/tukasa0001/TownOfHost/blob/main/Roles/Impostor/Penguin.cs
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Penguin : RoleBase
 {
@@ -146,7 +146,7 @@ internal class Penguin : RoleBase
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(AbductVictim?.PlayerId ?? 255);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)

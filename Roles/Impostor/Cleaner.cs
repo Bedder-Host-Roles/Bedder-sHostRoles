@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Cleaner : RoleBase
 {

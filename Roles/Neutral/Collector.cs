@@ -1,9 +1,9 @@
 using System.Text;
-using TOHE.Modules;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Roles.Core;
 using UnityEngine;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Collector : RoleBase
 {

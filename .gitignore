@@ -7,9 +7,11 @@
 
 token.env
 FodyWeavers.xsd
-TOHE.sln
+BHR.sln
 .vscode/settings.json
 /token.env
 token.env
 
-BatmenzDWNotes/
+notes.md
+BHR.Tests/obj
+BHR.Tests/bin

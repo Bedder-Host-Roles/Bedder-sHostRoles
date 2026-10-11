@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Diseased : IAddon
 {

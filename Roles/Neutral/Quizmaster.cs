@@ -1,15 +1,15 @@
 using AmongUs.GameOptions;
 using Hazel;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Core;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Core;
+using static BHR.MeetingHudStartPatch;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Quizmaster : RoleBase
 {
@@ -104,7 +104,7 @@ internal class Quizmaster : RoleBase
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(targetId);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -234,7 +234,6 @@ internal class Quizmaster : RoleBase
 
                 new SetAnswersQuestion { Stage = 3, Question = "FactionRemovedName", Answer = "None", PossibleAnswers = { "Sabotuer", "Sorcerers", "Coven", "Killer", "None" }, QuizmasterQuestionType = QuizmasterQuestionType.RemovedFactionQuestion },
                 // ^ I added Coven back so this question no longer applies :) - Marg
-                new SetAnswersQuestion { Stage = 3, Question = "WhatDoesEOgMeansInName", Answer = "Edited", PossibleAnswers = { "Edition", "Experimental", "Enhanced", "Edited" }, QuizmasterQuestionType = QuizmasterQuestionType.NameOriginQuestion },
                 new CountQuestion { Stage = 3, Question = "HowManyDiedFirstRound", QuizmasterQuestionType = QuizmasterQuestionType.DiedFirstRoundCountQuestion },
                 new CountQuestion { Stage = 3, Question = "ButtonPressedBefore", QuizmasterQuestionType = QuizmasterQuestionType.ButtonPressedBeforeThisQuestion },
                 new SetAnswersQuestion { Stage = 3, Question = "WhoOwns", Answer = "ItIsSimonTTV", PossibleAnswers = { "Lauryn", "Jackler", "ItIsSimonTTV", "Marg", "Sarha", "laikrai", "Niko", "D1GQ", "KARPED1EM", "Matt" }, QuizmasterQuestionType = QuizmasterQuestionType.WhoOwns },
@@ -778,8 +777,8 @@ public enum QuizmasterQuestionType
     QuizmasterCooldownQuestion,
     WhoCoded,
     WhoOwns,
-    TOHEPartners,
-    TOHEEventCoordinator,
+    BHRPartners,
+    BHREventCoordinator,
     HowManyCats,
     GuessingCommand,
     NotFromTOS2,

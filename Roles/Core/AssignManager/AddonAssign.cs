@@ -1,8 +1,8 @@
 using System;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Impostor;
 
-namespace TOHE.Roles.Core.AssignManager;
+namespace BHR.Roles.Core.AssignManager;
 
 public static class AddonAssign
 {

@@ -1,14 +1,14 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Double;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.Double;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Puppeteer : RoleBase
 {
@@ -52,8 +52,7 @@ internal class Puppeteer : RoleBase
 
     private static void SendRPC(byte puppetId, byte targetId, byte typeId)
     {
-        var msg = new RpcSyncPuppet(PlayerControl.LocalPlayer.NetId, typeId, puppetId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSyncPuppet(PlayerControl.LocalPlayer.NetId, typeId, puppetId, targetId);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

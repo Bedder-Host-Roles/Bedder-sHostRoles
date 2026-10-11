@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using static TOHE.Options;
-using static TOHE.Utils;
+using BHR.Modules;
+using static BHR.Options;
+using static BHR.Utils;
 
 
-namespace TOHE.Roles._Ghosts_.Impostor;
+namespace BHR.Roles._Ghosts_.Impostor;
 
 internal class Minion : RoleBase
 {
