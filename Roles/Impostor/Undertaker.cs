@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
+using BHR.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Undertaker : RoleBase
 {
@@ -56,8 +56,7 @@ internal class Undertaker : RoleBase
     {
         var xLoc = MarkedLocation[playerId].x;
         var yLoc = MarkedLocation[playerId].y;
-        var msg = new RpcUndertakerLocationSync(PlayerControl.LocalPlayer.NetId, playerId, xLoc, yLoc);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendUndertakerLocationSync(PlayerControl.LocalPlayer.NetId, playerId, xLoc, yLoc);
 
     }
     public static void ReceiveRPC(MessageReader reader)

@@ -5,16 +5,16 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 public static class TemplateManager
 {
 #if ANDROID
-    private static readonly string TEMPLATE_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "template.txt");
+    private static readonly string TEMPLATE_FILE_PATH = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "template.txt");
 #else
-    private static readonly string TEMPLATE_FILE_PATH = "./TOHE-DATA/template.txt";
+    private static readonly string TEMPLATE_FILE_PATH = "./BHR-DATA/template.txt";
 #endif
 
     private static readonly Dictionary<string, Func<string>> _replaceDictionaryNormalOptions = new()
@@ -113,15 +113,15 @@ public static class TemplateManager
             else fileName = "English";
 
 #if ANDROID
-            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA");
-            string defaultTemplatePath = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "Default_Teamplate.txt");
+            string dataDirectory = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA");
+            string defaultTemplatePath = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "Default_Teamplate.txt");
 #else
-        string dataDirectory = @"TOHE-DATA";
-        string defaultTemplatePath = @"./TOHE-DATA/Default_Teamplate.txt";
+        string dataDirectory = @"BHR-DATA";
+        string defaultTemplatePath = @"./BHR-DATA/Default_Teamplate.txt";
 #endif
 
             if (!Directory.Exists(dataDirectory)) Directory.CreateDirectory(dataDirectory);
-            var defaultTemplateMsg = GetResourcesTxt($"TOHE.Resources.Config.template.{fileName}.txt");
+            var defaultTemplateMsg = GetResourcesTxt($"BHR.Resources.Config.template.{fileName}.txt");
 
             if (!File.Exists(defaultTemplatePath))
             {

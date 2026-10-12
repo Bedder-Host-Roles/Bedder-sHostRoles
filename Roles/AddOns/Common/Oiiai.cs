@@ -1,11 +1,11 @@
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Oiiai : IAddon
 {

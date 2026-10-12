@@ -1,12 +1,12 @@
 using Hazel;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Swooper : RoleBase
 {
@@ -51,7 +51,7 @@ internal class Swooper : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(InvisCooldown.GetValueOrDefault(pc.PlayerId, -1).ToString());
         writer.Write(InvisDuration.GetValueOrDefault(pc.PlayerId, -1).ToString());
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

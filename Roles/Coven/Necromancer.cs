@@ -1,12 +1,12 @@
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Neutral;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class Necromancer : CovenManager
 {

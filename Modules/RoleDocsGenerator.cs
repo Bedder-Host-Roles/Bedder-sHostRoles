@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using TOHE.Roles.Core;
+using BHR.Roles.Core;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 public static class RoleDocsGenerator
 {

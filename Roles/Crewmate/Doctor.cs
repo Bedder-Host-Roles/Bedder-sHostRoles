@@ -1,8 +1,8 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Doctor : RoleBase
 {

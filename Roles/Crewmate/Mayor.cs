@@ -1,9 +1,9 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal partial class Mayor : RoleBase
 {
@@ -64,17 +64,12 @@ internal partial class Mayor : RoleBase
         {
             statesList.Add(new MeetingHud.VoterState()
             {
-                VoterId = votedPlayer.TargetPlayerId,
-                VotedForId = votedPlayer.VotedFor
+                VoterId = votedPlayer.PlayerId,
+                VotedForId = votedPlayer.VotedForId
             });
         }
     }
 
-    //public override void OnReportDeadBody(PlayerControl reporter, PlayerControl target)
-    //{
-    //    if (target == null)
-    //        MayorUsedButtonCount[reporter.PlayerId] += 1;
-    //}
     public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
         AURoleOptions.EngineerCooldown =
@@ -120,3 +115,4 @@ internal partial class Mayor : RoleBase
     }
     public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting) => CustomButton.Get("EmergencyButton");
 }
+

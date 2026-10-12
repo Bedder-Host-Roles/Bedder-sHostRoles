@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Neutral;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.Neutral;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Altruist : RoleBase
 {
@@ -66,7 +66,7 @@ internal class Altruist : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(IsRevivingMode);
         writer.Write(RevivedPlayerId);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)

@@ -1,15 +1,15 @@
 using Hazel;
 using System;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Core;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Dictator : RoleBase
 {
@@ -23,15 +23,14 @@ internal class Dictator : RoleBase
     public override void SetupCustomOption()
     {
         SetupRoleOptions(Id, TabGroup.CrewmateRoles, CustomRoles.Dictator);
-        ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", false, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
+        ChangeCommandToExpel = BooleanOptionItem.Create(Id + 10, "DictatorChangeCommandToExpel", true, TabGroup.CrewmateRoles, false).SetParent(Options.CustomRoleSpawnChances[CustomRoles.Dictator]);
     }
 
     public static bool CheckVotingForTarget(PlayerControl pc, PlayerVoteArea pva)
-        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedFor && pva.VotedFor < 253 && !pc.Data.IsDead && pc.IsAlive();
+        => pc.Is(CustomRoles.Dictator) && pva.DidVote && pc.PlayerId != pva.VotedForId && pva.VotedForId < 253 && !pc.Data.IsDead && pc.IsAlive();
 
     public static void ExpelCommand(PlayerControl pc, string commandKey, string msg, string[] args)
     {
-        if (!ChangeCommandToExpel.GetBool()) return;
         if (!AmongUsClient.Instance.AmHost)
         {
             ChatCommands.RequestCommandProcessingFromHost(msg, commandKey);
@@ -42,9 +41,6 @@ internal class Dictator : RoleBase
         if (!pc.IsAlive()) return;
         if (!pc.Is(CustomRoles.Dictator)) return;
 
-        List<MeetingHud.VoterState> statesList = [];
-        MeetingHud.VoterState[] states;
-
         bool isUI = pc.IsModded();
 
         if (args.Length < 2 || !int.TryParse(args[1], out int targetid))
@@ -54,22 +50,30 @@ internal class Dictator : RoleBase
         }
 
         var target = GetPlayerById(targetid);
+        pc.GetRoleClass().OnJudge(pc, target);
+    }
+
+    public override bool OnJudge(PlayerControl pc, PlayerControl target)
+    {
         if (target == pc)
         {
-            pc.ShowInfoMessage(isUI, GetString("DictatorExpelSelf"));
-            return;
+            pc.ShowInfoMessage(pc.IsModded(), GetString("DictatorExpelSelf"));
+            return false;
         }
         if (!target.IsAlive())
         {
-            return;
+            return false;
         }
 
         if (target.Is(CustomRoles.Solsticer))
         {
-            pc.ShowInfoMessage(isUI, GetString("ExpelSolsticer"));
-            MeetingHud.Instance.RpcClearVoteDelay(pc.GetClientId());
-            return;
+            pc.ShowInfoMessage(pc.IsModded(), GetString("ExpelSolsticer"));
+            MeetingHud.Instance.RpcClearVoteDelay(pc.PlayerId);
+            return false;
         }
+
+        List<MeetingHud.VoterState> statesList = [];
+        MeetingHud.VoterState[] states;
 
         statesList.Add(new()
         {
@@ -88,18 +92,18 @@ internal class Dictator : RoleBase
             if (isBlackOut)
                 MeetingHud.Instance.AntiBlackRpcVotingComplete(states, exiled, false);
             else
-                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), exiled, false);
+                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), exiled, false, false, 0);
             if (exiled != null)
             {
                 AntiBlackout.ShowExiledInfo = isBlackOut;
                 CheckForEndVotingPatch.ConfirmEjections(exiled, isBlackOut);
-                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true);
+                MeetingHud.Instance.RpcVotingComplete(statesList.ToArray(), null, true, false, 0);
                 MeetingHud.Instance.RpcClose();
             }
         }
         else
         {
-            MeetingHud.Instance.RpcVotingComplete(states, exiled, false);
+            MeetingHud.Instance.RpcVotingComplete(states, exiled, false, false, 0);
 
             if (exiled != null)
             {
@@ -114,6 +118,8 @@ internal class Dictator : RoleBase
         Logger.Info("Dictatorial vote, forced closure of the meeting", "Special Phase");
 
         target.SetRealKiller(pc);
+
+        return true;
     }
     
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
@@ -121,8 +127,7 @@ internal class Dictator : RoleBase
 
     private static void SendDictatorRPC(byte playerId)
     {
-        var msg = new RpcDictator(PlayerControl.LocalPlayer.NetId, playerId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendDictator(PlayerControl.LocalPlayer.NetId, playerId);
     }
 
     public static void OnReceiveDictatorRPC(MessageReader reader, PlayerControl pc)
@@ -176,7 +181,7 @@ internal class Dictator : RoleBase
         {
             if (pva.transform.Find("DictatorButton") != null) UnityEngine.Object.Destroy(pva.transform.Find("DictatorButton").gameObject);
 
-            var pc = pva.TargetPlayerId.GetPlayer();
+            var pc = ((byte)pva.PlayerId).GetPlayer();
             var local = PlayerControl.LocalPlayer;
             if (pc == null || !pc.IsAlive()) continue;
 
@@ -191,7 +196,7 @@ internal class Dictator : RoleBase
             button.OnClick.RemoveAllListeners();
             button.OnClick.AddListener((UnityEngine.Events.UnityAction)(() =>
             {
-                DictatorOnClick(pva.TargetPlayerId, __instance);
+                DictatorOnClick(pva.PlayerId, __instance);
             }));
         }
     }

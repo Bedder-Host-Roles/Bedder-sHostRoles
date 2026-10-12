@@ -1,8 +1,8 @@
-using TOHE.Modules;
-using static TOHE.Options;
-using static TOHE.Utils;
+using BHR.Modules;
+using static BHR.Options;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Transporter : RoleBase
 {

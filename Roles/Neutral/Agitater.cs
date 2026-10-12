@@ -1,11 +1,11 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 internal class Agitater : RoleBase
 {
     //===========================SETUP================================\\
@@ -199,7 +199,7 @@ internal class Agitater : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(newbomb);
         writer.Write(oldbomb);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
 
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)

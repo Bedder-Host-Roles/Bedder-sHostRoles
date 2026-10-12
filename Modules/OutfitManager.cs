@@ -1,7 +1,7 @@
 using AmongUs.InnerNet.GameDataMessages;
-using TOHE.Modules.Rpc;
+using BHR.Modules.Rpc;
 
-namespace TOHE.Modules;
+namespace BHR.Modules;
 
 public static class OutfitManager
 {
@@ -35,8 +35,7 @@ public static class OutfitManager
                 RpcUtils.LateBroadcastReliableMessage(setLevel);
             }
 
-            var setOutfit = new RpcSetOutfit(player.NetId, player.Data.NetId, Outfit, true, setNamePlate);
-            RpcUtils.LateBroadcastReliableMessage(setOutfit);
+            LegacyRpcSenders.SendSetOutfit(player.NetId, player.Data.NetId, Outfit, true, setNamePlate);
 
             //cannot use currentoutfit type because of mushroom mixup . .
             var OutfitTypeSet = player.CurrentOutfitType != PlayerOutfitType.Shapeshifted ? PlayerOutfitType.Default : PlayerOutfitType.Shapeshifted;
@@ -85,7 +84,6 @@ public static class OutfitManager
             RpcUtils.LateBroadcastReliableMessage(setLevel);
         }
 
-        var setOutfit = new RpcSetOutfit(player.NetId, player.Data.NetId, newOutfit, setName, setNamePlate);
-        RpcUtils.LateBroadcastReliableMessage(setOutfit);
+        LegacyRpcSenders.SendSetOutfit(player.NetId, player.Data.NetId, newOutfit, setName, setNamePlate);
     }
 }

@@ -1,13 +1,13 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class HexMaster : CovenManager
 {
@@ -82,8 +82,7 @@ internal class HexMaster : CovenManager
     {
         if (regularHex)
         {
-            var msg = new RpcDoHex(PlayerControl.LocalPlayer.NetId, hexId, target);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            RoleRpcs.SendDoHex(PlayerControl.LocalPlayer.NetId, hexId, target);
         }
         else
         {
@@ -93,7 +92,7 @@ internal class HexMaster : CovenManager
             var writer = MessageWriter.Get(SendOption.Reliable);
             writer.Write(newHex);
             writer.Write(oldHex);
-            RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, player.NetId, writer));
+            LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, player.NetId, writer);
         }
     }
     public static void ReceiveRPC(MessageReader reader, bool regularHex)

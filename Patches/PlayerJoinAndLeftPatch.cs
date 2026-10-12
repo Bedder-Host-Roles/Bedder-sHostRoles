@@ -1,21 +1,22 @@
-using AmongUs.Data;
+﻿using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
 using InnerNet;
 using System;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core.AssignManager;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Neutral;
+using BHR.Test;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
 internal static class OnGameJoinedPatch
@@ -88,8 +89,8 @@ internal static class OnGameJoinedPatch
                     if (AURoleOptions.GuardianAngelCooldown == 0f)
                         AURoleOptions.GuardianAngelCooldown = Main.LastGuardianAngelCooldown.Value;
 
-                    // If custom Gamemode is HideNSeekTOHE in normal game, set Standard
-                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is HideNSeekBHR in normal game, set Standard
+                    if (Options.CurrentGameMode == CustomGameMode.HidenSeekBHR)
                     {
                         // Select Standard
                         Options.GameMode.SetValue(0);
@@ -100,10 +101,10 @@ internal static class OnGameJoinedPatch
                 case GameModes.HideNSeek:
                     Logger.Info(" Is Hide & Seek", "Game Mode");
 
-                    // If custom Gamemode is Standard/FFA/Speedrun in H&S game, set HideNSeekTOHE
-                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekTOHE)
+                    // If custom Gamemode is Standard/FFA/Speedrun in H&S game, set HideNSeekBHR
+                    if (Options.CurrentGameMode != CustomGameMode.HidenSeekBHR)
                     {
-                        // Select HideNSeekTOHE
+                        // Select HideNSeekBHR
                         Options.GameMode.SetValue(3);
                     }
                     break;
@@ -176,6 +177,19 @@ class DisconnectInternalPatch
         GameStates.InGame = false;
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
+
+        if (reason == DisconnectReasons.Kicked)
+        {
+            ExperimentManager.OnKicked();
+        }
+        else if (reason == DisconnectReasons.ClientTimeout)
+        {
+            ExperimentManager.OnTimedOut();
+        }
+        else
+        {
+            ExperimentManager.OnDisconnected();
+        }
     }
 }
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnPlayerJoined))]
@@ -624,7 +638,7 @@ class OnPlayerLeftPatch
                     Swapper.CheckSwapperTarget(data.Character.PlayerId);
 
                     // Prevent double check end voting
-                    if (MeetingHud.Instance.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                    if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance.CheckForEndVoting();
                     }
@@ -687,8 +701,7 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
-                RpcUtils.LateSpecificSendMessage(message, client.Id);
+                LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame && !client.Character.IsHost())
@@ -816,8 +829,7 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                var message = new RpcRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId);
-                RpcUtils.LateSpecificSendMessage(message, client.Id);
+                LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame)
@@ -829,14 +841,12 @@ class InnerNetClientSpawnPatch
                         // Only for vanilla
                         if (!client.Character.IsModded())
                         {
-                            var message = new RpcSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false);
-                            RpcUtils.LateSpecificSendMessage(message, client.Id);
+                            LegacyRpcSenders.SendSyncLobbyTimerVanilla(LobbyBehaviour.Instance.NetId, (int)GameStartManagerPatch.timer, false, client.Id);
                         }
                         // Non-host modded client
                         else if (client.Character.IsNonHostModdedClient())
                         {
-                            var message = new RpcSyncLobbyTimerModded(PlayerControl.LocalPlayer.NetId, (int)GameStartManagerPatch.timer);
-                            RpcUtils.LateBroadcastReliableMessage(message);
+                            LegacyRpcSenders.SendSyncLobbyTimerModded(PlayerControl.LocalPlayer.NetId, (int)GameStartManagerPatch.timer);
                         }
                     }
                 }, 3.1f, "Send RPC or Sync Lobby Timer");
@@ -905,3 +915,4 @@ class InnerNetClientSpawnPatch
         }
     }
 }
+

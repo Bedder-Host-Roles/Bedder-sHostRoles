@@ -1,14 +1,14 @@
 using Hazel;
 using System;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Keeper : RoleBase
 {
@@ -64,8 +64,7 @@ internal class Keeper : RoleBase
 
     private static void SendRPC(int type, byte keeperId = 0xff, byte targetId = 0xff)
     {
-        var msg = new RpcKeeper(PlayerControl.LocalPlayer.NetId, type, keeperId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendKeeper(PlayerControl.LocalPlayer.NetId, type, keeperId, targetId);
     }
 
     public static void ReceiveRPC(MessageReader reader)
@@ -90,7 +89,7 @@ internal class Keeper : RoleBase
     }
 
 
-    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {
         if (!CustomRoles.Keeper.HasEnabled()) return true;
         if (voter == null || target == null) return true;

@@ -1,6 +1,6 @@
 using System;
 
-namespace TOHE;
+namespace BHR;
 
 public class RoleChanceOptionItem(int id, CustomRoles role, string name, int defaultValue, TabGroup tab, bool isSingleValue, string[] selections, bool vanilla, bool useGetString) : StringOptionItem(id, name, defaultValue, tab, isSingleValue, selections, vanilla, useGetString)
 {

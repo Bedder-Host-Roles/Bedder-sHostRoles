@@ -1,8 +1,8 @@
 using Hazel;
-using TOHE.Modules.Rpc;
+using BHR.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 public static class NameNotifyManager
 {

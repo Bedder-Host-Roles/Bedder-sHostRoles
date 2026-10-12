@@ -1,10 +1,10 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using static TOHE.Options;
+using BHR.Modules.Rpc;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using static BHR.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Executioner : RoleBase
 {
@@ -35,7 +35,7 @@ internal class Executioner : RoleBase
     [
         CustomRoles.Amnesiac,
         CustomRoles.Maverick,
-        CustomRoles.CrewmateTOHE,
+        CustomRoles.CrewmateBHR,
         CustomRoles.Celebrity,
         CustomRoles.Bodyguard,
         CustomRoles.Dictator,
@@ -45,7 +45,7 @@ internal class Executioner : RoleBase
         CustomRoles.Opportunist,
         CustomRoles.Pursuer,
         CustomRoles.Refugee,
-        CustomRoles.TrackerTOHE,
+        CustomRoles.TrackerBHR,
         CustomRoles.Sheriff,
         CustomRoles.Deputy,
         CustomRoles.Medic,
@@ -136,7 +136,7 @@ internal class Executioner : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(SetTarget);
         writer.Write(TargetId);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {

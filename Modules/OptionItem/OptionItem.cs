@@ -1,10 +1,10 @@
 using System;
 using System.Text.Json;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 public abstract class OptionItem
 {
@@ -134,7 +134,7 @@ public abstract class OptionItem
     public OptionItem SetHidden(bool value) => Do(i => i.IsHidden = value);
     public OptionItem SetText(bool value) => Do(i => i.IsText = value);
     public OptionItem HideInFFA(CustomGameMode value = CustomGameMode.FFA) => Do(i => i.HideOptionInFFA = value);
-    public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekTOHE) => Do(i => i.HideOptionInHnS = value);
+    public OptionItem HideInHnS(CustomGameMode value = CustomGameMode.HidenSeekBHR) => Do(i => i.HideOptionInHnS = value);
     public OptionItem HideInSpeedRun(CustomGameMode value = CustomGameMode.SpeedRun) => Do(i => i.HideOptionInSpeedRun = value);
 
     public OptionItem SetParent(OptionItem parent, bool OverrideRoleName = true) => Do(i =>
@@ -239,8 +239,7 @@ public abstract class OptionItem
             {
                 if (AmongUsClient.Instance.AmHost && PlayerControl.LocalPlayer != null && Main.EnumeratePlayerControls().Any(pc => pc.IsNonHostModdedClient()))
                 {
-                    var message = new RpcSyncCustomSettingsSingle(PlayerControl.LocalPlayer.NetId, Id, afterValue);
-                    RpcUtils.LateBroadcastReliableMessage(message);
+                    LegacyRpcSenders.SendSyncCustomSettingsSingle(PlayerControl.LocalPlayer.NetId, Id, afterValue);
                 }
             }
             else
@@ -261,7 +260,7 @@ public abstract class OptionItem
     {
         AllValues = values;
     }
-    // This Code For Reset All TOHE Setting To Default
+    // This Code For Reset All BHR Setting To Default
     public virtual void SetValueNoRpc(int value)
     {
         int beforeValue = CurrentValue;

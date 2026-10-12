@@ -1,8 +1,8 @@
 using AmongUs.InnerNet.GameDataMessages;
-using TOHE.Modules.Rpc;
-using static TOHE.Options;
+using BHR.Modules.Rpc;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 // https://github.com/Yumenopai/TownOfHost_Y/blob/main/Roles/Crewmate/Y/Rainbow.cs
 public class Rainbow : IAddon

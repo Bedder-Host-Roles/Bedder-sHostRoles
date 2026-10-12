@@ -2,13 +2,13 @@ using Hazel;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.Impostor;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Modules.ChatManager
+namespace BHR.Modules.ChatManager
 {
     public class ChatManager
     {
@@ -152,8 +152,7 @@ namespace TOHE.Modules.ChatManager
 
         public static void SendQuickChatSpam()
         {
-            var message = new RpcQuickChatSpam();
-            RpcUtils.LateBroadcastReliableMessage(message);
+            LegacyRpcSenders.SendQuickChatSpam();
         }
         public static void SendPreviousMessagesToAll()
         {

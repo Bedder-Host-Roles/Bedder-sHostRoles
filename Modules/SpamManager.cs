@@ -1,10 +1,10 @@
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 public static class SpamManager
 {
-    //private static readonly string BANEDWORDS_FILE_PATH = "./TOHE-DATA/BanWords.txt";
+    //private static readonly string BANEDWORDS_FILE_PATH = "./BHR-DATA/BanWords.txt";
     //public static List<string> BanWords = new();
     //public static void Init()
     //{
@@ -17,7 +17,7 @@ public static class SpamManager
     //    {
     //        try
     //        {
-    //            if (!Directory.Exists(@"TOHE-DATA")) Directory.CreateDirectory(@"TOHE-DATA");
+    //            if (!Directory.Exists(@"BHR-DATA")) Directory.CreateDirectory(@"BHR-DATA");
     //            if (File.Exists(@"./BanWords.txt")) File.Move(@"./BanWords.txt", BANEDWORDS_FILE_PATH);
     //            else
     //            {
@@ -32,7 +32,7 @@ public static class SpamManager
     //                    };
     //                else fileName = "English";
     //                Logger.Warn($"创建新的 BanWords 文件：{fileName}", "SpamManager");
-    //                File.WriteAllText(BANEDWORDS_FILE_PATH, GetResourcesTxt($"TOHE.Resources.Config.BanWords.{fileName}.txt"));
+    //                File.WriteAllText(BANEDWORDS_FILE_PATH, GetResourcesTxt($"BHR.Resources.Config.BanWords.{fileName}.txt"));
     //            }
     //        }
     //        catch (Exception ex)

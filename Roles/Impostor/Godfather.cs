@@ -1,10 +1,10 @@
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Double;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Double;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Godfather : RoleBase
 {

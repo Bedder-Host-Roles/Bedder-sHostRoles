@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Impostor;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using BHR.Roles.Impostor;
 
-namespace TOHE;
+namespace BHR;
 
-//ÕÅé×Çâ
+// Sabotage system patch
 //https://github.com/Koke1024/Town-Of-Moss/blob/main/TownOfMoss/Patches/MeltDownBoost.cs
 
 public class SabotageSystemPatch

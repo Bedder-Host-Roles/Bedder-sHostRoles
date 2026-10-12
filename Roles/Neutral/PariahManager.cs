@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE;
+namespace BHR;
 
 public abstract class PariahManager : RoleBase // NO, THIS IS NOT A ROLE
 {

@@ -1,6 +1,6 @@
 using Hazel;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.Serialize))]
 public static class GameManagerSerializeFix

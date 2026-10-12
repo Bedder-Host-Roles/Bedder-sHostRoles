@@ -1,19 +1,19 @@
 using Hazel;
 using System;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
+using BHR.Roles.Coven;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 internal class Inspector : RoleBase
 {
     //===========================SETUP================================\\
@@ -66,8 +66,7 @@ internal class Inspector : RoleBase
     }
     public static void SendRPC(byte playerId)
     {
-        var msg = new RpcSetInspectorLimit(PlayerControl.LocalPlayer.NetId, playerId, RoundCheckLimit[playerId]);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetInspectorLimit(PlayerControl.LocalPlayer.NetId, playerId, RoundCheckLimit[playerId]);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

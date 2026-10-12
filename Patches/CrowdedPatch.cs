@@ -8,7 +8,7 @@ using UnityEngine;
 // https://github.com/CrowdedMods/CrowdedMod/blob/master/src/CrowdedMod
 // Niko adjusted mono behavior patches to fit into non-reactor mods
 
-namespace TOHE.Patches.Crowded;
+namespace BHR.Patches.Crowded;
 
 internal static class Crowded
 {
@@ -217,10 +217,10 @@ internal static class Crowded
         }
     }
 
-    [HarmonyPatch(typeof(NormalGameOptionsV10), nameof(NormalGameOptionsV10.AreInvalid))]
+    [HarmonyPatch(typeof(NormalGameOptionsV12), nameof(NormalGameOptionsV12.AreInvalid))]
     public static class NormalGameOptions_AreInvalid
     {
-        public static bool Prefix(NormalGameOptionsV10 __instance, ref bool __result)
+        public static bool Prefix(NormalGameOptionsV12 __instance, ref bool __result)
         {
             __result = __instance.NumImpostors < 0 || __instance.KillDistance < 0 || __instance.KillCooldown < 0 || __instance.PlayerSpeedMod <= 0;
 
@@ -469,7 +469,7 @@ public class MeetingHudPagingBehaviour : AbstractPagingBehaviour
     {
         base.Update();
 
-        if (meetingHud.state is MeetingHud.VoteStates.Animating or MeetingHud.VoteStates.Proceeding || meetingHud.TimerText.text.Contains($" ({PageIndex + 1}/{MaxPageIndex + 1})"))
+        if (meetingHud.state is MeetingHud.MeetingStates.Animating or MeetingHud.MeetingStates.Proceeding || meetingHud.TimerText.text.Contains($" ({PageIndex + 1}/{MaxPageIndex + 1})"))
             return; // TimerText does not update there                                                 ^ Sometimes the timer text is spammed with the page counter for some weird reason so this is just a band-aid fix for it
 
         meetingHud.TimerText.text += $" ({PageIndex + 1}/{MaxPageIndex + 1})";

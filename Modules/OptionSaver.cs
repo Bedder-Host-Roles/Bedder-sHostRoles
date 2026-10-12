@@ -1,16 +1,16 @@
 using System.IO;
 using System.Text.Json;
 
-namespace TOHE.Modules;
+namespace BHR.Modules;
 
 // https://github.com/tukasa0001/TownOfHost/blob/main/Modules/OptionSaver.cs
 public static class OptionSaver
 {
 #if ANDROID
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "SaveData"));
-    private static readonly FileInfo OptionSaverFileInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "SaveData", "Options.json"));
+    private static readonly DirectoryInfo SaveDataDirectoryInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "SaveData"));
+    private static readonly FileInfo OptionSaverFileInfo = new(Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "SaveData", "Options.json"));
 #else
-    private static readonly DirectoryInfo SaveDataDirectoryInfo = new("./TOHE-DATA/SaveData/");
+    private static readonly DirectoryInfo SaveDataDirectoryInfo = new("./BHR-DATA/SaveData/");
     private static readonly FileInfo OptionSaverFileInfo = new($"{SaveDataDirectoryInfo.FullName}/Options.json");
 #endif
     public static void Initialize()

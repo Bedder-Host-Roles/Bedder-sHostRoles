@@ -11,7 +11,7 @@ using System.Text.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace TOHE;
+namespace BHR;
 
 // code credit https://github.com/Yumenopai/TownOfHost_Y
 [HarmonyPatch]
@@ -42,7 +42,7 @@ public class ModNews
         return result;
     }
     public static List<ModNews> AllModNews = [];
-    public static string ModNewsURL = "https://raw.githubusercontent.com/EnhancedNetwork/TownofHost-Enhanced/refs/heads/main/Resources/Announcements/modNews-";
+    public static string ModNewsURL = "https://raw.githubusercontent.com/BatmenzDW/TownofHost-Enhanced/refs/heads/main/Resources/Announcements/modNews-";
     static bool downloaded = false;
     public ModNews(int Number, string Title, string SubTitle, string ShortTitle, string Text, string Date)
     {
@@ -58,7 +58,7 @@ public class ModNews
     [HarmonyPatch(typeof(AnnouncementPopUp), nameof(AnnouncementPopUp.Init)), HarmonyPostfix]
     public static void Initialize_Postfix(ref Il2CppSystem.Collections.IEnumerator __result)
     {
-        static IEnumerator FetchBlacklist()
+        static IEnumerator FetchAnnouncements()
         {
             Logger.Info("Fetching Mod News from GitHub", "ModNews");
             if (downloaded)
@@ -118,7 +118,7 @@ public class ModNews
                 LoadModNewsFromResources();
             }
         }
-        __result = Effects.Sequence(FetchBlacklist().WrapToIl2Cpp(), __result);
+        __result = Effects.Sequence(FetchAnnouncements().WrapToIl2Cpp(), __result);
     }
 
     private static void LoadModNewsFromResources()
@@ -142,7 +142,7 @@ public class ModNews
         };
 
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        using Stream resourceStream = assembly.GetManifestResourceStream("TOHE.Resources.Announcements.modNews-" + filename);
+        using Stream resourceStream = assembly.GetManifestResourceStream("BHR.Resources.Announcements.modNews-" + filename);
         using StreamReader reader = new(resourceStream);
         using var jsonDocument = JsonDocument.Parse(reader.ReadToEnd());
         var newsArray = jsonDocument.RootElement.GetProperty("News");
@@ -193,7 +193,7 @@ public class ModNews
         obj.transform.localPosition = new Vector3(-0.8f, 0.13f, 0.5f);
         obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
         var renderer = obj.AddComponent<SpriteRenderer>();
-        renderer.sprite = Utils.LoadSprite($"TOHE.Resources.Images.CreditsButton.png", 250f);
+        renderer.sprite = Utils.LoadSprite($"BHR.Resources.Images.CreditsButton.png", 250f);
         renderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
     }
 }

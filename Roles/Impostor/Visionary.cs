@@ -1,6 +1,6 @@
-using TOHE.Roles.Neutral;
+using BHR.Roles.Neutral;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Visionary : RoleBase
 {

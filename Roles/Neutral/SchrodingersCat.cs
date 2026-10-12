@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class SchrodingersCat : RoleBase
 {
@@ -37,7 +37,7 @@ internal class SchrodingersCat : RoleBase
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(catID);
         writer.Write(teammate[catID]);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -84,7 +84,7 @@ internal class SchrodingersCat : RoleBase
     {
         if (teammate.TryGetValue(seer.PlayerId, out var temmate) && target.PlayerId == temmate)
         {
-            if (target.IsPlayerCrewmateTeam()) return Main.roleColors[CustomRoles.CrewmateTOHE];
+            if (target.IsPlayerCrewmateTeam()) return Main.roleColors[CustomRoles.CrewmateBHR];
             else return Main.roleColors[target.GetCustomRole()];
         }
         return string.Empty;

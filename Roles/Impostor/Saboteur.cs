@@ -1,6 +1,6 @@
-using static TOHE.Utils;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Saboteur : RoleBase
 {

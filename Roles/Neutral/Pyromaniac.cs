@@ -1,9 +1,9 @@
 using AmongUs.GameOptions;
 using UnityEngine;
 
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Pyromaniac : RoleBase
 {

@@ -1,7 +1,7 @@
-using TOHE.Roles.Crewmate;
-using static TOHE.Options;
+using BHR.Roles.Crewmate;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Crewmate;
+namespace BHR.Roles.AddOns.Crewmate;
 
 public class Bloodthirst : IAddon
 {

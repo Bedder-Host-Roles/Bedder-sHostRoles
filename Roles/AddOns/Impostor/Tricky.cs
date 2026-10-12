@@ -1,6 +1,6 @@
-using static TOHE.Options;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Impostor;
+namespace BHR.Roles.AddOns.Impostor;
 public class Tricky : IAddon
 {
     public CustomRoles Role => CustomRoles.Tricky;

@@ -1,12 +1,12 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Coven;
+using BHR.Roles.Neutral;
+using static BHR.Options;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Investigator : RoleBase
 {
@@ -55,8 +55,7 @@ internal class Investigator : RoleBase
 
     private static void SendRPC(bool setTarget, byte playerId = byte.MaxValue, byte targetId = byte.MaxValue)
     {
-        var msg = new RpcSetInvestigatorLimit(PlayerControl.LocalPlayer.NetId, setTarget, playerId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetInvestigatorLimit(PlayerControl.LocalPlayer.NetId, setTarget, playerId, targetId);
     }
 
     public static void ReceiveRPC(MessageReader reader)

@@ -1,12 +1,12 @@
 using Hazel;
 using System;
 using System.Text;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Benefactor : RoleBase
 {
@@ -50,8 +50,7 @@ internal class Benefactor : RoleBase
     private static void SendRPC(int type, byte benefactorId = 0xff, byte targetId = 0xff, int taskIndex = -1)
     {
         var stimeStamp = shieldedPlayers.TryGetValue(targetId, out long timeStamp) ? timeStamp.ToString() : "";
-        var msg = new RpcBenefactor(PlayerControl.LocalPlayer.NetId, type, benefactorId, taskIndex, targetId, stimeStamp);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendBenefactor(PlayerControl.LocalPlayer.NetId, type, benefactorId, taskIndex, targetId, stimeStamp);
     }
 
     public static void ReceiveRPC(MessageReader reader)

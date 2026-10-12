@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using TOHE.Roles.Crewmate;
-using static TOHE.Translator;
+using BHR.Modules;
+using BHR.Roles.Core;
+using BHR.Roles.Crewmate;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Eraser : RoleBase
 {
@@ -40,7 +40,7 @@ internal class Eraser : RoleBase
     {
         playerId.SetAbilityUseLimit(EraseLimitOpt.GetInt());
     }
-    public override bool CheckVote(PlayerControl player, PlayerControl target)
+    public override bool OnJudge(PlayerControl player, PlayerControl target)
     {
         if (!HasEnabled) return true;
         if (player == null || target == null) return true;
@@ -141,15 +141,15 @@ internal class Eraser : RoleBase
             ? role
             : roleType switch
             {
-                RoleTypes.Crewmate => CustomRoles.CrewmateTOHE,
-                RoleTypes.Scientist => CustomRoles.ScientistTOHE,
-                RoleTypes.Tracker => CustomRoles.TrackerTOHE,
-                RoleTypes.Noisemaker => CustomRoles.NoisemakerTOHE,
-                RoleTypes.Engineer => CustomRoles.EngineerTOHE,
-                RoleTypes.Impostor when role.IsCrewmate() => CustomRoles.CrewmateTOHE,
-                RoleTypes.Impostor => CustomRoles.ImpostorTOHE,
-                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterTOHE,
-                RoleTypes.Phantom => CustomRoles.PhantomTOHE,
+                RoleTypes.Crewmate => CustomRoles.CrewmateBHR,
+                RoleTypes.Scientist => CustomRoles.ScientistBHR,
+                RoleTypes.Tracker => CustomRoles.TrackerBHR,
+                RoleTypes.Noisemaker => CustomRoles.NoisemakerBHR,
+                RoleTypes.Engineer => CustomRoles.EngineerBHR,
+                RoleTypes.Impostor when role.IsCrewmate() => CustomRoles.CrewmateBHR,
+                RoleTypes.Impostor => CustomRoles.ImpostorBHR,
+                RoleTypes.Shapeshifter => CustomRoles.ShapeshifterBHR,
+                RoleTypes.Phantom => CustomRoles.PhantomBHR,
                 _ => role,
             };
     }

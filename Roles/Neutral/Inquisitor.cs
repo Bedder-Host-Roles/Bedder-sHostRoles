@@ -1,17 +1,17 @@
-using TOHE.Roles.Neutral;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Roles.Neutral;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 
-using static TOHE.Translator;
+using static BHR.Translator;
 using Hazel;
 using UnityEngine;
 using System;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
 using System.Text;
-using TOHE.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Common;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Inquisitor : RoleBase
 {
@@ -242,8 +242,7 @@ internal class Inquisitor : RoleBase
 
     private static void SendRPC(byte playerId, byte targetId)
     {
-        var msg = new RpcSetInquisitor(PlayerControl.LocalPlayer.NetId, playerId, targetId);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetInquisitor(PlayerControl.LocalPlayer.NetId, playerId, targetId);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

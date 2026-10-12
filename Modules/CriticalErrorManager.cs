@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Patches;
-using static TOHE.Translator;
+using BHR.Modules.Rpc;
+using BHR.Patches;
+using static BHR.Translator;
 
-namespace TOHE.Modules;
+namespace BHR.Modules;
 
 public static class CriticalErrorManager
 {
@@ -31,8 +31,7 @@ public static class CriticalErrorManager
         }
         else
         {
-            var msg = new RpcAntiBlackout(PlayerControl.LocalPlayer.NetId, PlayerControl.LocalPlayer.PlayerId, reason, sourseError);
-            RpcUtils.LateBroadcastReliableMessage(msg);
+            LegacyRpcSenders.SendAntiBlackout(PlayerControl.LocalPlayer.NetId, PlayerControl.LocalPlayer.PlayerId, reason, sourseError);
         }
     }
     public static void ReadRpc(PlayerControl player, MessageReader reader)

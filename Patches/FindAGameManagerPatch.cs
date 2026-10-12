@@ -5,7 +5,7 @@ using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.Injection;
 using InnerNet;
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 [Serializable]
 public class ModFilter
@@ -23,7 +23,7 @@ internal class FindAGameManagerStartPatch
         // TODO: Once vanilla adds this
         // Guid guid = new(Main.PluginGuid4);
 
-        // var filter = new TOHEFilter()
+        // var filter = new BHRFilter()
         // {
         //     AcceptedValues = guid,
         // };

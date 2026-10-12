@@ -4,7 +4,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 // Originally code by Gurge44. Reference: https://github.com/Gurge44/EndlessHostRoles/blob/main/Patches/TextBoxPatch.cs
 
@@ -375,6 +375,18 @@ public static class TextBoxPatch
     }
 
 #if !ANDROID
+    private static int GetCaretPosition(TextBoxTMP textBox)
+    {
+        var type = textBox.GetType();
+        var field = type.GetField("caretPos", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                    ?? type.GetField("caretPosition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        if (field != null && field.GetValue(textBox) is int value) return value;
+        var property = type.GetProperty("caretPos", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic)
+                       ?? type.GetProperty("caretPosition", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        if (property != null && property.GetValue(textBox) is int propertyValue) return propertyValue;
+        return textBox.text?.Length ?? 0;
+    }
+
     [HarmonyPatch(nameof(TextBoxTMP.Update))]
     [HarmonyPrefix]
     public static bool UpdatePatch(TextBoxTMP __instance)
@@ -388,7 +400,7 @@ public static class TextBoxPatch
         if (inputString.Length > 0 || __instance.compoText != Input.compositionString)
         {
             if (__instance.text is null or "Enter Name") __instance.text = "";
-            int startIndex = Math.Clamp(__instance.caretPos, 0, __instance.text.Length);
+            int startIndex = Math.Clamp(GetCaretPosition(__instance), 0, __instance.text.Length);
             __instance.SetText(__instance.text.Insert(startIndex, inputString), Input.compositionString);
         }
 

@@ -1,6 +1,6 @@
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class GuessMaster : RoleBase
 {

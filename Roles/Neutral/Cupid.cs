@@ -1,17 +1,17 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.AddOns.Impostor;
-using static TOHE.Options;
-using static TOHE.Translator;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.AddOns.Common;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.AddOns.Impostor;
+using static BHR.Options;
+using static BHR.Translator;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.AddOns.Common;
 using UnityEngine;
 
-namespace TOHE.Roles.Neutral;
+namespace BHR.Roles.Neutral;
 
 internal class Cupid : RoleBase
 {
@@ -80,7 +80,7 @@ internal class Cupid : RoleBase
             writer.Write(val.Item2);
         }
 
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {

@@ -7,21 +7,21 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using TOHE.Modules;
-using TOHE.Modules.ChatManager;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Core.DraftAssign;
-using TOHE.Roles.Coven;
-using TOHE.Roles.Crewmate;
-using TOHE.Roles.Impostor;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Modules.ChatManager;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
+using BHR.Roles.Core.AssignManager;
+using BHR.Roles.Core.DraftAssign;
+using BHR.Roles.Coven;
+using BHR.Roles.Crewmate;
+using BHR.Roles.Impostor;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
 
-namespace TOHE.Patches;
+namespace BHR.Patches;
 
 internal class Command(string commandKey, string arguments, string description, Command.UsageLevels usageLevel, Command.UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null)
 {
@@ -188,7 +188,7 @@ internal class Command(string commandKey, string arguments, string description, 
             }
     }
 
-    public string ToHelpString()
+    public string BHRlpString()
     {
         var names = GetString(CommandKey).Split("|");
         return $"\n  ○ /{names[0]} {Description}";
@@ -215,15 +215,15 @@ internal class Command(string commandKey, string arguments, string description, 
 internal class ChatCommands
 {
 #if !ANDROID
-    private static readonly string modLogFiles = @"./TOHE-DATA/ModLogs.txt";
-    private static readonly string modTagsFiles = @"./TOHE-DATA/Tags/MOD_TAGS";
-    private static readonly string sponsorTagsFiles = @"./TOHE-DATA/Tags/SPONSOR_TAGS";
-    private static readonly string vipTagsFiles = @"./TOHE-DATA/Tags/VIP_TAGS";
+    private static readonly string modLogFiles = @"./BHR-DATA/ModLogs.txt";
+    private static readonly string modTagsFiles = @"./BHR-DATA/Tags/MOD_TAGS";
+    private static readonly string sponsorTagsFiles = @"./BHR-DATA/Tags/SPONSOR_TAGS";
+    private static readonly string vipTagsFiles = @"./BHR-DATA/Tags/VIP_TAGS";
 #else
-    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "ModLogs.txt");
-    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "MOD_TAGS");
-    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "SPONSOR_TAGS");
-    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "TOHE-DATA", "VIP_TAGS");
+    private static readonly string modLogFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "ModLogs.txt");
+    private static readonly string modTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "MOD_TAGS");
+    private static readonly string sponsorTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "SPONSOR_TAGS");
+    private static readonly string vipTagsFiles = Path.Combine(UnityEngine.Application.persistentDataPath, "BHR-DATA", "VIP_TAGS");
 #endif
 
     private static readonly Dictionary<char, int> Pollvotes = [];
@@ -313,7 +313,7 @@ internal class ChatCommands
 #endregion
 #region Role Commands
         Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]); // ["shoot", "guess", "bet", "st", "gs", "bt", "猜", "赌", "賭"]
-        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Judge.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Judge, CustomRoles.Councillor]); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
+        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Prosecutor.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Prosecutor, CustomRoles.Councillor]); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
         Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President]); // ["finish", "结束", "结束会议", "結束", "結束會議"]
         Command.Create("Command.Reveal", "", GetString("CommandDescription.Reveal"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.RevealCommand, false, false, requiredRole: [CustomRoles.President]); // ["reveal","展示"]
         Command.Create("Command.Inspect", "{id1} {id2}", GetString("CommandDescription.Inspect"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Inspector.InspectCommand, false, false, [GetString("CommandArgs.Inspect.Id1"), GetString("CommandArgs.Inspect.Id2")], [CustomRoles.Inspector]); // ["compare", "cmp", "比较", "比較"]
@@ -482,7 +482,8 @@ internal class ChatCommands
             return;
         }
         
-        if (text.StartsWith("/cmd ")) 
+        bool hasCmdPrefix = text.StartsWith("/cmd ");
+        if (hasCmdPrefix) 
         {
             text = text[5..];
             if (!text.StartsWith("/")) text = "/" + text;
@@ -494,7 +495,7 @@ internal class ChatCommands
 
         var commandEntered = false;
 
-        if (text.StartsWith('/') && !player.IsModded() && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.VoteStates.Results and not MeetingHud.VoteStates.Proceeding))
+        if (text.StartsWith('/') && !player.IsModded() && (!GameStates.IsMeeting || MeetingHud.Instance.state is not MeetingHud.MeetingStates.Results and not MeetingHud.MeetingStates.Proceeding))
         {
             foreach ((string key, Command command) in Command.AllCommands)
             {
@@ -516,6 +517,11 @@ internal class ChatCommands
         }
 
         if (ExileController.Instance)
+        {
+            canceled = true;
+        }
+
+        if (hasCmdPrefix)
         {
             canceled = true;
         }
@@ -706,8 +712,8 @@ internal class ChatCommands
             {
                 CustomRoles setrole = result.GetCustomRoleTeam() switch
                 {
-                    Custom_Team.Impostor => CustomRoles.ImpostorTOHE,
-                    _ => CustomRoles.CrewmateTOHE
+                    Custom_Team.Impostor => CustomRoles.ImpostorBHR,
+                    _ => CustomRoles.CrewmateBHR
 
                 };
                 RoleAssign.SetRoles[pid] = setrole;
@@ -1314,7 +1320,7 @@ internal class ChatCommands
             string killerName = killer == null ? "N/A" : killer.GetRealName(clientData: true);
             CustomRoles killerSubRole = killer == null || !killer.GetCustomSubRoles().Any(x => x.IsBetrayalAddonV2()) ? CustomRoles.NotAssigned : killer.GetCustomSubRoles().FirstOrDefault(x => x.IsBetrayalAddonV2(), CustomRoles.NotAssigned);
             string killerRole = killer == null ? "N/A" : Utils.GetRoleName(MurderRole);
-            Utils.SendMessage(GetString("DeathCmd.YourName") + "<b>" + target.GetRealName() + "</b>" + "\n\r" + GetString("DeathCmd.YourRole") + "<b>" + $"<color={Utils.GetRoleColorCode(target.GetCustomRole())}>{Utils.GetRoleName(target.GetCustomRole())}</color>" + "</b>" + "\n\r" + GetString("DeathCmd.DeathReason") + "<b>" + Utils.GetVitalText(target.PlayerId) + "</b>" + "\n\r" + "</b>" + "\n\r" + GetString("DeathCmd.KillerName") + "<b>" + killerName + "</b>" + "\n\r" + GetString("DeathCmd.KillerRole") + "<b>" + (killerSubRole != CustomRoles.NotAssigned ? $"<color={Utils.GetRoleColorCode(killerSubRole)}>{killerSubRole.GetActualRoleName()}</color>" : "") + $"<color={Utils.GetRoleColorCode(killer.GetCustomRole())}>{killerRole}</color>" + "</b>", player.PlayerId);
+            Utils.SendMessage(GetString("DeathCmd.YourName") + "<b>" + target.GetRealName() + "</b>" + "\n\r" + GetString("DeathCmd.YourRole") + "<b>" + $"<color={Utils.GetRoleColorCode(target.GetCustomRole())}>{Utils.GetRoleName(target.GetCustomRole())}</color>" + "</b>" + "\n\r" + GetString("DeathCmd.DeathReason") + "<b>" + Utils.GetVitalsText(target.PlayerId) + "</b>" + "\n\r" + "</b>" + "\n\r" + GetString("DeathCmd.KillerName") + "<b>" + killerName + "</b>" + "\n\r" + GetString("DeathCmd.KillerRole") + "<b>" + (killerSubRole != CustomRoles.NotAssigned ? $"<color={Utils.GetRoleColorCode(killerSubRole)}>{killerSubRole.GetActualRoleName()}</color>" : "") + $"<color={Utils.GetRoleColorCode(killer.GetCustomRole())}>{killerRole}</color>" + "</b>", player.PlayerId);
         }
     }
 
@@ -2661,7 +2667,7 @@ internal class UpdateCharCountPatch
     public static void Postfix(FreeChatInputField __instance)
     {
         int length = __instance.textArea.text.Length;
-        __instance.charCountText.SetText(length <= 0 ? GetString("ThankYouForUsingTOHE") : $"{length}/{__instance.textArea.characterLimit}");
+        __instance.charCountText.SetText(length <= 0 ? GetString("ThankYouForUsingBHR") : $"{length}/{__instance.textArea.characterLimit}");
         __instance.charCountText.enableWordWrapping = false;
         if (length < (AmongUsClient.Instance.AmHost ? 888 : 444))
             __instance.charCountText.color = Color.black;

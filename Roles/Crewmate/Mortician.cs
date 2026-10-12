@@ -1,10 +1,10 @@
-using TOHE.Roles.Core;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.MeetingHudStartPatch;
-using static TOHE.Options;
-using static TOHE.Translator;
+using static BHR.MeetingHudStartPatch;
+using static BHR.Options;
+using static BHR.Translator;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 internal class Mortician : RoleBase
 {
     //===========================SETUP================================\\

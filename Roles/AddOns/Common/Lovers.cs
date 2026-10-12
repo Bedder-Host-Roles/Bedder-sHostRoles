@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
+using BHR.Modules.Rpc;
+using BHR.Roles.Neutral;
+using static BHR.Options;
 
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Lovers : IAddon
 {
@@ -199,7 +199,7 @@ public class Lovers : IAddon
                     p2.Data.IsDead = true;
                     p2.RpcExileV2();
                     Main.PlayerStates[p2.PlayerId].SetDead();
-                    if (MeetingHud.Instance?.state is MeetingHud.VoteStates.Discussion or MeetingHud.VoteStates.NotVoted or MeetingHud.VoteStates.Voted)
+                    if (MeetingHud.Instance?.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
                     {
                         MeetingHud.Instance?.CheckForEndVoting();
                     }
@@ -244,8 +244,7 @@ public class Lovers : IAddon
         {
             Logger.Info($"{pair.Item1.GetPlayerName()} loves {pair.Item2.GetPlayerName()}", "Lovers.SendRPC");
         }
-        var msg = new RpcSetLoverPairs(PlayerControl.LocalPlayer.NetId, loverPairs.Count, loverPairs, loverless);
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendSetLoverPairs(PlayerControl.LocalPlayer.NetId, loverPairs.Count, loverPairs, loverless);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

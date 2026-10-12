@@ -1,9 +1,9 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 static class LocateArrow
 {
@@ -34,8 +34,7 @@ static class LocateArrow
         var seer = seerId.GetPlayer();
         if (!seer.IsNonHostModdedClient()) return;
 
-        var message = new RpcArrow(PlayerControl.LocalPlayer.NetId, false, index, seer.PlayerId, null, vector3);
-        RpcUtils.LateSpecificSendMessage(message, seer.OwnerId);
+        LegacyRpcSenders.SendArrow(PlayerControl.LocalPlayer.NetId, false, index, seer.PlayerId, null, vector3, seer.OwnerId);
     }
     public static void ReceiveRPC(MessageReader reader)
     {

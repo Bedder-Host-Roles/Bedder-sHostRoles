@@ -1,11 +1,11 @@
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Neutral;
-using static TOHE.Options;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Neutral;
+using static BHR.Options;
 
 
-namespace TOHE.Roles.Impostor;
+namespace BHR.Roles.Impostor;
 
 internal class Lightning : RoleBase
 {
@@ -39,8 +39,7 @@ internal class Lightning : RoleBase
     }
     private static void SendRPC(byte playerId)
     {
-        var msg = new RpcLightningSetGhostPlayer(PlayerControl.LocalPlayer.NetId, playerId, IsGhost(playerId));
-        RpcUtils.LateBroadcastReliableMessage(msg);
+        RoleRpcs.SendLightningSetGhostPlayer(PlayerControl.LocalPlayer.NetId, playerId, IsGhost(playerId));
 
     }
     public static void ReceiveRPC(MessageReader reader)

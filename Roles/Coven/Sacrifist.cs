@@ -1,13 +1,13 @@
-using AmongUs.GameOptions;
+﻿using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
+using BHR.Modules;
+using BHR.Modules.Rpc;
 using UnityEngine;
-using static TOHE.Options;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Options;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Coven;
+namespace BHR.Roles.Coven;
 
 internal class Sacrifist : CovenManager
 {
@@ -78,7 +78,7 @@ internal class Sacrifist : CovenManager
     {
         var writer = MessageWriter.Get(SendOption.Reliable);
         writer.Write(DebuffID);
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, pc.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, pc.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl NaN)
     {
@@ -325,10 +325,10 @@ internal class Sacrifist : CovenManager
         if (exiled != _Player) return;
 
         List<PlayerControl> killPotentials = [];
-        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedFor == exiled.PlayerId && a.TargetPlayerId != exiled.PlayerId).ToArray();
+        var votedForExiled = MeetingHud.Instance.playerStates.Where(a => a.VotedForId == exiled.PlayerId && a.PlayerId != exiled.PlayerId).ToArray();
         foreach (var playerVote in votedForExiled)
         {
-            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.TargetPlayerId);
+            var crewPlayer = Main.EnumeratePlayerControls().FirstOrDefault(a => a.PlayerId == playerVote.PlayerId);
             if (crewPlayer == null || crewPlayer.GetCustomRole().IsCoven() || crewPlayer.GetCustomRole().IsTNA()) return;
             killPotentials.Add(crewPlayer);
         }
@@ -360,3 +360,4 @@ internal class Sacrifist : CovenManager
         }
     }
 }
+

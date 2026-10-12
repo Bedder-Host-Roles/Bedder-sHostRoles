@@ -6,17 +6,17 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using TOHE.Modules;
-using TOHE.Patches;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.AddOns.Impostor;
-using TOHE.Roles.Core;
-using TOHE.Roles.Core.AssignManager;
-using TOHE.Roles.Neutral;
+using BHR.Modules;
+using BHR.Patches;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Impostor;
+using BHR.Roles.Core;
+using BHR.Roles.Core.AssignManager;
+using BHR.Roles.Neutral;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.CoShowIntro))]
 class CoShowIntroPatch
@@ -33,10 +33,13 @@ class CoShowIntroPatch
 
             DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
 
-            // foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
-            // {
-            //     pc.SetCustomIntro();
-            // }
+            // Show custom intro information to unmodded clients during the intro.
+            SetUpRoleTextPatch.IsInIntro = true;
+            foreach (var pc in PlayerControl.AllPlayerControls.GetFastEnumerator())
+            {
+                if (pc == null || pc.IsModded()) continue;
+                pc.SetCustomIntro();
+            }
         }, 0.6f, "Set Disconnected");
 
         _ = new LateTask(() =>
@@ -73,7 +76,7 @@ class CoShowIntroPatch
 
             __instance.IsIntroDisplayed = true;
             __instance.LobbyTimerExtensionUI.HideAll();
-            __instance.SetMapButtonEnabled(false);
+            __instance.SetMapAndInfoButtonsEnabled(false);
             __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -250f);
 
             yield return __instance.ShowEmblem(true);
@@ -90,11 +93,11 @@ class CoShowIntroPatch
             yield return __instance.CoFadeFullScreen(Color.black, Color.clear);
             __instance.FullScreen.transform.localPosition = new Vector3(0.0f, 0.0f, -500f);
             __instance.IsIntroDisplayed = false;
-            __instance.SetMapButtonEnabled(true);
+            __instance.SetMapAndInfoButtonsEnabled(true);
             __instance.SetHudActive(true);
             __instance.CrewmatesKilled.gameObject.SetActive(GameManager.Instance.ShowCrewmatesKilled());
             GameManager.Instance.StartGame();
-            
+
             RPC.RpcVersionCheck();
         }
 
@@ -331,7 +334,7 @@ public class SetUpRoleTextPatch
             try
             {
                 byte[] logBytes = Encoding.UTF8.GetBytes(logStringBuilder.ToString());
-                byte[] encryptedBytes = EncryptDES(logBytes, $"TOHE{PlayerControl.LocalPlayer.PlayerId}00000000"[..8]);
+                byte[] encryptedBytes = EncryptDES(logBytes, $"BHR{PlayerControl.LocalPlayer.PlayerId}00000000"[..8]);
                 string encryptedString = Convert.ToBase64String(encryptedBytes);
                 sb.Append(encryptedString + "\n");
             }
@@ -341,7 +344,7 @@ public class SetUpRoleTextPatch
             }
         }
         //https://www.toolhelper.cn/SymmetricEncryption/DES
-        //mode CBC, PKCS7, 64bit, Key = IV= "TOHE" + playerid + 000/00 "to 8 bits
+        //mode CBC, PKCS7, 64bit, Key = IV= "BHR" + playerid + 000/00 "to 8 bits
 
         yield return null;
 
@@ -582,38 +585,38 @@ class BeginCrewmatePatch
         switch (role)
         {
             case CustomRoles.ShapeMaster:
-            case CustomRoles.ShapeshifterTOHE:
+            case CustomRoles.ShapeshifterBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Shapeshifter);
                 break;
             case CustomRoles.CursedSoul:
             case CustomRoles.SoulCatcher:
             case CustomRoles.Specter:
             case CustomRoles.Stalker:
-            case CustomRoles.PhantomTOHE:
+            case CustomRoles.PhantomBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Phantom);
                 break;
             case CustomRoles.Coroner:
-            case CustomRoles.TrackerTOHE:
+            case CustomRoles.TrackerBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Tracker);
                 break;
-            case CustomRoles.DetectiveTOHE:
+            case CustomRoles.DetectiveBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Detective);
                 break;
-            case CustomRoles.ViperTOHE:
+            case CustomRoles.ViperBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Viper);
                 break;
             case CustomRoles.Celebrity:
             case CustomRoles.Sacrifist:
             case CustomRoles.Poisoner:
-            case CustomRoles.NoisemakerTOHE:
+            case CustomRoles.NoisemakerBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Noisemaker);
                 break;
-            case CustomRoles.EngineerTOHE:
+            case CustomRoles.EngineerBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Engineer);
                 break;
             case CustomRoles.Doctor:
             case CustomRoles.Medic:
-            case CustomRoles.ScientistTOHE:
+            case CustomRoles.ScientistBHR:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Scientist);
                 break;
             case CustomRoles.Observer:
@@ -707,7 +710,12 @@ class BeginCrewmatePatch
             case CustomRoles.Twister:
                 PlayerControl.LocalPlayer.Data.Role.IntroSound = RoleManager.Instance.AllRoles.ToArray().FirstOrDefault((role) => role.Role == RoleTypes.Shapeshifter)?.UseSound;
                 break;
-
+            
+            case CustomRoles.Judge:
+            case CustomRoles.JudgeBHR:
+            case CustomRoles.Prosecutor:
+                PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Judge);
+                break;
         }
 
         if (PlayerControl.LocalPlayer.Is(CustomRoles.Lovers))

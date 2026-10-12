@@ -2,12 +2,12 @@ using BepInEx.Unity.IL2CPP.Utils.Collections;
 using System;
 using System.Collections.Concurrent;
 using TMPro;
-using TOHE.Patches;
+using BHR.Patches;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 using Object = UnityEngine.Object;
 
-namespace TOHE;
+namespace BHR;
 
 // Thanks: https://github.com/Yumenopai/TownOfHost_Y/blob/main/Patches/GameOptionsMenuPatch.cs
 public static class ModGameOptionsMenu
@@ -649,7 +649,7 @@ public static class StringOptionPatch
                 var name = item.GetName();
                 if (Main.CustomRoleValues.Find(x => GetString($"{x}") == name.RemoveHtmlTags(), out var role))
                 {
-                    var roleName = role.IsVanilla() ? role + "TOHE" : role.ToString();
+                    var roleName = role.IsVanilla() ? role + "BHR" : role.ToString();
                     var str = GetString($"{roleName}InfoLong");
                     int size = str.Length > 500 ? str.Length > 550 ? 65 : 70 : 100;
                     var infoLong = str[(str.IndexOf('\n') + 1)..str.Length];

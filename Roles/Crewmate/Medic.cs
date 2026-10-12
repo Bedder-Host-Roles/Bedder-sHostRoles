@@ -1,13 +1,13 @@
 using AmongUs.GameOptions;
 using Hazel;
-using TOHE.Modules;
-using TOHE.Modules.Rpc;
-using TOHE.Roles.Core;
+using BHR.Modules;
+using BHR.Modules.Rpc;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
-using static TOHE.Utils;
+using static BHR.Translator;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Medic : RoleBase
 {
@@ -115,7 +115,7 @@ internal class Medic : RoleBase
         {
             writer.Write(protect);
         }
-        RpcUtils.LateBroadcastReliableMessage(new RpcSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer));
+        LegacyRpcSenders.SendSyncRoleSkill(PlayerControl.LocalPlayer.NetId, _Player.NetId, writer);
     }
     public override void ReceiveRPC(MessageReader reader, PlayerControl pc)
     {
@@ -139,6 +139,9 @@ internal class Medic : RoleBase
     private static bool CheckKillButton(byte playerId) => playerId.GetAbilityUseLimit() > 0;
 
     public override bool CanUseKillButton(PlayerControl pc) => CheckKillButton(pc.PlayerId);
+    // Medic's Impostor base is only an implementation detail for the shield ability.
+    public override bool CanUseImpostorVentButton(PlayerControl pc) => false;
+    public override bool CanUseSabotage(PlayerControl pc) => false;
     public override void SetKillCooldown(byte id) => Main.AllPlayerKillCooldown[id] = CheckKillButton(id) ? 5f : 300f;
 
     public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)

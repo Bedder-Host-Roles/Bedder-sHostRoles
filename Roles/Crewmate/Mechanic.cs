@@ -1,10 +1,10 @@
 using AmongUs.GameOptions;
-using TOHE.Modules;
-using TOHE.Roles.Core;
-using static TOHE.Options;
-using static TOHE.Utils;
+using BHR.Modules;
+using BHR.Roles.Core;
+using static BHR.Options;
+using static BHR.Utils;
 
-namespace TOHE.Roles.Crewmate;
+namespace BHR.Roles.Crewmate;
 
 internal class Mechanic : RoleBase
 {

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace TOHE;
+namespace BHR;
 
 // Credit：https://github.com/tugaru1975/TownOfPlus/TOPmods/Zoom.cs 
 // Credit：https://github.com/Yumenopai/TownOfHost_Y

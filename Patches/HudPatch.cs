@@ -1,11 +1,11 @@
 using System.Text;
 using TMPro;
-using TOHE.Roles.AddOns.Common;
-using TOHE.Roles.Core;
+using BHR.Roles.AddOns.Common;
+using BHR.Roles.Core;
 using UnityEngine;
-using static TOHE.Translator;
+using static BHR.Translator;
 
-namespace TOHE;
+namespace BHR;
 
 [HarmonyPatch(typeof(HudManager), nameof(HudManager.Start))]
 class HudManagerStartPatch
@@ -53,14 +53,28 @@ class SetHudActivePatch
     public static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl player, [HarmonyArgument(2)] bool isActive)
     {
         // Fix vanilla bug when report button displayed in the lobby
-        __instance.ReportButton.ToggleVisible(!GameStates.IsLobby && isActive);
+        if (GameStates.IsLobby || !isActive) __instance?.ReportButton?.ToggleVisible(false);
 
         if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;
 
+        if (!__instance)
+        {
+            Logger.Fatal("HudManager __instance ended up being null", "SetHudActivePatch.Postfix");
+            return;
+        }
+
         IsActive = isActive;
 
-        if (GameStates.IsLobby || !isActive) return;
-        if (player == null) return;
+        if (!isActive) return;
+
+        if (player == null) 
+        {
+            __instance.KillButton.ToggleVisible(true);
+            __instance.ReportButton.ToggleVisible(true);
+            __instance.ImpostorVentButton.ToggleVisible(true);
+            __instance.SabotageButton.ToggleVisible(true);
+            return;
+        }
 
         if (player.Is(CustomRoles.Oblivious) || player.Is(CustomRoles.KillingMachine) || Options.CurrentGameMode != CustomGameMode.Standard)
             __instance.ReportButton.ToggleVisible(false);
@@ -70,11 +84,13 @@ class SetHudActivePatch
 
         // Check Toggle visible
         Logger.Info($"Set kill button visibility for {player.GetRealName()}: Can Use: {player.CanUseKillButton()}", "SetHudActive");
-        __instance.KillButton.ToggleVisible(player.CanUseKillButton());
-        __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
-        __instance.SabotageButton.ToggleVisible(player.CanUseSabotage());
+
+        if (!player.CanUseKillButton()) __instance.KillButton.ToggleVisible(false);
+        if (!player.CanUseImpostorVentButton()) __instance.ImpostorVentButton.ToggleVisible(false);
+        if (!player.CanUseSabotage()) __instance.SabotageButton.ToggleVisible(false);
     }
 }
+
 [HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
 class VentButtonDoClickPatch
 {

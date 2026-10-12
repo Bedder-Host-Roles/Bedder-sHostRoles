@@ -1,4 +1,4 @@
-namespace TOHE.Roles.AddOns.Common;
+namespace BHR.Roles.AddOns.Common;
 
 public class Tiebreaker : IAddon
 {
@@ -24,7 +24,7 @@ public class Tiebreaker : IAddon
     }
     public static void CheckVote(PlayerControl target, PlayerVoteArea ps)
     {
-        if (CheckForEndVotingPatch.CheckRole(ps.TargetPlayerId, CustomRoles.Tiebreaker) && !VoteFor.Contains(target.PlayerId))
+        if (CheckForEndVotingPatch.CheckRole(ps.PlayerId, CustomRoles.Tiebreaker) && !VoteFor.Contains(target.PlayerId))
             VoteFor.Add(target.PlayerId);
     }
 }
