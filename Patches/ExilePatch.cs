@@ -209,16 +209,20 @@ class ExileControllerWrapUpPatch
 
                 Utils.CheckAndSetVentInteractions();
 
-                if (Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool())
+
+                if (Main.CurrentServerIsVanilla)
                 {
-                    // Spread SetName RPCs across frames. A full NotifyRoles(seer)
-                    // dump in one frame is what official AC flags as hacking.
-                    Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 2));
+                    // Avoid sending a full role/name notification burst to vanilla clients.
+                    if (Options.BypassRateLimitAC.GetBool())
+                    {
+                        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 2));
+                    }
                 }
                 else
                 {
                     Utils.NotifyRoles();
                 }
+
 
                 _ = new LateTask(() =>
                 {

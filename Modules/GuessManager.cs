@@ -683,7 +683,11 @@ public static class GuessManager
     {
         var pc = Utils.GetPlayerById(playerId);
         Logger.Info($"GuesserOnClick called for playerId: {playerId}", "GuesserOnClick");
-        if (pc == null || !pc.IsAlive() || guesserUI != null || !GameStates.IsVoting) return;
+        if (pc == null || !pc.IsAlive() || guesserUI != null ||
+      __instance == null ||
+      !(__instance.state is MeetingHud.MeetingStates.Voted
+          or MeetingHud.MeetingStates.NotVoted))
+            return;
         Logger.Info($"Player character retrieved: {pc}", "GuesserOnClick");
 
         try

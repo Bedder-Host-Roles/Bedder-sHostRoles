@@ -40,8 +40,8 @@ internal class Car : RoleBase
         PropelDistance = FloatOptionItem.Create(
                 Id + 2,
                 "CarPropelDistance",
-                new(1f, 20f, 0.5f),
-                5f,
+                new(1f, 3f, 0.5f),
+                3f,
                 TabGroup.CrewmateRoles,
                 false)
             .SetParent(CustomRoleSpawnChances[CustomRoles.Car]);
@@ -148,7 +148,7 @@ internal class Car : RoleBase
             _ => Vector2.zero
         };
 
-        float distance = PropelDistance.GetFloat();
+        float distance = Mathf.Min(PropelDistance.GetFloat(), 3f);
         Collider2D collider = target.Collider;
 
         for (Vector2 newPos = target.GetCustomPosition();
