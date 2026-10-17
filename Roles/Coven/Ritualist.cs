@@ -118,8 +118,6 @@ internal class Ritualist : CovenManager
         if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return;
         if (!player.Is(CustomRoles.Ritualist)) return;
 
-        bool isUI = player.IsModded();
-
         if (!player.IsAlive())
         {
             player.ShowInfoMessage(isUI, GetString("GuessDead"));
@@ -138,7 +136,7 @@ internal class Ritualist : CovenManager
             return;
         }
 
-        if (!GetTargetAndRoleFromCommand(text, out byte targetId, out CustomRoles role, out string error))
+        if (!GetTargetAndRoleFromCommand(string.Join(" ", args.Skip(1)), out byte targetId, out CustomRoles role, out string error))
         {
             player.ShowInfoMessage(isUI, error);
             return;
@@ -202,45 +200,44 @@ internal class Ritualist : CovenManager
     }
     private static bool GetTargetAndRoleFromCommand(string msg, out byte id, out CustomRoles role, out string error)
     {
-        if (msg.StartsWith("/")) msg = msg.Replace("/", string.Empty);
+        // Expected format: /ritual <player id> <role name>.
+        // Parse the ID and role separately; passing the full command to GetRoleByName
+        // includes the command alias and prevents the role name from matching.
+        var parts = msg.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var idIndex = parts.Length > 0 && parts[0].StartsWith("/")
+            ? 1
+            : 0;
 
-        Regex r = new("\\d+"); // number regex
-        MatchCollection mc = r.Matches(msg);
-        string result = string.Empty;
-        for (int i = 0; i < mc.Count; i++)
-        {
-            result += mc[i];
-        }
-
-        if (int.TryParse(result, out int num))
-        {
-            id = Convert.ToByte(num);
-        }
-        else
+        if (parts.Length <= idIndex ||
+            !byte.TryParse(parts[idIndex], out id))
         {
             id = byte.MaxValue;
-            error = GetString("RitualistCommandHelp");
             role = new();
+            error = GetString("RitualistCommandHelp");
             return false;
         }
 
-        PlayerControl target = GetPlayerById(id);
-        if (target == null || target.Data.IsDead || !target.IsAlive())
+        var target = GetPlayerById(id);
+        if (target == null || target.Data == null || target.Data.IsDead || !target.IsAlive())
         {
             error = GetString("GuessNull");
             role = new();
             return false;
         }
 
-        if (!ChatCommands.GetRoleByName(msg, out role))
+        var roleName = string.Join(" ", parts.Skip(idIndex + 1));
+        if (string.IsNullOrWhiteSpace(roleName) ||
+            !ChatCommands.GetRoleByName(roleName, out role))
         {
             error = GetString("RitualistCommandHelp");
+            role = new();
             return false;
         }
 
         error = string.Empty;
         return true;
     }
+
     public static bool CanBeConverted(PlayerControl pc)
     {
         return pc != null && !(pc.GetCustomRole().IsCovenTeam() || pc.GetBetrayalAddon().IsCovenTeam()) && !pc.IsTransformedNeutralApocalypse() && !pc.Is(CustomRoles.Solsticer);

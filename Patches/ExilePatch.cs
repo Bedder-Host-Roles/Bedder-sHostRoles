@@ -210,19 +210,12 @@ class ExileControllerWrapUpPatch
                 Utils.CheckAndSetVentInteractions();
 
 
-                if (Main.CurrentServerIsVanilla)
-                {
-                    // Avoid sending a full role/name notification burst to vanilla clients.
-                    if (Options.BypassRateLimitAC.GetBool())
-                    {
-                        Main.Instance.StartCoroutine(Utils.NotifyEveryoneAsync(speed: 2));
-                    }
-                }
-                else
+                // Only send the full role notification update on modded servers.
+                // Avoid the full seer/target notification loop on vanilla servers.
+                if (!Main.CurrentServerIsVanilla)
                 {
                     Utils.NotifyRoles();
                 }
-
 
                 _ = new LateTask(() =>
                 {

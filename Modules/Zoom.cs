@@ -65,7 +65,7 @@ public static class Zoom
         }
         catch (Exception ex)
         {
-            Logger.Warning($"Zoom update skipped during a game transition: {ex.Message}", "Zoom");
+            Logger.Warn($"Zoom update skipped during a game transition: {ex.Message}", "Zoom");
         }
     }
 
@@ -127,7 +127,7 @@ public static class Zoom
         }
         catch (Exception ex)
         {
-            Logger.Warning($"Zoom resize skipped: {ex.Message}", "Zoom");
+            Logger.Warn($"Zoom resize skipped: {ex.Message}", "Zoom");
         }
     }
 
