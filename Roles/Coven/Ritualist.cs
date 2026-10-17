@@ -90,7 +90,13 @@ internal class Ritualist : CovenManager
             return;
         }
 
-        if (RitualLimit[player.PlayerId] <= 0)
+        if (!RitualLimit.TryGetValue(player.PlayerId, out int remainingRituals))
+        {
+            player.ShowInfoMessage(isUI, GetString("RitualistRitualMax"));
+            return;
+        }
+
+        if (remainingRituals <= 0)
         {
             player.ShowInfoMessage(isUI, GetString("RitualistRitualMax"));
             return;
