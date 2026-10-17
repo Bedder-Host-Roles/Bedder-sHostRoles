@@ -69,13 +69,49 @@ internal class Ritualist : CovenManager
     public override string PVANameText(PlayerVoteArea pva, PlayerControl seer, PlayerControl target)
         => seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Ritualist), target.PlayerId.ToString()) + " " + pva.NameText.text : "";
 
+
     public static void RitualCommand(PlayerControl player, string commandKey, string text, string[] args)
     {
+        Logger.Info(
+            $"RitualCommand ENTERED | Text={text} | Key={commandKey} | " +
+            $"Host={AmongUsClient.Instance.AmHost} | " +
+            $"Player={(player == null ? "null" : player.PlayerId.ToString())}",
+            "RitualistDebug"
+        );
+
         if (!AmongUsClient.Instance.AmHost)
         {
+            Logger.Info("Not host; forwarding command to host.", "RitualistDebug");
             ChatCommands.RequestCommandProcessingFromHost(text, commandKey);
             return;
         }
+
+        if (!GameStates.IsMeeting || player == null || GameStates.IsExilling)
+        {
+            Logger.Warn("Rejected: not in a valid meeting state.", "RitualistDebug");
+            return;
+        }
+
+        var actualRole = player.GetCustomRole();
+
+        Logger.Info(
+            $"Role check | ActualRole={actualRole} | " +
+            $"IsRitualist={player.Is(CustomRoles.Ritualist)}",
+            "RitualistDebug"
+        );
+
+        if (!player.Is(CustomRoles.Ritualist))
+        {
+            Logger.Warn("Rejected: player failed Ritualist role check.", "RitualistDebug");
+            player.ShowInfoMessage(
+                player.IsModded(),
+                "Ritualist command rejected: role check failed."
+            );
+            return;
+        }
+
+        bool isUI = player.IsModded();
+
 
         var originMsg = text;
 
