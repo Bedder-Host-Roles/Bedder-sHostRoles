@@ -713,7 +713,7 @@ class ShapeshiftPatch
 
         if (!Pelican.IsEaten(shapeshifter.PlayerId) && !GameStates.IsVoting)
             shapeshifter.GetRoleClass()?.OnShapeshift(shapeshifter, target, animate, shapeshifting);
-            // isSSneeded = shapeshifter.GetRoleClass()?.OnShapeshift(shapeshifter, target, animate, shapeshifting) ?? true;
+        // isSSneeded = shapeshifter.GetRoleClass()?.OnShapeshift(shapeshifter, target, animate, shapeshifting) ?? true;
 
         if (!shapeshifter.Is(CustomRoles.Glitch) && !Main.MeetingIsStarted)
         {
@@ -1002,7 +1002,7 @@ class ReportDeadBodyPatch
         _ = new LateTask(Utils.SyncAllSettings, 3f, "Sync all settings after report");
     }
 }
-// [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
+[HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.FixedUpdate))]
 class FixedUpdateInNormalGamePatch
 {
     private static readonly StringBuilder RealName = new();
@@ -1023,7 +1023,7 @@ class FixedUpdateInNormalGamePatch
 
         if (AmongUsClient.Instance.AmHost && __instance.AmOwner)
             CustomNetObject.FixedUpdate();
-        
+
         byte id = __instance.PlayerId;
 
         if (GameStates.IsHideNSeek) return;
@@ -1060,7 +1060,7 @@ class FixedUpdateInNormalGamePatch
         catch (Exception ex)
         {
             if (OnGameJoinedPatch.JoiningGame && ex is NullReferenceException) return;
-            
+
             Utils.ThrowException(ex);
             Logger.Error($"Error for {__instance.GetNameWithRole().RemoveHtmlTags()}: Error: {ex}", "FixedUpdateInNormalGamePatch");
         }
@@ -1143,11 +1143,14 @@ class FixedUpdateInNormalGamePatch
 
         AsHost(amHost, inLobby, lowLoad, player, amongUsClient, playerData, playerAmOwner, playerClientId, inGame, timerLowLoad, nowTime, playerId, isInTask);
 
-        if (!RoleTextCache.TryGetValue(playerId, out var roleText))
+        if (!RoleTextCache.TryGetValue(playerId, out var roleText) || roleText == null)
         {
-            var roleTextTransform = player.cosmetics.nameText.transform.Find("RoleText");
-            roleText = roleTextTransform.GetComponent<TMPro.TextMeshPro>();
-            RoleTextCache[playerId] = roleText;
+            var roleTextTransform = player.cosmetics?.nameText?.transform.Find("RoleText");
+            roleText = roleTextTransform != null ? roleTextTransform.GetComponent<TMPro.TextMeshPro>() : null;
+            // Do not permanently cache a missing component; PlayerStartPatch may not
+            // have created RoleText yet on the first FixedUpdate.
+            if (roleText != null)
+                RoleTextCache[playerId] = roleText;
         }
 
         if (lowLoad || roleText == null || player == null) return;
@@ -1598,15 +1601,15 @@ class PlayerClientInitializePatch
             yield break;
         }
     }
-    
+
     public static void Postfix(PlayerControl __instance, ref Il2CppSystem.Collections.IEnumerator __result)
     {
         var myEnumerator = new ClientInitializeEnumerator()
-		{
-			enumerator = __result,
-			instance = __instance
-		};
-		__result = myEnumerator.GetEnumerator().WrapToIl2Cpp();
+        {
+            enumerator = __result,
+            instance = __instance
+        };
+        __result = myEnumerator.GetEnumerator().WrapToIl2Cpp();
     }
 }
 
@@ -2012,7 +2015,7 @@ class PlayerControlCheckNamePatch
 
     // public static void Postfix(PlayerControl __instance, ref string playerName)
     // {
-        
+
     // }
 }
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetColor))]

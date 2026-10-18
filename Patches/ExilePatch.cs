@@ -249,6 +249,26 @@ class ExileControllerWrapUpPatch
 
         _ = new LateTask(() =>
         {
+            // Bodies that existed when the meeting began must stay removed after
+            // WrapUp. Clean up by parent id as well as by the captured object
+            // reference, because a client can recreate a stale body object while
+            // processing the meeting's network updates.
+            var reportedMeetingBodyIds = MeetingStates.DeadBodies?
+                .Where(body => body != null)
+                .Select(body => body.ParentId)
+                .ToHashSet() ?? new HashSet<byte>();
+
+            if (reportedMeetingBodyIds.Count > 0)
+            {
+                foreach (var body in UnityEngine.Object.FindObjectsOfType<DeadBody>())
+                {
+                    if (body != null && reportedMeetingBodyIds.Contains(body.ParentId))
+                        UnityEngine.Object.Destroy(body.gameObject);
+                }
+            }
+
+            MeetingStates.DeadBodies = Array.Empty<DeadBody>();
+
             if (!AmongUsClient.Instance.IsGameOver)
                 DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
         }, 0.8f, "Set Hud Active");

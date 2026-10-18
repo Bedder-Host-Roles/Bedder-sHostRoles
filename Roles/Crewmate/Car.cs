@@ -151,28 +151,46 @@ internal class Car : RoleBase
         float distance = Mathf.Min(PropelDistance.GetFloat(), 3f);
         Collider2D collider = target.Collider;
 
-        for (Vector2 newPos = target.GetCustomPosition();
+        // Keep the target at the last known valid position. We test the
+        // NEXT position before teleporting so the Car cannot push players
+        // through walls or into unplayable/out-of-bounds space.
+        Vector2 safePos = target.GetCustomPosition();
+
+        for (Vector2 newPos = safePos;
              Vector2.Distance(pos, newPos) <= distance && GameStates.IsInTask;
              newPos += addVector)
         {
-            if (IsSkeld)
-            {
-                var room = target.GetPlainShipRoom();
-                if (room != null &&
-                    (room.RoomId == SystemTypes.LowerEngine ||
-                     room.RoomId == SystemTypes.UpperEngine))
-                    break;
-            }
+            Vector2 nextPos = newPos + addVector;
 
+            // Map-independent boundary check.
+            // Test the candidate position before teleporting. This uses the
+            // game's ShipOnlyMask rather than hard-coded coordinates or a
+            // Skeld-only room check, so the same protection works on every map.
             if (PhysicsHelpers.AnythingBetween(
                     collider,
                     collider.bounds.center,
-                    newPos + addVector * 2,
+                    nextPos,
                     Constants.ShipOnlyMask,
                     false))
                 break;
 
-            target.RpcTeleport(newPos, sendInfoInLogs: false);
+            // Also make sure the target's collider would not overlap
+            // ship-only geometry at the candidate position.
+            Vector2 originalPosition = target.GetCustomPosition();
+            target.transform.position = nextPos;
+
+            bool invalidPosition = Physics2D.OverlapCircle(
+                collider.bounds.center,
+                Mathf.Max(collider.bounds.extents.x, collider.bounds.extents.y),
+                Constants.ShipOnlyMask) != null;
+
+            target.transform.position = originalPosition;
+
+            if (invalidPosition)
+                break;
+
+            safePos = nextPos;
+            target.RpcTeleport(safePos, sendInfoInLogs: false);
             yield return new WaitForSecondsRealtime(0.05f);
         }
 
