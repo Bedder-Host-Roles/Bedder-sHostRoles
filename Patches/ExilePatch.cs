@@ -192,7 +192,7 @@ class ExileControllerWrapUpPatch
                     // Just to be sure
                     _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
-                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true);
+                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true, false);
                 });
 
                 Main.AfterMeetingDeathPlayers.Clear();
