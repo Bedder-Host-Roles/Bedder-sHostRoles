@@ -174,7 +174,7 @@ internal class ChangeRoleSettings
                     {
                         string realName = Main.AllPlayerNames.GetValueOrDefault(pc.PlayerId, string.Empty);
                         //Logger.Info($"player id: {pc.PlayerId} {realName}", "FinallyBegin");
-                        if (realName == string.Empty) continue;
+                        if (string.IsNullOrEmpty(realName)) realName = pc.name ?? string.Empty;
 
                         currentName = realName;
                         pc.RpcSetName(realName);

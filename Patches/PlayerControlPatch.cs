@@ -1015,7 +1015,7 @@ class FixedUpdateInNormalGamePatch
     public static readonly Dictionary<byte, TMPro.TextMeshPro> RoleTextCache = [];
     private static int LevelKickBufferTime = 20;
 
-    public static void Postfix(PlayerControl __instance, bool lowLoad)
+    public static void Postfix(PlayerControl __instance)
     {
         if (__instance == null || __instance.PlayerId >= 254) return;
 
@@ -1055,7 +1055,8 @@ class FixedUpdateInNormalGamePatch
 
         try
         {
-            DoPostfix(__instance, lowLoad);
+            // Among Us 2026.9.29 FixedUpdate has no lowLoad parameter.
+            DoPostfix(__instance, lowLoad: false);
         }
         catch (Exception ex)
         {

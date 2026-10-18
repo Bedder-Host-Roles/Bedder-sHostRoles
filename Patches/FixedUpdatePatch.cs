@@ -120,7 +120,7 @@ public static class FixedUpdatePatch
 
                         if (!pc || pc.PlayerId >= 254) continue;
 
-                        FixedUpdateInNormalGamePatch.Postfix(pc, NonLowLoadPlayerIndex != index);
+                        FixedUpdateInNormalGamePatch.Postfix(pc);
 
                         if (lobby) continue;
 

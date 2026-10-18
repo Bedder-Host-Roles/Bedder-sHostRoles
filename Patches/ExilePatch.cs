@@ -158,8 +158,12 @@ class ExileControllerWrapUpPatch
                 if (GameStates.IsEnded) return;
 
                 exiled = AntiBlackout_LastExiled;
-                AntiBlackout.SendGameData();
-                AntiBlackout.SetRealPlayerRoles();
+
+                if (AntiBlackout.BlackOutIsActive)
+                {
+                    AntiBlackout.SendGameData();
+                    AntiBlackout.SetRealPlayerRoles();
+                }
 
                 if (AntiBlackout.BlackOutIsActive && // State in which the expulsion target is overwritten (need not be executed if the expulsion target is not overwritten)
                     exiled != null && // Exiled is not null
@@ -192,7 +196,7 @@ class ExileControllerWrapUpPatch
                     // Just to be sure
                     _ = new LateTask(() => player?.RpcExile(), 0.5f, "Extra Exile to be Sure");
 
-                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true, false);
+                    MurderPlayerPatch.AfterPlayerDeathTasks(player, player, true);
                 });
 
                 Main.AfterMeetingDeathPlayers.Clear();
@@ -249,26 +253,6 @@ class ExileControllerWrapUpPatch
 
         _ = new LateTask(() =>
         {
-            // Bodies that existed when the meeting began must stay removed after
-            // WrapUp. Clean up by parent id as well as by the captured object
-            // reference, because a client can recreate a stale body object while
-            // processing the meeting's network updates.
-            var reportedMeetingBodyIds = MeetingStates.DeadBodies?
-                .Where(body => body != null)
-                .Select(body => body.ParentId)
-                .ToHashSet() ?? new HashSet<byte>();
-
-            if (reportedMeetingBodyIds.Count > 0)
-            {
-                foreach (var body in UnityEngine.Object.FindObjectsOfType<DeadBody>())
-                {
-                    if (body != null && reportedMeetingBodyIds.Contains(body.ParentId))
-                        UnityEngine.Object.Destroy(body.gameObject);
-                }
-            }
-
-            MeetingStates.DeadBodies = Array.Empty<DeadBody>();
-
             if (!AmongUsClient.Instance.IsGameOver)
                 DestroyableSingleton<HudManager>.Instance.SetHudActive(true);
         }, 0.8f, "Set Hud Active");

@@ -1589,7 +1589,13 @@ class MeetingHudOnDestroyPatch
         Logger.Info("------------End Meeting------------", "Phase");
         if (AmongUsClient.Instance.AmHost)
         {
-            _ = new LateTask(() => { AntiBlackout.SetIsDead(); }, 0.1f, "AntiBlackout");
+            _ = new LateTask(() =>
+            {
+                if (AntiBlackout.BlackOutIsActive)
+                {
+                    AntiBlackout.SetIsDead();
+                }
+            }, 0.1f, "AntiBlackout");
 
             Main.LastVotedPlayerInfo = null;
             EAC.ReportTimes = [];
