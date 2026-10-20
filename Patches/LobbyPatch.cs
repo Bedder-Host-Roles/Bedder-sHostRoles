@@ -30,6 +30,8 @@ public class LobbyStartPatch
             __instance.StartCoroutine(CoLoadDecorations().WrapToIl2Cpp());
         }, waitTime, "Co Load Dropship Decorations", shoudLog: false);
 
+        CleanupStaleDeadBodies();
+
         static System.Collections.IEnumerator CoLoadDecorations()
         {
             var LeftBox = GameObject.Find("Leftbox");
@@ -62,6 +64,27 @@ public class LobbyStartPatch
             yield return null;
 
             FirstDecorationsLoad = false;
+        }
+    }
+
+    private static void CleanupStaleDeadBodies()
+    {
+        try
+        {
+            var bodies = UnityEngine.Object.FindObjectsOfType<DeadBody>();
+
+            foreach (var body in bodies)
+            {
+                if (body != null)
+                    UnityEngine.Object.Destroy(body.gameObject);
+            }
+
+            MeetingStates.DeadBodies = System.Array.Empty<DeadBody>();
+            Main.UnreportableBodies.Clear();
+        }
+        catch (System.Exception ex)
+        {
+            Logger.Error(ex.ToString(), "LobbyStartPatch");
         }
     }
 }

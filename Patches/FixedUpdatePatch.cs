@@ -15,7 +15,7 @@ namespace BHR.Patches;
 public static class FixedUpdatePatch
 {
     private static int NonLowLoadPlayerIndex;
-    
+
     [HarmonyPostfix]
     public static void Postfix()
     {
@@ -312,7 +312,7 @@ public static class FixedUpdatePatch
                     Logger.Info($"Updated kill button visibility for {player.GetRealName()}: Can Use: {player.CanUseKillButton()}; Alive: {player.IsAlive()}; InTask: {GameStates.IsInTask}", "UpdateHud");
                     killButtonStateCache[player.PlayerId] = state;
                 }
-                
+
                 // if (player.CanUseKillButton())
                 // {
                 //     __instance.KillButton.ToggleVisible(player.IsAlive() && GameStates.IsInTask);

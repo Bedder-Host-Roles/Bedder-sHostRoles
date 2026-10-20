@@ -30,11 +30,23 @@ internal class Zombie : RoleBase
     {
         opt.SetFloat(FloatOptionNames.ImpostorLightMod, 0.2f);
     }
+
     public override void SetKillCooldown(byte id)
     {
         Main.AllPlayerKillCooldown[id] = ZombieKillCooldown.GetFloat();
-        Main.AllPlayerSpeed[id] -= (float)Math.Clamp(ZombieSpeedReduce.GetFloat(), 0, (double)Main.AllPlayerSpeed[id] - 0.5);
+
+        // Reduce speed without allowing Math.Clamp's max to go below min.
+        float currentSpeed = Main.AllPlayerSpeed[id];
+        float maxReduction = Math.Max(0f, currentSpeed - 0.5f);
+        float reduction = Math.Clamp(
+            ZombieSpeedReduce.GetFloat(),
+            0f,
+            maxReduction
+        );
+
+        Main.AllPlayerSpeed[id] = currentSpeed - reduction;
     }
+
 
     public static void CheckRealVotes(PlayerControl target, ref int VoteNum)
     {

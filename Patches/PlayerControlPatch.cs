@@ -370,9 +370,9 @@ class MurderPlayerPatch
     {
         Logger.Info($"{__instance.GetNameWithRole().RemoveHtmlTags()} => {target.GetNameWithRole().RemoveHtmlTags()}{(target.IsProtected() ? "(Protected)" : "")}, flags : {resultFlags}", "MurderPlayer Prefix");
 
-        if (GameStates.IsLobby)
+        if (GameStates.IsEnded)
         {
-            Logger.Info("Murder triggered in lobby, so murder canceled", "MurderPlayer Prefix");
+            Logger.Info("Murder triggered after game end, so murder canceled", "MurderPlayer Prefix");
             return false;
         }
 
@@ -551,9 +551,9 @@ class RpcMurderPlayerPatch
         if (!AmongUsClient.Instance.AmHost)
             Logger.Error("Client is calling RpcMurderPlayer, are you Hacking?", "RpcMurderPlayerPatch.Prefix");
 
-        if (GameStates.IsLobby)
+        if (GameStates.IsEnded)
         {
-            Logger.Info("Murder triggered in lobby, so murder canceled", "RpcMurderPlayer.Prefix");
+            Logger.Info("Murder triggered after game end, so murder canceled", "RpcMurderPlayer.Prefix");
             return false;
         }
 

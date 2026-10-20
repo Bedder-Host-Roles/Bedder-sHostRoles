@@ -72,58 +72,58 @@ class CheckForEndVotingPatch
                         && voteTarget.IsAlive()
                         && !voteTarget.Data.Disconnected)
                     {
-                    TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
+                        TryAddAfterMeetingDeathPlayers(PlayerState.DeathReason.Suicide, pc.PlayerId);
 
-                    statesList.Add(new()
-                    {
-                        VoterId = pva.PlayerId,
-                        VotedForId = pva.VotedForId
-                    });
-                    states = [.. statesList];
-
-                    var exiled = voteTarget.Data;
-
-                    ExileControllerWrapUpPatch.AntiBlackout_LastExiled = exiled;
-                    Main.LastVotedPlayerInfo = exiled;
-                    AntiBlackout.ExilePlayerId = exiled.PlayerId;
-
-                    if (AntiBlackout.BlackOutIsActive)
-                    {
-                        // Need check BlackOutIsActive again
-                        var isBlackOut = AntiBlackout.BlackOutIsActive;
-
-                        if (exiled != null)
+                        statesList.Add(new()
                         {
-                            AntiBlackout.ShowExiledInfo = isBlackOut;
-                            ConfirmEjections(exiled, isBlackOut);
-                        }
+                            VoterId = pva.PlayerId,
+                            VotedForId = pva.VotedForId
+                        });
+                        states = [.. statesList];
 
-                        if (isBlackOut)
-                            __instance.AntiBlackRpcVotingComplete(states, exiled, false);
+                        var exiled = voteTarget.Data;
+
+                        ExileControllerWrapUpPatch.AntiBlackout_LastExiled = exiled;
+                        Main.LastVotedPlayerInfo = exiled;
+                        AntiBlackout.ExilePlayerId = exiled.PlayerId;
+
+                        if (AntiBlackout.BlackOutIsActive)
+                        {
+                            // Need check BlackOutIsActive again
+                            var isBlackOut = AntiBlackout.BlackOutIsActive;
+
+                            if (exiled != null)
+                            {
+                                AntiBlackout.ShowExiledInfo = isBlackOut;
+                                ConfirmEjections(exiled, isBlackOut);
+                            }
+
+                            if (isBlackOut)
+                                __instance.AntiBlackRpcVotingComplete(states, exiled, false);
+                            else
+                                __instance.RpcVotingComplete(states, exiled, false, false, 0);
+                        }
                         else
-                            __instance.RpcVotingComplete(states, exiled, false, false, 0);
-                    }
-                    else
-                    {
-
-                        if (exiled != null)
                         {
-                            ConfirmEjections(exiled);
+
+                            if (exiled != null)
+                            {
+                                ConfirmEjections(exiled);
+                            }
+
+                            __instance.RpcVotingComplete(states, exiled, false, false, 0);
                         }
 
-                        __instance.RpcVotingComplete(states, exiled, false, false, 0);
+                        Logger.Info($"{voteTarget.GetNameWithRole()} expelled by Dictator", "Dictator");
+
+                        CheckForDeathOnExile(PlayerState.DeathReason.Vote, pva.VotedForId);
+
+                        Logger.Info("Dictatorial vote, forced closure of the meeting", "Special Phase");
+
+                        voteTarget.SetRealKiller(pc);
+
+                        return true;
                     }
-
-                    Logger.Info($"{voteTarget.GetNameWithRole()} expelled by Dictator", "Dictator");
-
-                    CheckForDeathOnExile(PlayerState.DeathReason.Vote, pva.VotedForId);
-
-                    Logger.Info("Dictatorial vote, forced closure of the meeting", "Special Phase");
-
-                    voteTarget.SetRealKiller(pc);
-
-                    return true;
-                }
 
                     if (voteTarget == null || !voteTarget.IsAlive() || voteTarget.Data.Disconnected)
                     {
@@ -1116,7 +1116,7 @@ class MeetingHudStartPatch
 
         if (Eavesdropper.IsEnable)
             Eavesdropper.GetMessage();
-            
+
         // Add Mimic msg
         if (MimicMsg != "")
         {
@@ -1687,48 +1687,48 @@ class MeetingHudHandleRpcPatch
         switch (callId)
         {
             case (byte)RpcCalls.QueueOverruleVotes:
-            {
-                byte judgePlayerId = reader.ReadByte();
-                byte targetPlayerId = reader.ReadByte();
-
-                PlayerControl judge = judgePlayerId.GetPlayer();
-                PlayerControl target = targetPlayerId.GetPlayer();
-
-                if (judge && target && judge.UsesJudgeAbilityAsTrigger() && Main.PlayerStates.TryGetValue(judgePlayerId, out PlayerState state))
-                    return !state.RoleClass.OnJudge(judge, target);
-                break;
-            }
-            case (byte)RpcCalls.CloseMeeting:
-            {
-                if (AmongUsClient.Instance.AmHost)
                 {
-                    EAC.WarnHost(4);
-                    Logger.Warn("MeetingHud.HandleRpc CloseMeeting is being called, impossible to receive as host.", "MeetingHudHandleRpcPatch");
-                    return false;
+                    byte judgePlayerId = reader.ReadByte();
+                    byte targetPlayerId = reader.ReadByte();
+
+                    PlayerControl judge = judgePlayerId.GetPlayer();
+                    PlayerControl target = targetPlayerId.GetPlayer();
+
+                    if (judge && target && judge.UsesJudgeAbilityAsTrigger() && Main.PlayerStates.TryGetValue(judgePlayerId, out PlayerState state))
+                        return !state.RoleClass.OnJudge(judge, target);
+                    break;
                 }
-                else
+            case (byte)RpcCalls.CloseMeeting:
                 {
-                    Logger.Info("Received Close Meeting Rpc", "MeetingHudHandleRpcPatch");
-
-                    if (reader.BytesRemaining > 6)
+                    if (AmongUsClient.Instance.AmHost)
                     {
-                        try
-                        {
-                            var temp = reader.ReadString();
+                        EAC.WarnHost(4);
+                        Logger.Warn("MeetingHud.HandleRpc CloseMeeting is being called, impossible to receive as host.", "MeetingHudHandleRpcPatch");
+                        return false;
+                    }
+                    else
+                    {
+                        Logger.Info("Received Close Meeting Rpc", "MeetingHudHandleRpcPatch");
 
-                            if (temp.Contains("<size"))
+                        if (reader.BytesRemaining > 6)
+                        {
+                            try
                             {
-                                Logger.Info($"Read Name From Rpc: {temp}", "MeetingHudHandleRpcPatch");
-                                CheckForEndVotingPatch.TempExileMsg = temp;
+                                var temp = reader.ReadString();
+
+                                if (temp.Contains("<size"))
+                                {
+                                    Logger.Info($"Read Name From Rpc: {temp}", "MeetingHudHandleRpcPatch");
+                                    CheckForEndVotingPatch.TempExileMsg = temp;
+                                }
+                            }
+                            catch
+                            {
                             }
                         }
-                        catch
-                        {
-                        }
                     }
+                    break;
                 }
-                break;
-            }
         }
 
         return true;

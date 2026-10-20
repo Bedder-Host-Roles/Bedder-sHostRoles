@@ -94,6 +94,17 @@ public static class AntiBlackout
 
     public static void SetIsDead(bool doSend = true, [CallerMemberName] string callerMethodName = "")
     {
+        if (!BlackOutIsActive)
+        {
+            logger.Info("Skipping SetIsDead because AntiBlackout is inactive");
+            return;
+        }
+
+        SkipTasks = true;
+        RevivePlayersAndSetDummyImp();
+
+        SkipTasks = true;
+        RevivePlayersAndSetDummyImp();
         SkipTasks = true;
         RevivePlayersAndSetDummyImp();
         logger.Info($"SetIsDead is called from {callerMethodName}");
@@ -360,12 +371,9 @@ public static class AntiBlackout
 
             LegacyRpcSenders.SendExiled(pc.NetId, ownerId);
 
-            if (!pc.IsModded() && pc.PlayerId == ExileControllerWrapUpPatch.AntiBlackout_LastExiled?.PlayerId)
-            {
-                LegacyRpcSenders.SendMurderPlayer(pc.NetId, pc.NetId, MurderResultFlags.Succeeded, ownerId);
-
-                pc.ReactorFlash(0.2f);
-            }
+            // Do not send MurderPlayer to a vanilla client for a self-exile.
+            // The Exiled RPC above is sufficient to apply the exile; sending
+            // MurderPlayer here can show a kill animation and create a body.
         }
 
         ResetAllCooldown();

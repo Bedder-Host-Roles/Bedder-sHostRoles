@@ -1,4 +1,4 @@
-﻿using AmongUs.Data;
+using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
@@ -427,7 +427,7 @@ public static class Utils
         sender.Write(Main.AllPlayerKillCooldown[player.PlayerId]);
         sender.Write(Main.AllPlayerSpeed[player.PlayerId]);
         sender.EndRpc();
-        
+
         return true;
     }
     public static void SyncSpeed(this PlayerControl player)
@@ -548,7 +548,7 @@ public static class Utils
         }
     }
 
-    private static readonly CustomRoles[] displayedSubRoles = 
+    private static readonly CustomRoles[] displayedSubRoles =
     [
         CustomRoles.Madmate,
         CustomRoles.Recruit,
@@ -676,11 +676,11 @@ public static class Utils
         if (States.RoleClass != null && !States.RoleClass.HasTasks(playerData, role, ForRecompute)) hasTasks = false;
 
         if (
-            role == CustomRoles.GM || 
+            role == CustomRoles.GM ||
             States.RoleClass.ThisRoleBase is CustomRoles.Impostor or CustomRoles.Shapeshifter or CustomRoles.Phantom or CustomRoles.Viper
         ) hasTasks = false;
 
-        foreach (var subRole in States.SubRoles.ToArray()) 
+        foreach (var subRole in States.SubRoles.ToArray())
         {
             if (subRole == CustomRoles.Mundane && !hasTasks)
                 hasTasks = !ForRecompute;
@@ -1255,7 +1255,7 @@ public static class Utils
             helpString.Append("\n\n");
             helpString.AppendGetString($"CommandList.{currentBlock}");
         }
-    
+
         helpString.Append(command.BHRlpString());
     }
     private static readonly StringBuilder helpString = new();
@@ -1485,7 +1485,7 @@ public static class Utils
         return false;
     }
 
-    private static void HandleSplitMessage(string text, int textRpcSizeLimit, byte sendTo, int targetClientId,  string title, PlayerControl sender, ref CustomRpcSender writer, SendOption sendOption, bool multiple)
+    private static void HandleSplitMessage(string text, int textRpcSizeLimit, byte sendTo, int targetClientId, string title, PlayerControl sender, ref CustomRpcSender writer, SendOption sendOption, bool multiple)
     {
         string[] lines = text.Split('\n');
         var shortenedText = string.Empty;
@@ -1523,7 +1523,7 @@ public static class Utils
         }
     }
 
-    private static void RestartMessageIfTooLong(ref CustomRpcSender writer, SendOption sendOption) 
+    private static void RestartMessageIfTooLong(ref CustomRpcSender writer, SendOption sendOption)
     {
         if (writer.stream.Length > 500)
         {
@@ -1596,10 +1596,10 @@ public static class Utils
     private static string ReplaceHexColorsWithSafeColors(string text) => ColorTagRegex.Replace(text, match =>
     {
         string hex = match.Groups[1].Value.ToLowerInvariant();
-        
+
         string a = hex.Length == 8 ? hex[6..8] : string.Empty;
         if (!string.IsNullOrEmpty(a)) hex = hex[..6];
-        
+
         if (hex.Length != 6 || !hex.Any(char.IsDigit)) return match.Value;
 
         int r = Convert.ToInt32(hex[..2], 16);
@@ -1615,7 +1615,7 @@ public static class Utils
     private static string FindClosestSafeColor(int r, int g, int b)
     {
         if (CachedColorReplacements.TryGetValue((r, g, b), out string cache)) return cache;
-        
+
         double bestDist = double.MaxValue;
         string bestValue = "white";
 
@@ -1677,7 +1677,7 @@ public static class Utils
 
         return CachedLetterOnlyHexColors;
     }
-    
+
     private static string ReplaceDigitsOutsideRichText(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return text;
@@ -1981,7 +1981,7 @@ public static class Utils
                 name = Options.HideHostText.GetBool() ? coloredName
                                                     : $"{coloredHost}<color={GetString("IconColor")}>{GetString("Icon")}</color>{coloredName}";
             }
-            
+
         }
         if (Options.CurrentGameMode == CustomGameMode.FFA)
             name = $"<color=#00ffff><size=1.7>{GetString("ModeFFA")}</size></color>\r\n" + name;
@@ -2084,10 +2084,10 @@ public static class Utils
 
         if (Options.ApplyModeratorList.GetValue() == 1 && player.FriendCode != PlayerControl.LocalPlayer.FriendCode)
             if (IsPlayerModerator(player.FriendCode)) modtag = GetModTag(player);
-        
+
         if (player.FriendCode != PlayerControl.LocalPlayer.FriendCode && TagManager.CheckFriendCode(player.FriendCode, false))
             modtag = TagManager.ReadColoredTag(player.FriendCode);
-        
+
         return modtag;
     }
     private static void AppendHostLobbyTag(ref string name)
@@ -2123,7 +2123,7 @@ public static class Utils
                 SetRealName(player);
                 return;
             }
-        }        
+        }
 
         string name = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n) ? n : "";
         if (Main.HostRealName != "" && player.AmOwner) name = Main.HostRealName;
@@ -2538,7 +2538,7 @@ public static class Utils
         string fontSize = isForMeeting ? "1.6" : "1.8";
         string fontSizeDeathReason = "1.6";
         if (
-                seer.Data.IsDead 
+                seer.Data.IsDead
                 || !seer.IsAlive()
                 || seerList.Count() == 1
                 || targetList.Count() == 1
@@ -2581,7 +2581,7 @@ public static class Utils
                         string TargetRoleText = KnowRoleTarget
                                 ? $"<size={fontSize}>{seer.GetDisplayRoleAndSubName(target, false)}{GetProgressText(target)}</size>\r\n" : "";
 
-                        
+
 
                         HandleTargetDisguised(seer, target, fontSize, ref TargetRoleText);
 
@@ -2823,55 +2823,55 @@ public static class Utils
             PlayerState.DeathReason.Shattered => CustomRoles.Fragile.IsEnable(),
             PlayerState.DeathReason.Bite => CustomRoles.Vampire.IsEnable(),
             PlayerState.DeathReason.Poison => CustomRoles.Poisoner.IsEnable(),
-            PlayerState.DeathReason.Bombed => CustomRoles.Bomber.IsEnable() 
+            PlayerState.DeathReason.Bombed => CustomRoles.Bomber.IsEnable()
                                 || CustomRoles.Burst.IsEnable()
-                                || CustomRoles.Trapster.IsEnable() 
-                                || CustomRoles.Fireworker.IsEnable() 
-                                || CustomRoles.Bastion.IsEnable(),
-            PlayerState.DeathReason.Misfire => CustomRoles.ChiefOfPolice.IsEnable() 
-                                || CustomRoles.Sheriff.IsEnable()
-                                || CustomRoles.Reverie.IsEnable() 
-                                || CustomRoles.Sheriff.IsEnable() 
+                                || CustomRoles.Trapster.IsEnable()
                                 || CustomRoles.Fireworker.IsEnable()
-                                || CustomRoles.Hater.IsEnable() 
-                                || CustomRoles.Pursuer.IsEnable() 
+                                || CustomRoles.Bastion.IsEnable(),
+            PlayerState.DeathReason.Misfire => CustomRoles.ChiefOfPolice.IsEnable()
+                                || CustomRoles.Sheriff.IsEnable()
+                                || CustomRoles.Reverie.IsEnable()
+                                || CustomRoles.Sheriff.IsEnable()
+                                || CustomRoles.Fireworker.IsEnable()
+                                || CustomRoles.Hater.IsEnable()
+                                || CustomRoles.Pursuer.IsEnable()
                                 || CustomRoles.Romantic.IsEnable()
                                 || CustomRoles.Inquisitor.IsEnable(),
-            PlayerState.DeathReason.Torched => CustomRoles.Arsonist.IsEnable() 
+            PlayerState.DeathReason.Torched => CustomRoles.Arsonist.IsEnable()
                                 || CustomRoles.Inquisitor.IsEnable(),
             PlayerState.DeathReason.Sniped => CustomRoles.Sniper.IsEnable(),
-            PlayerState.DeathReason.Revenge => CustomRoles.Avanger.IsEnable() 
+            PlayerState.DeathReason.Revenge => CustomRoles.Avanger.IsEnable()
                                 || CustomRoles.Retributionist.IsEnable()
                                 || CustomRoles.Nemesis.IsEnable(),
             PlayerState.DeathReason.Quantization => CustomRoles.Lightning.IsEnable(),
             PlayerState.DeathReason.Ashamed => CustomRoles.Workaholic.IsEnable(),
-            PlayerState.DeathReason.PissedOff => CustomRoles.Pestilence.IsEnable() 
+            PlayerState.DeathReason.PissedOff => CustomRoles.Pestilence.IsEnable()
                                 || CustomRoles.Provocateur.IsEnable(),
             PlayerState.DeathReason.Dismembered => CustomRoles.Butcher.IsEnable(),
             PlayerState.DeathReason.LossOfHead => CustomRoles.Hangman.IsEnable(),
-            PlayerState.DeathReason.Trialed => CustomRoles.Prosecutor.IsEnable() 
+            PlayerState.DeathReason.Trialed => CustomRoles.Prosecutor.IsEnable()
                                 || CustomRoles.Councillor.IsEnable(),
             PlayerState.DeathReason.Infected => CustomRoles.Infectious.IsEnable(),
             PlayerState.DeathReason.Hack => false,
             PlayerState.DeathReason.Pirate => CustomRoles.Pirate.IsEnable(),
             PlayerState.DeathReason.Shrouded => CustomRoles.Shroud.IsEnable(),
             PlayerState.DeathReason.Mauled => CustomRoles.Werewolf.IsEnable(),
-            PlayerState.DeathReason.Suicide => CustomRoles.Unlucky.IsEnable() 
+            PlayerState.DeathReason.Suicide => CustomRoles.Unlucky.IsEnable()
                                 || CustomRoles.Ghoul.IsEnable()
-                                || CustomRoles.Terrorist.IsEnable() 
+                                || CustomRoles.Terrorist.IsEnable()
                                 || CustomRoles.Dictator.IsEnable()
-                                || CustomRoles.Addict.IsEnable() 
+                                || CustomRoles.Addict.IsEnable()
                                 || CustomRoles.Mercenary.IsEnable()
-                                || CustomRoles.Mastermind.IsEnable() 
+                                || CustomRoles.Mastermind.IsEnable()
                                 || CustomRoles.Deathpact.IsEnable(),
-            PlayerState.DeathReason.FollowingSuicide => CustomRoles.Lovers.IsEnable() 
+            PlayerState.DeathReason.FollowingSuicide => CustomRoles.Lovers.IsEnable()
                                 || CustomRoles.Romantic.IsEnable(),
             PlayerState.DeathReason.Execution => CustomRoles.Jailer.IsEnable(),
             PlayerState.DeathReason.Fall => Options.LadderDeath.GetBool(),
-            PlayerState.DeathReason.Sacrifice => CustomRoles.Bodyguard.IsEnable() 
+            PlayerState.DeathReason.Sacrifice => CustomRoles.Bodyguard.IsEnable()
                                 || CustomRoles.Revolutionist.IsEnable()
                                 || CustomRoles.Hater.IsEnable(),
-            PlayerState.DeathReason.Drained => CustomRoles.Puppeteer.IsEnable() 
+            PlayerState.DeathReason.Drained => CustomRoles.Puppeteer.IsEnable()
                                 || CustomRoles.Sorceress.IsEnable(),
             PlayerState.DeathReason.Trap => CustomRoles.Trapster.IsEnable(),
             PlayerState.DeathReason.Targeted => CustomRoles.Kamikaze.IsEnable(),
@@ -2940,6 +2940,26 @@ public static class Utils
                 }
 
                 AFKDetector.RecordPosition(player);
+
+                // Immediate vanilla-client black-screen recovery after meeting wrap-up.
+                // This is intentionally independent of the AFK detection timer.
+                if (player.IsAlive() && !player.IsModded() && !MeetingStates.FirstMeeting)
+                {
+                    Logger.Info($"[BHR-BS-FIX] Triggering post-meeting recovery for {player.GetNameWithRole()}.", "FixBlackScreen");
+                    player.FixBlackScreen();
+                }
+            }
+
+            // Dead vanilla clients are not included in EnumerateAlivePlayerControls().
+            // Run the existing dead-player recovery path for them after meeting wrap-up.
+            if (!MeetingStates.FirstMeeting)
+            {
+                foreach (var player in Main.EnumeratePlayerControls())
+                {
+                    if (player == null || player.IsAlive() || player.IsModded()) continue;
+                    Logger.Info($"[BHR-BS-FIX] Triggering post-meeting ghost recovery for {player.GetNameWithRole()}.", "FixBlackScreen");
+                    player.FixBlackScreen();
+                }
             }
 
             if (Statue.IsEnable) Statue.AfterMeetingTasks();
@@ -3037,7 +3057,7 @@ public static class Utils
         var f = $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}/BHR-logs/";
         if (OperatingSystem.IsAndroid())
             f = $"{Main.DataPath}/BHR-logs/";
-        
+
         string t = DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss");
         string filename = $"{f}BHR-v{Main.PluginVersion}-{t}.log";
         if (!Directory.Exists(f)) Directory.CreateDirectory(f);
@@ -3181,9 +3201,9 @@ public static class Utils
     }
     public static Color ShadeColor(this Color color, float Darkness = 0)
     {
-        bool IsDarker = Darkness >= 0; 
+        bool IsDarker = Darkness >= 0;
         if (!IsDarker) Darkness = -Darkness;
-        float Weight = IsDarker ? 0 : Darkness; 
+        float Weight = IsDarker ? 0 : Darkness;
         float R = (color.r + Weight) / (Darkness + 1);
         float G = (color.g + Weight) / (Darkness + 1);
         float B = (color.b + Weight) / (Darkness + 1);

@@ -1040,7 +1040,7 @@ public static class ExtendedPlayerControl
             return State.SubRoles;
         }
 
-        return  [CustomRoles.NotAssigned];
+        return [CustomRoles.NotAssigned];
     }
     public static CountTypes GetCountTypes(this PlayerControl player)
     {
@@ -1238,7 +1238,7 @@ public static class ExtendedPlayerControl
     }
     public static bool CanUseKillButtonNested(this PlayerControl pc)
     {
-        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId)) 
+        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId))
         {
             if (KillButtonCache.TryGetValue(pc.PlayerId, out var cachedResult) && cachedResult)
             {
@@ -1340,7 +1340,7 @@ public static class ExtendedPlayerControl
         {
             Main.AllPlayerKillCooldown[player.PlayerId] = 0.3f;
         }
-        
+
         Logger.Info($"Set {player.name} cooldown to {Main.AllPlayerKillCooldown[player.PlayerId]}", "ResetKillCooldown");
     }
     public static bool IsNonCrewSheriff(this PlayerControl sheriff) => ((IPlayerControl)(ModdedPlayerControl)sheriff).IsNonCrewSheriff();
@@ -1506,7 +1506,7 @@ public static class ExtendedPlayerControl
         else if (Madmate.ImpKnowWhosMadmate.GetBool() && target.Is(CustomRoles.Madmate) && seer.CheckImpCanSeeAllies(CheckAsSeer: true)) return LogKnowRole(true);
         else if (seer.CheckImpCanSeeAllies(CheckAsSeer: true) && target.GetCustomRole().IsGhostRole() && target.GetCustomRole().IsImpostor() && !Main.PlayerStates[target.PlayerId].IsNecromancer) return LogKnowRole(true);
         else if (seer.IsNeutralApocalypse() && target.IsNeutralApocalypse() && !Main.PlayerStates[seer.PlayerId].IsFalseRole && !Main.PlayerStates[target.PlayerId].IsFalseRole) return LogKnowRole(true);
-        else if (Ritualist.EnchantedKnowsCoven.GetBool() && seer.Is(CustomRoles.Enchanted) && ( target.Is(Custom_Team.Coven) || (Summoner.KnowSummonedRoles.GetBool() && target.Is(CustomRoles.Summoned))) && !Main.PlayerStates[target.PlayerId].IsRandomizer) return LogKnowRole(true);
+        else if (Ritualist.EnchantedKnowsCoven.GetBool() && seer.Is(CustomRoles.Enchanted) && (target.Is(Custom_Team.Coven) || (Summoner.KnowSummonedRoles.GetBool() && target.Is(CustomRoles.Summoned))) && !Main.PlayerStates[target.PlayerId].IsRandomizer) return LogKnowRole(true);
         else if (target.Is(CustomRoles.Enchanted) && (seer.Is(Custom_Team.Coven) || (Summoner.KnowSummonedRoles.GetBool() && seer.Is(CustomRoles.Summoned))) && !Main.PlayerStates[seer.PlayerId].IsRandomizer) return LogKnowRole(true);
         else if ((target.Is(Custom_Team.Coven) || (Summoner.KnowSummonedRoles.GetBool() && target.Is(CustomRoles.Summoned))) && (seer.Is(Custom_Team.Coven) || (Summoner.KnowSummonedRoles.GetBool() && seer.Is(CustomRoles.Summoned))) && !Main.PlayerStates[seer.PlayerId].IsRandomizer && !Main.PlayerStates[target.PlayerId].IsRandomizer) return LogKnowRole(true);
         else if (target.GetRoleClass().KnowRoleTarget(seer, target)) return LogKnowRole(true);
@@ -1804,11 +1804,23 @@ public static class ExtendedPlayerControl
     // Credit to EHR
     public static void FixBlackScreen(this PlayerControl pc)
     {
-        if (pc == null || !AmongUsClient.Instance.AmHost || pc.IsModded()) return;
+        if (pc == null || !AmongUsClient.Instance.AmHost) return;
+
+        // Match the reference fork: do not run the normal black-screen repair
+        // during the first meeting; refresh the target client's role state instead.
+        if (MeetingStates.FirstMeeting)
+        {
+            pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.OwnerId);
+            return;
+        }
+
+        if (pc.IsModded()) return;
 
         var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost);
-        if (ShouldDeferBlackScreenFix(GameStates.IsMeeting, ExileController.Instance, AntiBlackout.SkipTasks, pc.inVent,
-            pc.inMovingPlat, pc.onLadder, hasDeadGhost))
+        // Wait for unsafe game states to finish, but do not wait forever just because
+        // every player is alive. A living-only lobby uses the system-only fallback below.
+        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent
+            || pc.inMovingPlat || pc.onLadder)
         {
             if (BlackScreenWaitingPlayers.Add(pc.PlayerId))
                 Main.Instance.StartCoroutine(Wait());
@@ -1819,7 +1831,7 @@ public static class ExtendedPlayerControl
             {
                 Logger.Warn($"FixBlackScreen was called for {pc.GetNameWithRole()}, but the conditions are not met to execute this code right now, waiting until it becomes possible to do so", "FixBlackScreen");
 
-                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || Main.EnumeratePlayerControls().All(x => x.IsAlive())))
+                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder))
                     yield return null;
 
                 if (CancelBlackScreenFix.Remove(pc.PlayerId))
@@ -1852,80 +1864,103 @@ public static class ExtendedPlayerControl
         }
 
         var systemtype = GetBlackScreenRepairSystemType(Utils.GetActiveMapId());
+        var playerName = pc.GetNameWithRole();
+        var targetClientId = pc.OwnerId;
+        var originalPosition = pc.GetCustomPosition();
+        var cooldown = Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var value) ? Math.Max(value, 0.1f) : 20f;
 
-        var sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()}", SendOption.Reliable);
+        // A vanilla client's camera/HUD is not reset by UpdateSystem repair phases alone.
+        // Use the legacy targeted murder-state transition, then immediately repair the
+        // client-side system state and return living players to their original position.
+        // The RPC is targeted only at the affected vanilla client; the host's authoritative
+        // death state is not changed. Never move a living fallback player as the dummy killer.
+        hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => x != null && !x.IsAlive(), out dummyGhost);
+        if (pc.IsAlive() && !hasDeadGhost)
+            dummyGhost = Main.EnumeratePlayerControls().FindFirst(x => x != null && x.PlayerId != pc.PlayerId, out var fallbackPlayer) ? fallbackPlayer : null;
 
-        sender.RpcDesyncRepairSystem(pc, systemtype, 128);
-
-        int targetClientId = pc.OwnerId;
-        var ghostPos = dummyGhost.GetCustomPosition();
-        var pcPos = pc.GetCustomPosition();
-        var timer = Math.Max(Main.AllPlayerKillCooldown[pc.PlayerId], 0.1f);
-
-        if (pc.IsAlive())
+        if (pc.IsAlive() && dummyGhost == null)
         {
-            // CheckInvalidMovementPatch.ExemptedPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
-            AFKDetector.TempIgnoredPlayers.UnionWith([pc.PlayerId, dummyGhost.PlayerId]);
-            _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.ExceptWith([pc.PlayerId, dummyGhost.PlayerId]), 3f);
-
-            var murderPos = Pelican.GetBlackRoomPSForPelican();
-
-            sender.TP(pc, murderPos, noCheckState: true);
-
-            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-            sender.WriteNetObject(dummyGhost);
-            sender.Write((int)MurderResultFlags.Succeeded);
-            sender.EndRpc();
-
-            dummyGhost.NetTransform.SnapTo(murderPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
-            dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
-
-            sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
-            sender.WriteVector2(murderPos);
-            sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
-            sender.EndRpc();
-        }
-        else
-        {
-            sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-            sender.WriteNetObject(pc);
-            sender.Write((int)MurderResultFlags.Succeeded);
-            sender.EndRpc();
+            Logger.Error($"[BHR-BS-FIX] Cannot reset camera for {playerName}: no other player is available for targeted recovery.", "FixBlackScreen");
+            return;
         }
 
-        sender.SendMessage();
-
-        _ = new LateTask(() =>
+        Vector2 recoveryPosition = originalPosition;
+        try
         {
-            sender = CustomRpcSender.Create($"Fix Black Screen For {pc.GetNameWithRole()} (2)", SendOption.Reliable);
+            if (pc.IsAlive()) recoveryPosition = Pelican.GetBlackRoomPSForPelican();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"[BHR-BS-FIX] No recovery position for map {Utils.GetActiveMapId()}: {ex.Message}", "FixBlackScreen");
+            return;
+        }
 
-            sender.RpcDesyncRepairSystem(pc, systemtype, 16);
-            if (systemtype == SystemTypes.HeliSabotage) sender.RpcDesyncRepairSystem(pc, systemtype, 17);
+        Logger.Warn($"[BHR-BS-FIX] Starting targeted camera/HUD reset for {playerName} on map {Utils.GetActiveMapId()} ({systemtype}); alive={pc.IsAlive()}, deadGhost={hasDeadGhost}.", "FixBlackScreen");
+        AFKDetector.TempIgnoredPlayers.Add(pc.PlayerId);
+        _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.Remove(pc.PlayerId), 4f);
+
+        try
+        {
+            var sender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (camera reset)", SendOption.Reliable);
+            sender.RpcDesyncRepairSystem(pc, systemtype, 128);
 
             if (pc.IsAlive())
             {
-                sender.TP(pc, pcPos, noCheckState: true);
-                pc.SetKillCooldown(timer);
-                pc.Notify(GetString("BlackScreenFixCompleteNotify"));
-
-                dummyGhost.NetTransform.SnapTo(ghostPos, (ushort)(dummyGhost.NetTransform.lastSequenceId + 328));
-                dummyGhost.NetTransform.SetDirtyBit(uint.MaxValue);
-
-                sender.AutoStartRpc(dummyGhost.NetTransform.NetId, 21);
-                sender.WriteVector2(ghostPos);
-                sender.Write((ushort)(dummyGhost.NetTransform.lastSequenceId + 8));
+                sender.TP(pc, recoveryPosition, noCheckState: true, log: false);
+                // This murder RPC is delivered only to the affected vanilla client. If the
+                // fallback killer is alive, leave their position untouched on every client.
+                sender.AutoStartRpc(pc.NetId, 12, targetClientId);
+                sender.WriteNetObject(dummyGhost);
+                sender.Write((int)MurderResultFlags.Succeeded);
                 sender.EndRpc();
             }
-
+            else
+            {
+                // For a ghost, target the state transition at that client's own ghost object.
+                sender.AutoStartRpc(pc.NetId, 12, targetClientId);
+                sender.WriteNetObject(pc);
+                sender.Write((int)MurderResultFlags.Succeeded);
+                sender.EndRpc();
+            }
             sender.SendMessage();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"[BHR-BS-FIX] Initial camera reset RPC failed for {playerName}: {ex}", "FixBlackScreen");
+            return;
+        }
+
+        _ = new LateTask(() =>
+        {
+            if (pc == null || !GameStates.InGame || GameStates.IsEnded) return;
+            try
+            {
+                var repair = CustomRpcSender.Create($"Fix Black Screen For {playerName} (restore)", SendOption.Reliable);
+                repair.RpcDesyncRepairSystem(pc, systemtype, 16);
+                if (systemtype == SystemTypes.HeliSabotage)
+                    repair.RpcDesyncRepairSystem(pc, systemtype, 17);
+
+                if (pc.IsAlive())
+                {
+                    repair.TP(pc, originalPosition, noCheckState: true, log: false);
+                    pc.SetKillCooldown(cooldown);
+                    pc.Notify(GetString("BlackScreenFixCompleteNotify"));
+                }
+                repair.SendMessage();
+                Logger.Msg($"[BHR-BS-FIX] Targeted camera/HUD reset sequence sent to {playerName}.", "FixBlackScreen");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"[BHR-BS-FIX] Restore phase failed for {playerName}: {ex}", "FixBlackScreen");
+            }
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
+        return;
     }
 
     public static bool ShouldDeferBlackScreenFix(bool isMeeting, bool hasExileController, bool isSkippingTasks,
         bool isInVent, bool isUsingMovingPlatform, bool isOnLadder, bool hasDeadGhost)
     {
-        return isMeeting || hasExileController || isSkippingTasks || isInVent || isUsingMovingPlatform || isOnLadder
-            || !hasDeadGhost;
+        return isMeeting || hasExileController || isSkippingTasks || isInVent || isUsingMovingPlatform || isOnLadder;
     }
 
     public static SystemTypes GetBlackScreenRepairSystemType(int mapId)
