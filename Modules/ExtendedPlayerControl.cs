@@ -2027,7 +2027,7 @@ public static class ExtendedPlayerControl
     }
 
     public static bool ShouldDeferBlackScreenFix(bool isMeeting, bool hasExileController, bool isSkippingTasks,
-        bool isInVent, bool isUsingMovingPlatform, bool isOnLadder, bool hasDeadGhost)
+        bool isInVent, bool isUsingMovingPlatform, bool isOnLadder)
     {
         return isMeeting || hasExileController || isSkippingTasks || isInVent || isUsingMovingPlatform || isOnLadder;
     }
