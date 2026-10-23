@@ -26,6 +26,10 @@ namespace BHR;
 public static class ExtendedPlayerControl
 {
     public static readonly HashSet<byte> BlackScreenWaitingPlayers = [];
+    // Client-targeted black-screen recovery can temporarily create a local-only fake body
+    // when no real dead player exists. Suppress only reports from the affected client
+    // for that temporary body; other clients and normal bodies are untouched.
+    public static readonly HashSet<(byte TargetPlayerId, int ReporterClientId)> BlackScreenRecoveryReports = [];
     public static readonly HashSet<byte> CancelBlackScreenFix = [];
     // checkAddons disable checks in MainRole Set, checkAAconflict disable checks in SubRole Set
     public static void RpcSetCustomRole(this PlayerControl player, CustomRoles role, bool checkAddons = true, bool checkAAconflict = true)
@@ -1802,12 +1806,14 @@ public static class ExtendedPlayerControl
     public static SendOption RpcSendOption => Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool() ? SendOption.None : SendOption.Reliable;
 
     // Credit to EHR
+    // Adapted from EndlessHostRoles 8.0.3's vanilla black-screen recovery.
+    // The important difference from the old BHR workaround is that the MurderPlayer
+    // transition is sent ONLY to the affected vanilla client's connection, and for
+    // a living player it targets an existing ghost object rather than the player.
     public static void FixBlackScreen(this PlayerControl pc)
     {
         if (pc == null || !AmongUsClient.Instance.AmHost) return;
 
-        // Match the reference fork: do not run the normal black-screen repair
-        // during the first meeting; refresh the target client's role state instead.
         if (MeetingStates.FirstMeeting)
         {
             pc.RpcSetRoleDesync(pc.GetCustomRole().GetRoleTypes(), pc.OwnerId);
@@ -1816,145 +1822,208 @@ public static class ExtendedPlayerControl
 
         if (pc.IsModded()) return;
 
-        var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost);
-        // Wait for unsafe game states to finish, but do not wait forever just because
-        // every player is alive. A living-only lobby uses the system-only fallback below.
-        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent
-            || pc.inMovingPlat || pc.onLadder)
+        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks
+            || pc.inVent || pc.inMovingPlat || pc.onLadder)
         {
             if (BlackScreenWaitingPlayers.Add(pc.PlayerId))
                 Main.Instance.StartCoroutine(Wait());
-
             return;
 
             IEnumerator Wait()
             {
-                Logger.Warn($"FixBlackScreen was called for {pc.GetNameWithRole()}, but the conditions are not met to execute this code right now, waiting until it becomes possible to do so", "FixBlackScreen");
-
-                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId) && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks || pc.inVent || pc.inMovingPlat || pc.onLadder))
+                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId)
+                    && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks
+                        || pc.inVent || pc.inMovingPlat || pc.onLadder))
                     yield return null;
 
-                if (CancelBlackScreenFix.Remove(pc.PlayerId))
+                if (CancelBlackScreenFix.Remove(pc.PlayerId) || !GameStates.InGame || GameStates.IsEnded)
                 {
-                    Logger.Msg($"The black screen fix was canceled for {pc.GetNameWithRole()}", "FixBlackScreen");
-                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
-                    yield break;
-                }
-
-                if (!GameStates.InGame || GameStates.IsEnded)
-                {
-                    Logger.Msg($"During the waiting, the game ended, so the black screen fix will not be executed for {pc.GetNameWithRole()}", "FixBlackScreen");
                     BlackScreenWaitingPlayers.Remove(pc.PlayerId);
                     yield break;
                 }
 
                 yield return new WaitForSecondsRealtime(pc.IsAlive() ? 1f : 3f);
-
-                if (!GameStates.InGame || GameStates.IsEnded)
-                {
-                    Logger.Msg($"During the waiting, the game ended, so the black screen fix will not be executed for {pc.GetNameWithRole()}", "FixBlackScreen");
-                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
-                    yield break;
-                }
-
-                Logger.Msg($"Now that the conditions are met, fixing black screen for {pc.GetNameWithRole()}", "FixBlackScreen");
                 BlackScreenWaitingPlayers.Remove(pc.PlayerId);
-                pc.FixBlackScreen();
+                if (GameStates.InGame && !GameStates.IsEnded) pc.FixBlackScreen();
             }
         }
 
         var systemtype = GetBlackScreenRepairSystemType(Utils.GetActiveMapId());
         var playerName = pc.GetNameWithRole();
         var targetClientId = pc.OwnerId;
+        var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost);
+        // A living vanilla player can still need the camera transition even when
+        // nobody is dead. In that case there is no real ghost object to use as
+        // the MurderPlayer payload, so use the affected player itself as a
+        // client-targeted, temporary proxy. The RPC is never broadcast; this is
+        // the same recovery transition as the dead-player path without creating
+        // a visible body for other clients.
+        var cameraProxy = hasDeadGhost
+            ? dummyGhost
+            : Main.EnumeratePlayerControls().FirstOrDefault(x => x != null && x.PlayerId != pc.PlayerId) ?? pc;
+        if (!hasDeadGhost && pc.IsAlive())
+        {
+            Logger.Info($"[BHR-BS-FIX] No dead player available; using {cameraProxy.GetNameWithRole()} as the targeted camera recovery proxy for {playerName}.", "FixBlackScreen");
+
+            // MurderPlayer is intentionally targeted only to this vanilla client.
+            // On that client the temporary proxy can appear as a local dead body and
+            // vanilla may immediately try to report it. Block only that client's
+            // report of this recovery body for the duration of the repair window.
+            var recoveryReportKey = (cameraProxy.PlayerId, targetClientId);
+            BlackScreenRecoveryReports.Add(recoveryReportKey);
+            _ = new LateTask(
+                () => BlackScreenRecoveryReports.Remove(recoveryReportKey),
+                5f, "Clear BlackScreen recovery report guard");
+        }
+
+        var ghostPosition = cameraProxy.GetCustomPosition();
         var originalPosition = pc.GetCustomPosition();
-        var cooldown = Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var value) ? Math.Max(value, 0.1f) : 20f;
+        var cooldown = Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var value)
+            ? Math.Max(value, 0.1f) : 20f;
 
-        // A vanilla client's camera/HUD is not reset by UpdateSystem repair phases alone.
-        // Use the legacy targeted murder-state transition, then immediately repair the
-        // client-side system state and return living players to their original position.
-        // The RPC is targeted only at the affected vanilla client; the host's authoritative
-        // death state is not changed. Never move a living fallback player as the dummy killer.
-        hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => x != null && !x.IsAlive(), out dummyGhost);
-        if (pc.IsAlive() && !hasDeadGhost)
-            dummyGhost = Main.EnumeratePlayerControls().FindFirst(x => x != null && x.PlayerId != pc.PlayerId, out var fallbackPlayer) ? fallbackPlayer : null;
+        var sender = CustomRpcSender.Create($"Fix Black Screen For {playerName}", SendOption.Reliable);
+        sender.RpcDesyncRepairSystem(pc, systemtype, 128);
 
-        if (pc.IsAlive() && dummyGhost == null)
+        if (pc.IsAlive())
         {
-            Logger.Error($"[BHR-BS-FIX] Cannot reset camera for {playerName}: no other player is available for targeted recovery.", "FixBlackScreen");
-            return;
-        }
+            AFKDetector.TempIgnoredPlayers.UnionWith([pc.PlayerId, cameraProxy.PlayerId]);
+            _ = new LateTask(
+                () => AFKDetector.TempIgnoredPlayers.ExceptWith([pc.PlayerId, cameraProxy.PlayerId]),
+                3f);
 
-        Vector2 recoveryPosition = originalPosition;
-        try
-        {
-            if (pc.IsAlive()) recoveryPosition = Pelican.GetBlackRoomPSForPelican();
-        }
-        catch (Exception ex)
-        {
-            Logger.Error($"[BHR-BS-FIX] No recovery position for map {Utils.GetActiveMapId()}: {ex.Message}", "FixBlackScreen");
-            return;
-        }
+            Vector2 recoveryPosition;
+            var targetPlatform = pc.GetClient()?.PlatformData.Platform;
+            var consoleClient = targetPlatform is Platforms.Playstation or Platforms.Xbox or Platforms.Switch;
+            try
+            {
+                recoveryPosition = Pelican.GetBlackRoomPSForPelican();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"[BHR-BS-FIX] No recovery position for map {Utils.GetActiveMapId()}: {ex.Message}", "FixBlackScreen");
+                return;
+            }
 
-        Logger.Warn($"[BHR-BS-FIX] Starting targeted camera/HUD reset for {playerName} on map {Utils.GetActiveMapId()} ({systemtype}); alive={pc.IsAlive()}, deadGhost={hasDeadGhost}.", "FixBlackScreen");
-        AFKDetector.TempIgnoredPlayers.Add(pc.PlayerId);
-        _ = new LateTask(() => AFKDetector.TempIgnoredPlayers.Remove(pc.PlayerId), 4f);
-
-        try
-        {
-            var sender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (camera reset)", SendOption.Reliable);
-            sender.RpcDesyncRepairSystem(pc, systemtype, 128);
-
-            if (pc.IsAlive())
+            if (hasDeadGhost)
             {
                 sender.TP(pc, recoveryPosition, noCheckState: true, log: false);
-                // This murder RPC is delivered only to the affected vanilla client. If the
-                // fallback killer is alive, leave their position untouched on every client.
-                sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-                sender.WriteNetObject(dummyGhost);
-                sender.Write((int)MurderResultFlags.Succeeded);
-                sender.EndRpc();
+                cameraProxy.NetTransform.SnapTo(recoveryPosition, (ushort)(cameraProxy.NetTransform.lastSequenceId + 328));
+                cameraProxy.NetTransform.SetDirtyBit(uint.MaxValue);
             }
             else
             {
-                // For a ghost, target the state transition at that client's own ghost object.
-                sender.AutoStartRpc(pc.NetId, 12, targetClientId);
-                sender.WriteNetObject(pc);
-                sender.Write((int)MurderResultFlags.Succeeded);
+                // With no dead player, every movement RPC in this recovery sequence
+                // must remain targeted at the affected vanilla client. Broadcasting
+                // these SnapTo calls would visibly teleport living players for everyone.
+                var proxyRecoveryPosition = consoleClient
+                    ? new Vector2(500f, 500f)
+                    : recoveryPosition;
+
+                if (consoleClient)
+                {
+                    // Some console vanilla clients materialize the client-targeted
+                    // MurderPlayer transition at the source player's position, not
+                    // the proxy's position. Keep BOTH objects off-map for the actual
+                    // transition so neither the kill animation nor the temporary
+                    // corpse can be rendered on the playable map.
+                    sender.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                    sender.WriteVector2(proxyRecoveryPosition);
+                    sender.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+                    sender.EndRpc();
+                }
+                else
+                {
+                    sender.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                    sender.WriteVector2(recoveryPosition);
+                    sender.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+                    sender.EndRpc();
+                }
+
+                // Keep the temporary MurderPlayer payload off-map as well.
+                sender.AutoStartRpc(cameraProxy.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                sender.WriteVector2(proxyRecoveryPosition);
+                sender.Write((ushort)(cameraProxy.NetTransform.lastSequenceId + 8));
                 sender.EndRpc();
             }
-            sender.SendMessage();
+
+            // This RPC is intentionally client-targeted. Do not replace it with
+            // RpcSpecificMurderPlayer(pc, pc): that broadcasts a visible self-kill/body.
+            sender.AutoStartRpc(pc.NetId, RpcCalls.MurderPlayer, targetClientId);
+            sender.WriteNetObject(cameraProxy);
+            sender.Write((int)MurderResultFlags.Succeeded);
+            sender.EndRpc();
+
+            if (!hasDeadGhost && pc.IsAlive() && consoleClient)
+            {
+                // The console client only needs the MurderPlayer transition long
+                // enough to repair its camera/HUD. Immediately put the real player
+                // back at the recovery point after the transition so the temporary
+                // off-map kill state is never left visible.
+                sender.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                sender.WriteVector2(recoveryPosition);
+                sender.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+                sender.EndRpc();
+            }
+
+            if (hasDeadGhost)
+            {
+                sender.AutoStartRpc(cameraProxy.NetTransform.NetId, RpcCalls.SnapTo);
+                sender.WriteVector2(recoveryPosition);
+                sender.Write((ushort)(cameraProxy.NetTransform.lastSequenceId + 8));
+                sender.EndRpc();
+            }
         }
-        catch (Exception ex)
+        else
         {
-            Logger.Error($"[BHR-BS-FIX] Initial camera reset RPC failed for {playerName}: {ex}", "FixBlackScreen");
-            return;
+            // EHR uses a client-targeted transition for ghosts too; it is not broadcast.
+            sender.AutoStartRpc(pc.NetId, RpcCalls.MurderPlayer, targetClientId);
+            sender.WriteNetObject(pc);
+            sender.Write((int)MurderResultFlags.Succeeded);
+            sender.EndRpc();
         }
+
+        sender.SendMessage();
 
         _ = new LateTask(() =>
         {
             if (pc == null || !GameStates.InGame || GameStates.IsEnded) return;
-            try
-            {
-                var repair = CustomRpcSender.Create($"Fix Black Screen For {playerName} (restore)", SendOption.Reliable);
-                repair.RpcDesyncRepairSystem(pc, systemtype, 16);
-                if (systemtype == SystemTypes.HeliSabotage)
-                    repair.RpcDesyncRepairSystem(pc, systemtype, 17);
 
-                if (pc.IsAlive())
+            var repair = CustomRpcSender.Create($"Fix Black Screen For {playerName} (restore)", SendOption.Reliable);
+            repair.RpcDesyncRepairSystem(pc, systemtype, 16);
+            if (systemtype == SystemTypes.HeliSabotage)
+                repair.RpcDesyncRepairSystem(pc, systemtype, 17);
+
+            if (pc.IsAlive())
+            {
+                if (hasDeadGhost)
                 {
                     repair.TP(pc, originalPosition, noCheckState: true, log: false);
-                    pc.SetKillCooldown(cooldown);
-                    pc.Notify(GetString("BlackScreenFixCompleteNotify"));
+                    cameraProxy.NetTransform.SnapTo(ghostPosition, (ushort)(cameraProxy.NetTransform.lastSequenceId + 328));
+                    cameraProxy.NetTransform.SetDirtyBit(uint.MaxValue);
+                    repair.AutoStartRpc(cameraProxy.NetTransform.NetId, RpcCalls.SnapTo);
+                    repair.WriteVector2(ghostPosition);
+                    repair.Write((ushort)(cameraProxy.NetTransform.lastSequenceId + 8));
+                    repair.EndRpc();
                 }
-                repair.SendMessage();
-                Logger.Msg($"[BHR-BS-FIX] Targeted camera/HUD reset sequence sent to {playerName}.", "FixBlackScreen");
+                else
+                {
+                    repair.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                    repair.WriteVector2(originalPosition);
+                    repair.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+                    repair.EndRpc();
+
+                    repair.AutoStartRpc(cameraProxy.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                    repair.WriteVector2(ghostPosition);
+                    repair.Write((ushort)(cameraProxy.NetTransform.lastSequenceId + 8));
+                    repair.EndRpc();
+                }
+                pc.SetKillCooldown(cooldown);
+                pc.Notify(GetString("BlackScreenFixCompleteNotify"));
             }
-            catch (Exception ex)
-            {
-                Logger.Error($"[BHR-BS-FIX] Restore phase failed for {playerName}: {ex}", "FixBlackScreen");
-            }
+
+            repair.SendMessage();
+            Logger.Msg($"[BHR-BS-FIX] EHR-style targeted camera recovery sequence sent to {playerName} (alive={pc.IsAlive()}).", "FixBlackScreen");
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
-        return;
     }
 
     public static bool ShouldDeferBlackScreenFix(bool isMeeting, bool hasExileController, bool isSkippingTasks,
