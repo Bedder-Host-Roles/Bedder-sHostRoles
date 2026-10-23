@@ -176,17 +176,10 @@ internal class Car : RoleBase
 
             // Also make sure the target's collider would not overlap
             // ship-only geometry at the candidate position.
-            Vector2 originalPosition = target.GetCustomPosition();
-            target.transform.position = nextPos;
-
-            bool invalidPosition = Physics2D.OverlapCircle(
-                collider.bounds.center,
+            if (Physics2D.OverlapCircle(
+                ((Vector2)collider.bounds.center) + addVector,
                 Mathf.Max(collider.bounds.extents.x, collider.bounds.extents.y),
-                Constants.ShipOnlyMask) != null;
-
-            target.transform.position = originalPosition;
-
-            if (invalidPosition)
+                Constants.ShipOnlyMask) != null)
                 break;
 
             safePos = nextPos;
