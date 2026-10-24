@@ -88,7 +88,7 @@ class PingTrackerUpdatePatch
     }
     private static Vector3 GetPingPosition()
     {
-        var settingButtonTransformPosition = DestroyableSingleton<HudManager>.Instance.SettingsButton.transform.localPosition;
+        var settingButtonTransformPosition = GameStates.IsLobby ? DestroyableSingleton<HudManager>.Instance.SettingsButton.transform.localPosition : DestroyableSingleton<HudManager>.Instance.MatchInfoButton.transform.localPosition;
         var offset_x = settingButtonTransformPosition.x - 1.58f;
         var offset_y = settingButtonTransformPosition.y + 3.2f;
         Vector3 position;
