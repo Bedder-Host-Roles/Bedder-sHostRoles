@@ -3,7 +3,7 @@
 
 <br>
 
-<img align="left" alt="Cover" src="Resources/Background/PrevArtWinner/TOHE-RE-Background-New.png" width="50%" height="300" /> 
+<img align="left" alt="Cover" src="Resources/Background/PrevArtWinner/TOH-RE-Background-New.png" width="50%" height="300" /> 
 
 <p align="right">
   
