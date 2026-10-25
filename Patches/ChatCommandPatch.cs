@@ -23,7 +23,7 @@ using static BHR.Translator;
 
 namespace BHR.Patches;
 
-internal class Command(string commandKey, string arguments, string description, Command.UsageLevels usageLevel, Command.UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null)
+internal class Command(string commandKey, string arguments, string description, Command.UsageLevels usageLevel, Command.UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null, bool requiresCmdPrefix = false)
 {
     public enum UsageLevels
     {
@@ -68,6 +68,7 @@ internal class Command(string commandKey, string arguments, string description, 
     public bool IsCanceled => isCanceled;
     public bool AlwaysHidden => alwaysHidden;
     private CustomRoles[] RequiredRole => requiredRole;
+    public bool RequiresCmdPrefix => requiresCmdPrefix;
 
     public bool IsThisCommand(string text)
     {
@@ -191,13 +192,16 @@ internal class Command(string commandKey, string arguments, string description, 
     public string BHRlpString()
     {
         var names = GetString(CommandKey).Split("|");
-        return $"\n  ○ /{names[0]} {Description}";
+        var text = names[0];
+        if (RequiresCmdPrefix)
+            text = "cmd " + text;
+        return $"\n  ○ /{text} {Description}";
     }
 
-    public static Command Create(string commandKey, string arguments, string description, UsageLevels usageLevel, UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null)
+    public static Command Create(string commandKey, string arguments, string description, UsageLevels usageLevel, UsageTimes usageTime, Action<PlayerControl, string, string, string[]> action, bool isCanceled, bool alwaysHidden, string[] argsDescriptions = null, CustomRoles[] requiredRole = null, bool requiresCmdPrefix = false)
     {
         // Logger.Info($"Creating Command {commandKey}", "Command.Create");
-        var command = new Command(commandKey, arguments, description, usageLevel, usageTime, action, isCanceled, alwaysHidden, argsDescriptions, requiredRole);
+        var command = new Command(commandKey, arguments, description, usageLevel, usageTime, action, isCanceled, alwaysHidden, argsDescriptions, requiredRole, requiresCmdPrefix);
         // Logger.Info($"Processing Command {commandKey}", "Command.Create");
         command.ProcessTranslations();
         // Logger.Info($"Translating Command {commandKey}", "Command.Create");
@@ -312,21 +316,21 @@ internal class ChatCommands
 
 #endregion
 #region Role Commands
-        Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")]); // ["shoot", "guess", "bet", "st", "gs", "bt", "猜", "赌", "賭"]
-        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Prosecutor.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Prosecutor, CustomRoles.Councillor]); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
-        Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President]); // ["finish", "结束", "结束会议", "結束", "結束會議"]
-        Command.Create("Command.Reveal", "", GetString("CommandDescription.Reveal"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.RevealCommand, false, false, requiredRole: [CustomRoles.President]); // ["reveal","展示"]
-        Command.Create("Command.Inspect", "{id1} {id2}", GetString("CommandDescription.Inspect"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Inspector.InspectCommand, false, false, [GetString("CommandArgs.Inspect.Id1"), GetString("CommandArgs.Inspect.Id2")], [CustomRoles.Inspector]); // ["compare", "cmp", "比较", "比較"]
-        Command.Create("Command.Duel", "{number}", GetString("CommandDescription.Duel"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Pirate.DuelCommand, false, false, [GetString("CommandArgs.Duel.Num")]); // ["duel"]
+        Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")], requiresCmdPrefix: true); // ["shoot", "guess", "bet", "st", "gs", "bt", "猜", "赌", "賭"]
+        Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Prosecutor.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Prosecutor, CustomRoles.Councillor], requiresCmdPrefix: true); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
+        Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President], requiresCmdPrefix: true); // ["finish", "结束", "结束会议", "結束", "結束會議"]
+        Command.Create("Command.Reveal", "", GetString("CommandDescription.Reveal"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.RevealCommand, false, false, requiredRole: [CustomRoles.President], requiresCmdPrefix: true); // ["reveal","展示"]
+        Command.Create("Command.Inspect", "{id1} {id2}", GetString("CommandDescription.Inspect"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Inspector.InspectCommand, false, false, [GetString("CommandArgs.Inspect.Id1"), GetString("CommandArgs.Inspect.Id2")], [CustomRoles.Inspector], requiresCmdPrefix: true); // ["compare", "cmp", "比较", "比較"]
+        Command.Create("Command.Duel", "{number}", GetString("CommandDescription.Duel"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Pirate.DuelCommand, false, false, [GetString("CommandArgs.Duel.Num")], requiresCmdPrefix: true); // ["duel"]
         Command.Create("Command.Revenge", "{id}", GetString("CommandDescription.Revenge"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InGame, Nemesis.RevengeCommand, false, false, [GetString("CommandArgs.Revenge.Id")], [CustomRoles.Nemesis]); // ["rv"]
         Command.Create("Command.Retribution", "{id}", GetString("CommandDescription.Retribution"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InGame, Retributionist.RetributionCommand, false, false, [GetString("CommandArgs.Retribution.Id")], [CustomRoles.Retributionist]); // ["ret"]
-        Command.Create("Command.Exorcism", "", GetString("CommandDescription.Exorcism"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Exorcist.ExorcismCommand, false, false, [GetString("CommandArgs.Exorcism")], [CustomRoles.Exorcist]); // ["exorcise", "exorcism", "ex"]
-        Command.Create("Command.Ritual", "{id} {role}", GetString("CommandDescription.Ritual"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Ritualist.RitualCommand, false, false, [GetString("CommandArgs.Ritual.Id"), GetString("CommandArgs.Ritual.Role")]);
-        Command.Create("Command.Medium", "{letter}", "CommandDescription.Medium", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Medium.MediumCommand, false, false, ["CommandArgs.Medium.YN"]); // ["通灵", "ms", "mediumship", "medium"]
-        Command.Create("Command.Summon", "{id}", "CommandDescription.Summon", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Summoner.SummonCommand, false, false, ["CommandArgs.Summon.Id"], [CustomRoles.Summoner]); // ["summon", "sm"]
-        Command.Create("Command.Swap", "{id}", "CommandDescription.Swap", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Swapper.SwapCommand, false, false, ["CommandArgs.Swap.Id"], [CustomRoles.Swapper]); // ["sw", "换票", "换", "換票", "換", "swap", "st"]
+        Command.Create("Command.Exorcism", "", GetString("CommandDescription.Exorcism"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Exorcist.ExorcismCommand, false, false, [GetString("CommandArgs.Exorcism")], [CustomRoles.Exorcist], requiresCmdPrefix: true); // ["exorcise", "exorcism", "ex"]
+        Command.Create("Command.Ritual", "{id} {role}", GetString("CommandDescription.Ritual"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Ritualist.RitualCommand, false, false, [GetString("CommandArgs.Ritual.Id"), GetString("CommandArgs.Ritual.Role")], requiresCmdPrefix: true);
+        Command.Create("Command.Medium", "{letter}", "CommandDescription.Medium", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Medium.MediumCommand, false, false, ["CommandArgs.Medium.YN"], requiresCmdPrefix: true); // ["通灵", "ms", "mediumship", "medium"]
+        Command.Create("Command.Summon", "{id}", "CommandDescription.Summon", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Summoner.SummonCommand, false, false, ["CommandArgs.Summon.Id"], [CustomRoles.Summoner], requiresCmdPrefix: true); // ["summon", "sm"]
+        Command.Create("Command.Swap", "{id}", "CommandDescription.Swap", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Swapper.SwapCommand, false, false, ["CommandArgs.Swap.Id"], [CustomRoles.Swapper], requiresCmdPrefix: true); // ["sw", "换票", "换", "換票", "換", "swap", "st"]
         Command.Create("Command.Expel", "{id}", "CommandDescription.Expel", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Dictator.ExpelCommand, false, false, ["CommandArgs.Expel.Id"], [CustomRoles.Dictator]); // ["exp", "expel", "独裁", "獨裁"]
-        Command.Create("Command.Daybreak", "", "CommandDescription.Daybreak", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Starspawn.DaybreakCommand, false, false, requiredRole: [CustomRoles.Starspawn]); // ["db", "daybreak"]
+        Command.Create("Command.Daybreak", "", "CommandDescription.Daybreak", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Starspawn.DaybreakCommand, false, false, requiredRole: [CustomRoles.Starspawn], requiresCmdPrefix: true); // ["db", "daybreak"]
         Command.Create("Command.Answer", "{letter}", "CommandDescription.Answer", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.AnswerCommand, false, false, ["CommandArgs.Answer.ABC"]); // ["ans", "asw", "answer", "回答"]
         Command.Create("Command.ShowQuestion", "", "CommandDescription.ShowQuestion", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.ShowQuestionCommand, false, false); // ["qmquiz", "提问"]
 #endregion            
@@ -344,11 +348,17 @@ internal class ChatCommands
         
         __instance.timeSinceLastMessage = 3f;
 
+        var canceled = false;
+
         string text = __instance.freeChatField.textArea.text.Trim();
-        if (text.StartsWith("/cmd ")) 
+        string originalText = text;
+
+        bool cmdPrefix = text.StartsWith("/cmd ");
+        if (cmdPrefix) 
         {
             text = text[5..];
             if (!text.StartsWith("/")) text = "/" + text;
+            canceled = true;
         }
         var cancelVal = string.Empty;
 
@@ -362,13 +372,12 @@ internal class ChatCommands
             goto Canceled;
         }
 
-        if (ChatHistory.Count == 0 || ChatHistory[^1] != text)
-            ChatHistory.Add(text);
+        if (ChatHistory.Count == 0 || ChatHistory[^1] != originalText)
+            ChatHistory.Add(originalText);
 
         ChatControllerUpdatePatch.CurrentHistorySelection = ChatHistory.Count;
 
         string[] args = text.Split(' ');
-        var canceled = false;
         Main.isChatCommand = true;
 
         Directory.CreateDirectory(modTagsFiles);
@@ -389,7 +398,12 @@ internal class ChatCommands
 
                 if (!command.CanUseCommand(PlayerControl.LocalPlayer, sendErrorMessage: true))
                     goto Canceled;
-
+                
+                if (command.RequiresCmdPrefix && !cmdPrefix)
+                {
+                    Utils.SendMessage("\n", PlayerControl.LocalPlayer.PlayerId, GetString($"Commands.RequiresCmdPrefix"));
+                    goto Canceled;
+                }
                 command.Action(PlayerControl.LocalPlayer, key, text, args);
                 if (command.IsCanceled) goto Canceled;
 
@@ -482,11 +496,13 @@ internal class ChatCommands
             return;
         }
         
+        string originalText = text;
         bool hasCmdPrefix = text.StartsWith("/cmd ");
         if (hasCmdPrefix) 
         {
             text = text[5..];
             if (!text.StartsWith("/")) text = "/" + text;
+            canceled = true;
         }
 
         if (text.StartsWith("\n")) text = text[1..];
@@ -506,6 +522,13 @@ internal class ChatCommands
 
                 if (!command.CanUseCommand(player, sendErrorMessage: true))
                 {
+                    canceled = true;
+                    break;
+                }
+
+                if (command.RequiresCmdPrefix && !hasCmdPrefix)
+                {
+                    Utils.SendMessage("\n", PlayerControl.LocalPlayer.PlayerId, GetString($"Commands.RequiresCmdPrefix"));
                     canceled = true;
                     break;
                 }
