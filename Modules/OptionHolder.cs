@@ -1280,7 +1280,7 @@ public static class Options
             .SetParent(AllowStartCommand)
             .SetValueFormat(OptionFormat.Seconds);
 
-        UseJudgeAbilityAsTrigger = BooleanOptionItem.Create(23865, "UseJudgeAbilityAsTrigger", true, TabGroup.SystemSettings, false)
+        UseJudgeAbilityAsTrigger = BooleanOptionItem.Create(23865, "UseJudgeAbilityAsTrigger", false, TabGroup.SystemSettings, false)
             .SetGameMode(CustomGameMode.Standard)
             .SetHeader(true)
             .SetColor(Palette.Orange);
