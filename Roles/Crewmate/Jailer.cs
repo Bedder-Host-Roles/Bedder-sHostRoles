@@ -132,6 +132,13 @@ internal class Jailer : RoleBase
         JailerTarget.Clear();
     }
 
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
+
     public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {
         if (voter == null || target == null) return false;

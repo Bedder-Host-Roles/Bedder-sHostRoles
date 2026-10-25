@@ -88,6 +88,12 @@ internal class Keeper : RoleBase
         }
     }
 
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
 
     public override bool OnJudge(PlayerControl voter, PlayerControl target)
     {

@@ -40,6 +40,14 @@ internal class Eraser : RoleBase
     {
         playerId.SetAbilityUseLimit(EraseLimitOpt.GetInt());
     }
+
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (Options.UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
+
     public override bool OnJudge(PlayerControl player, PlayerControl target)
     {
         if (!HasEnabled) return true;
