@@ -22,7 +22,7 @@ class EndGamePatch
     public static string MainRoleLog = "";
     public static void Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ref EndGameResult endGameResult)
     {
-        GameStates.InGame = false;
+        // GameStates.InGame = false;
 
         // if game is H&S or Host no have mod
         if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;

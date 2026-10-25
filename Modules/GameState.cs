@@ -670,7 +670,7 @@ public class PlayerVersion(Version ver, string tag_str, string forkId)
 }
 public static class GameStates
 {
-    public static bool InGame = false;
+    public static bool InGame => AmongUsClient.Instance.IsGameStarted;
     public static bool AlreadyDied = false;
     /**********Check Game Status***********/
     public static bool IsModHost => Main.playerVersion.ContainsKey(AmongUsClient.Instance.HostId);

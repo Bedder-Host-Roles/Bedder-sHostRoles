@@ -208,7 +208,7 @@ internal class StartGameHostPatch
         if (ShipStatus.Instance != null)
             isStartingAsHost = false;
 
-        GameStates.InGame = true;
+        // GameStates.InGame = true;
     }
 }
 

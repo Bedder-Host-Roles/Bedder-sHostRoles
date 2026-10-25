@@ -42,7 +42,7 @@ internal static class OnGameJoinedPatch
 
         ChatUpdatePatch.DoBlockChat = false;
         Main.CurrentServerIsVanilla = GameStates.IsVanillaServer && !GameStates.IsLocalGame;
-        GameStates.InGame = false;
+        // GameStates.InGame = false;
         ErrorText.Instance.Clear();
         EAC.Init();
         Main.AllClientRealNames.Clear();
@@ -174,7 +174,7 @@ class DisconnectInternalPatch
 {
     public static void Prefix(InnerNetClient __instance, DisconnectReasons reason, string stringReason)
     {
-        GameStates.InGame = false;
+        // GameStates.InGame = false;
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
 
