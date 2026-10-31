@@ -683,6 +683,17 @@ internal class EAC
             return;
         }
 
+        // Vanilla clients do not implement BHR's custom RPC/UI protocol. EAC
+        // checks that are valid for modded clients can therefore be false positives
+        // for normal vanilla traffic. Keep these events visible in the log, but never
+        // auto-kick/ban an unmodded client.
+        if (!pc.IsModded())
+        {
+            Logger.Warn($"Vanilla client EAC hit (report-only): {pc.GetRealName()} - {text}", "EAC");
+            Report(pc, $"Vanilla client / report-only: {text}");
+            return;
+        }
+
         switch (Options.CheatResponses.GetInt())
         {
             case 0:

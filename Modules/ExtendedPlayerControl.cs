@@ -1852,28 +1852,30 @@ public static class ExtendedPlayerControl
         var playerName = pc.GetNameWithRole();
         var targetClientId = pc.OwnerId;
         var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost);
-        // A living vanilla player can still need the camera transition even when
-        // nobody is dead. In that case there is no real ghost object to use as
-        // the MurderPlayer payload, so use the affected player itself as a
-        // client-targeted, temporary proxy. The RPC is never broadcast; this is
-        // the same recovery transition as the dead-player path without creating
-        // a visible body for other clients.
-        var cameraProxy = hasDeadGhost
-            ? dummyGhost
-            : Main.EnumeratePlayerControls().FirstOrDefault(x => x != null && x.PlayerId != pc.PlayerId) ?? pc;
+        var cameraProxy = hasDeadGhost ? dummyGhost : pc;
+
+        // Do not manufacture a fake corpse for a living vanilla player. The old
+        // fallback used MurderPlayer with a temporary proxy, which could create a
+        // visible/reportable body and feed false positives into EAC. If no real
+        // ghost exists, use only the desync-system repair path.
         if (!hasDeadGhost && pc.IsAlive())
         {
-            Logger.Info($"[BHR-BS-FIX] No dead player available; using {cameraProxy.GetNameWithRole()} as the targeted camera recovery proxy for {playerName}.", "FixBlackScreen");
-
-            // MurderPlayer is intentionally targeted only to this vanilla client.
-            // On that client the temporary proxy can appear as a local dead body and
-            // vanilla may immediately try to report it. Block only that client's
-            // report of this recovery body for the duration of the repair window.
-            var recoveryReportKey = (cameraProxy.PlayerId, targetClientId);
-            BlackScreenRecoveryReports.Add(recoveryReportKey);
-            _ = new LateTask(
-                () => BlackScreenRecoveryReports.Remove(recoveryReportKey),
-                5f, "Clear BlackScreen recovery report guard");
+            Logger.Info($"[BHR-BS-FIX] No dead player available; using system-only recovery for {playerName}.", "FixBlackScreen");
+            var safeSender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (safe)", SendOption.Reliable);
+            safeSender.RpcDesyncRepairSystem(pc, systemtype, 128);
+            safeSender.SendMessage();
+            _ = new LateTask(() =>
+            {
+                if (pc == null || !GameStates.InGame || GameStates.IsEnded) return;
+                var restore = CustomRpcSender.Create($"Fix Black Screen For {playerName} (safe restore)", SendOption.Reliable);
+                restore.RpcDesyncRepairSystem(pc, systemtype, 16);
+                if (systemtype == SystemTypes.HeliSabotage)
+                    restore.RpcDesyncRepairSystem(pc, systemtype, 17);
+                restore.SendMessage();
+                pc.SetKillCooldown(Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var cd) ? Math.Max(cd, 0.1f) : 20f);
+                pc.Notify(GetString("BlackScreenFixCompleteNotify"));
+            }, 1f + (AmongUsClient.Instance.Ping / 1000f));
+            return;
         }
 
         var ghostPosition = cameraProxy.GetCustomPosition();

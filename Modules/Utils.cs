@@ -1709,6 +1709,15 @@ public static class Utils
         return sb.ToString();
     }
 
+    /// <summary>Converts BHR-only symbols to characters supported by vanilla fonts.</summary>
+    private static string MakeVanillaClientSafeText(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+        return text.Replace("★", "*").Replace("♥", "<3").Replace("♡", "<3")
+            .Replace("⚠", "!").Replace("✓", "OK").Replace("Ⓣ", "T")
+            .Replace("◆", "*").Replace("◇", "*");
+    }
+
     public static CustomRpcSender SendMessage(string text, byte sendTo = byte.MaxValue, string title = "",
                                               bool noSplit = false, CustomRpcSender writer = null, bool final = false,
                                               bool multiple = false, SendOption sendOption = SendOption.Reliable,
@@ -1737,6 +1746,14 @@ public static class Utils
 
             text = text.Replace("color=#", "#");
             title = title.Replace("color=", string.Empty);
+
+            // Preserve BHR symbols for modded clients, but make targeted messages
+            // readable on vanilla clients whose font assets lack these glyphs.
+            if (sendTo != byte.MaxValue && receiver != null && !receiver.IsModded())
+            {
+                text = MakeVanillaClientSafeText(text);
+                title = MakeVanillaClientSafeText(title);
+            }
 
             if (GameStates.IsVanillaServer)
             {
