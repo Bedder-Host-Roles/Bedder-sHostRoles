@@ -69,6 +69,7 @@ class PingTrackerUpdatePatch
                 if (Options.GuesserMode.GetBool()) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.yellow, GetString("GuesserMode"))}</size>");
                 if (Options.AllowConsole.GetBool() && PlayerControl.LocalPlayer.FriendCode.GetDevUser().DeBug) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.red, GetString("AllowConsole"))}</size>");
                 if (DebugModeManager.IsDebugMode) sbOverlay.Append($"\r\n<size=50%>{Utils.ColorString(Color.green, GetString("DebugMode"))}</size>");
+                sbOverlay.Append(GameStates.InGame ? $"\r\n<size=50%>{Utils.ColorString(Color.cyan, GetString("InGame"))}</size>" : $"");
 
                 if (sbOverlay.Length > 0)
                     sb.Append(sbOverlay);
