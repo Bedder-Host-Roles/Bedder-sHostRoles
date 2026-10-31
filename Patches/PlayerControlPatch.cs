@@ -1056,7 +1056,7 @@ class FixedUpdateInNormalGamePatch
         try
         {
             // Among Us 2026.9.29 FixedUpdate has no lowLoad parameter.
-            DoPostfix(__instance, lowLoad: false);
+            DoPostfix(__instance, lowLoad: true);
         }
         catch (Exception ex)
         {

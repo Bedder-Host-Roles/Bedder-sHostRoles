@@ -72,7 +72,7 @@ class CoShowIntroPatch
         {
             while (!ShipStatus.Instance || !HudManager.InstanceExists) yield return null;
 
-            GameStates.InGame = true;
+            // GameStates.InGame = true;
 
             __instance.IsIntroDisplayed = true;
             __instance.LobbyTimerExtensionUI.HideAll();
@@ -106,7 +106,7 @@ class CoShowIntroPatch
             Logger.Info("IntroCutscene.CoBegin", "IntroCutScene.CoBegin");
 
             CriticalErrorManager.CheckEndGame();
-            GameStates.InGame = true;
+            // GameStates.InGame = true;
 
             FFAManager.SetData();
 

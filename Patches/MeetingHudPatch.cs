@@ -1233,7 +1233,7 @@ class MeetingHudStartPatch
             var IdNumber = LevelDisplay.transform.Find("LevelNumber");
             UnityEngine.Object.Destroy(IdLabel.GetComponent<TextTranslatorTMP>());
             IdLabel.GetComponent<TextMeshPro>().text = "ID";
-            IdNumber.GetComponent<TextMeshPro>().text = pva.PlayerId.ToString();
+            IdNumber.GetComponent<TextMeshPro>().text = ((byte)pva.PlayerId).ToString();
             IdLabel.name = "IdLabel";
             IdNumber.name = "IdNumber";
 

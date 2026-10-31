@@ -57,6 +57,13 @@ internal class Swapper : RoleBase
     public override string NotifyPlayerName(PlayerControl seer, PlayerControl target, string TargetPlayerName = "", bool IsForMeeting = false)
         => IsForMeeting && seer.IsAlive() && target.IsAlive() ? ColorString(GetRoleColor(CustomRoles.Swapper), target.PlayerId.ToString()) + " " + TargetPlayerName : string.Empty;
 
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (Options.UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
+
     public override bool OnJudge(PlayerControl pc, PlayerControl target)
     {
         if (pc.GetAbilityUseLimit() <= 0)

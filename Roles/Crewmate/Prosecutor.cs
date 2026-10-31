@@ -119,6 +119,13 @@ internal class Prosecutor : RoleBase
             Councillor.MurderMsg(player, text);
     }
 
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (Options.UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
+
     public override bool OnJudge(PlayerControl pc, PlayerControl target)
     {
         Logger.Info($"{pc.GetNameWithRole()} try trial {target.GetNameWithRole()}", "Prosecutor");

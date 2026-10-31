@@ -53,6 +53,13 @@ internal class Dictator : RoleBase
         pc.GetRoleClass().OnJudge(pc, target);
     }
 
+    public override bool CheckVote(PlayerControl voter, PlayerControl target)
+    {
+        if (UseJudgeAbilityAsTrigger.GetBool()) return true;
+
+        return OnJudge(voter, target);
+    }
+
     public override bool OnJudge(PlayerControl pc, PlayerControl target)
     {
         if (target == pc)
