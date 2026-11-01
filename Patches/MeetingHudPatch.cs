@@ -749,7 +749,7 @@ class CastVotePatch
         if (target == null && suspectPlayerId < 253)
         {
             SendMessage(GetString("VoteDead"), srcPlayerId);
-            __instance.RpcClearVoteDelay(voter.PlayerId);
+            ClearVoteForVoter(__instance, voter);
             return false;
         } //Vote a disconnect player
 
@@ -760,11 +760,10 @@ class CastVotePatch
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.PlayerId);
+                ClearVoteForVoter(__instance, voter);
                 return false;
             }
         }
-
 
         // Coven Leader Retraining
         if (CustomRoles.CovenLeader.RoleExist() && target == voter && CovenLeader.retrainPlayer.ContainsKey(voter.PlayerId))
@@ -791,7 +790,7 @@ class CastVotePatch
                     covenLeader.RpcRemoveAbilityUse();
                 }
 
-            __instance.RpcClearVoteDelay(voter.PlayerId);
+            ClearVoteForVoter(__instance, voter);
             return false;
         }
         else if (CustomRoles.CovenLeader.RoleExist() && target != voter && CovenLeader.retrainPlayer.ContainsKey(voter.PlayerId) && CovenLeader.retrainPlayer[voter.PlayerId].IsCoven())
@@ -800,7 +799,7 @@ class CastVotePatch
             SendMessage(string.Format(GetString("CovenLeaderDeclineRetrain"), CovenLeader.retrainPlayer[voter.PlayerId].ToColoredString()), CL.PlayerId);
             SendMessage(string.Format(GetString("RetrainDeclineOffer"), CustomRoles.CovenLeader.ToColoredString()), voter.PlayerId);
             CovenLeader.retrainPlayer.Clear();
-            __instance.RpcClearVoteDelay(voter.PlayerId);
+            ClearVoteForVoter(__instance, voter);
             return false;
         }
 
@@ -815,7 +814,7 @@ class CastVotePatch
             {
                 voter.GetRoleClass().HasVoted = true;
                 SendMessage(GetString("VoteNotUseAbility"), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.PlayerId);
+                ClearVoteForVoter(__instance, voter);
                 return false;
             }
         }
@@ -826,7 +825,7 @@ class CastVotePatch
                 voter.GetRoleClass().HasVoted = true;
                 CovenManager.necroVotes.Add(voter.PlayerId, target.PlayerId);
                 SendMessage(string.Format(GetString("NecronomiconVote"), target.GetRealName()), voter.PlayerId);
-                __instance.RpcClearVoteDelay(voter.PlayerId);
+                ClearVoteForVoter(__instance, voter);
                 return false;
             }
         }
@@ -836,7 +835,7 @@ class CastVotePatch
             if (!target.IsAlive() || target.Data.Disconnected)
             {
                 SendMessage(GetString("VoteDead"), srcPlayerId);
-                __instance.RpcClearVoteDelay(voter.PlayerId);
+                ClearVoteForVoter(__instance, voter);
                 Swapper.CheckSwapperTarget(suspectPlayerId);
                 return false;
             }
@@ -846,7 +845,7 @@ class CastVotePatch
             {
                 Logger.Info($"Canceling {voter.GetRealName()}'s vote because of {voter.GetCustomRole()}", "CastVotePatch.RoleBase.CheckVote");
                 voter.GetRoleClass().HasVoted = true;
-                __instance.RpcClearVoteDelay(voter.PlayerId);
+                ClearVoteForVoter(__instance, voter);
 
                 // Attempts to set thumbsdown color to the same as playerrole to signify player ability used on (only for modded client)
                 PlayerVoteArea pva = __instance.playerStates.FirstOrDefault(pva => pva.PlayerId == target.PlayerId);
@@ -861,10 +860,32 @@ class CastVotePatch
                     if (target.Is(CustomRoles.Solsticer))
                     {
                         SendMessage(GetString("ExpelSolsticer"), srcPlayerId);
-                        __instance.RpcClearVoteDelay(voter.PlayerId);
+                        ClearVoteForVoter(__instance, voter);
                         return false;
                     }
                     break;
+            }
+        }
+
+        static void ClearVoteForVoter(MeetingHud __instance, PlayerControl voter)
+        {
+            foreach (PlayerVoteArea playerVoteArea in __instance.playerStates)
+            {
+                if (playerVoteArea.VotedForId != voter.PlayerId) continue;
+
+                playerVoteArea.UnsetVote();
+                __instance.SetDirtyBit(1U);
+
+                PlayerControl voteAreaPlayer = GetPlayerById(playerVoteArea.PlayerId);
+                if (!voteAreaPlayer) continue;
+
+                if (!voteAreaPlayer.AmOwner)
+                {
+                    __instance.RpcClearVote(playerVoteArea.PlayerId);
+                    __instance.SetDirtyBit(1U);
+                }
+                else
+                    __instance.ClearVote(playerVoteArea.PlayerId, true);
             }
         }
 
