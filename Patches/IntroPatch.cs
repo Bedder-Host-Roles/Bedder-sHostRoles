@@ -23,6 +23,9 @@ class CoShowIntroPatch
 {
     public static bool Prefix(HudManager __instance, ref Il2CppSystem.Collections.IEnumerator __result)
     {
+        // Clients (and non-modded hosts) fall through to the vanilla intro below, so set the state here
+        GameStates.InGame = true;
+
         if (!AmongUsClient.Instance.AmHost || !GameStates.IsModHost || GameStates.IsHideNSeek) return true;
 
         _ = new LateTask(() =>
@@ -83,10 +86,10 @@ class CoShowIntroPatch
             yield return CoBegin(UnityEngine.Object.Instantiate(__instance.IntroPrefab, __instance.transform));
 
             PlayerControl.LocalPlayer.SetKillTimer(10f);
-            (ShipStatus.Instance.Systems[SystemTypes.Sabotage].CastFast<SabotageSystemType>()).SetInitialSabotageCooldown();
+            ShipStatus.Instance.Systems[SystemTypes.Sabotage].CastFast<SabotageSystemType>().SetInitialSabotageCooldown();
 
             if (ShipStatus.Instance.Systems.TryGetValue(SystemTypes.Doors, out ISystemType systemType) && systemType.TryCast<IDoorSystem>() != null)
-                (systemType.CastFast<IDoorSystem>()).SetInitialSabotageCooldown();
+                systemType.CastFast<IDoorSystem>().SetInitialSabotageCooldown();
 
             yield return ShipStatus.Instance.PrespawnStep();
             PlayerControl.LocalPlayer.AdjustLighting();
