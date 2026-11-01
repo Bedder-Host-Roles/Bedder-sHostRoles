@@ -453,17 +453,7 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                // BHR custom RPCs are not supported by vanilla clients/servers. Sending this
-                // version-check RPC through an official Among Us server can trigger its
-                // anti-cheat and disconnect the joining client/host with Reason:Hacking.
-                if (!GameStates.IsVanillaServer)
-                {
-                    LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
-                }
-                else
-                {
-                    Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
-                }
+                Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame && !client.Character.IsHost())
