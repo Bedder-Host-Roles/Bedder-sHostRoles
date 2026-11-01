@@ -59,7 +59,7 @@ public class Main : BasePlugin
     public const string PluginGuid = "com.batmenzdw.bedderhostroles";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
     public const string PluginVersion = "2026.1025.103.00100"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.0.3 beta 1";
+    public const string PluginDisplayVersion = "1.0.3 beta 1 hotfix 1";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
     [
         (2026, 9, 29, 0) // 2026.9.29 & 19.0.0
