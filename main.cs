@@ -58,15 +58,15 @@ public class Main : BasePlugin
 
     public const string PluginGuid = "com.batmenzdw.bedderhostroles";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
-    public const string PluginVersion = "2026.1025.103.00100"; // YEAR.MMDD.VERSION.CANARYDEV
-    public const string PluginDisplayVersion = "1.0.3 beta 1 hotfix 1";
+    public const string PluginVersion = "2026.1025.103.00001"; // YEAR.MMDD.VERSION.CANARYDEV
+    public const string PluginDisplayVersion = "1.0.3 dev 2";
     public static readonly List<(int year, int month, int day, int revision)> SupportedVersionAU =
     [
         (2026, 9, 29, 0) // 2026.9.29 & 19.0.0
     ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.BETA;
+    public static readonly Release RELEASE = Release.ALPHA;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: 
@@ -238,7 +238,7 @@ public class Main : BasePlugin
     public static int MeetingsPassed = 0;
     public static long LastMeetingEnded = Utils.GetTimeStamp();
     public static bool Daybreak;
-    
+
     public static IReadOnlyList<PlayerControl> AllPlayerControls => [.. EnumeratePlayerControls()];
     public static IReadOnlyList<PlayerControl> AllAlivePlayerControls => [.. EnumerateAlivePlayerControls()];
 
@@ -637,7 +637,7 @@ public class Main : BasePlugin
         Instance = this;
 
         LoadClientOptions();
-        
+
 
         if (!DebugModeManager.AmDebugger)
         {
@@ -646,7 +646,7 @@ public class Main : BasePlugin
         }
 
         SetupLogger();
-        
+
         coroutines = AddComponent<Coroutines>();
         dispatcher = AddComponent<Dispatcher>();
 
@@ -676,7 +676,7 @@ public class Main : BasePlugin
         IRandom.SetInstance(new NetRandomWrapper());
 
         LogGitInfo();
-        
+
         ClassInjector.RegisterTypeInIl2Cpp<ErrorText>();
         ClassInjector.RegisterTypeInIl2Cpp<OptionShower>();
         ClassInjector.RegisterTypeInIl2Cpp<MeetingHudPagingBehaviour>();
@@ -694,7 +694,7 @@ public class Main : BasePlugin
         {
             if (DebugModeManager.AmDebugger) ConsoleManager.CreateConsole();
             else ConsoleManager.DetachConsole();
-            
+
             // Harmony.PatchAll(typeof(TextBoxPatch));
         }
 
@@ -730,7 +730,6 @@ public enum CustomRoles
     TrackerBHR,
     DetectiveBHR,
     JudgeBHR,
-    influecerBHR,
 
     // Impostor Vanilla Remakes
     ImpostorBHR,
@@ -1015,6 +1014,10 @@ public enum CustomRoles
 
     // Speed run
     Runner,
+
+    // Crewmate Ghost (BHR vanilla-role implementation)
+    // Explicit value keeps every existing CustomRoles numeric ID unchanged.
+    Influencer = 282,
 
     // Sub-role after 500
     NotAssigned = 500,
