@@ -434,7 +434,7 @@ class InnerNetClientSpawnPatch
                     if (host == null || !GameStates.IsLobby) return;
                     Logger.Info($"Sending host SetName: {host.Data.PlayerName}", "HostSetName");
                     host.RpcSetName(host.Data.PlayerName);
-                }, 3.5f, "Host SetName");
+                }, 5f, "Host SetName");
             }
 
             LateTask.New(() =>
