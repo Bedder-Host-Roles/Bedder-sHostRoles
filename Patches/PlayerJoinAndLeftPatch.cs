@@ -1,4 +1,4 @@
-﻿using AmongUs.Data;
+using AmongUs.Data;
 using AmongUs.GameOptions;
 using AmongUs.InnerNet.GameDataMessages;
 using Hazel;
@@ -701,7 +701,17 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
+                // BHR custom RPCs are not supported by vanilla clients/servers. Sending this
+                // version-check RPC through an official Among Us server can trigger its
+                // anti-cheat and disconnect the joining client/host with Reason:Hacking.
+                if (!GameStates.IsVanillaServer)
+                {
+                    LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
+                }
+                else
+                {
+                    Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
+                }
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame && !client.Character.IsHost())
@@ -829,7 +839,17 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
+                // BHR custom RPCs are not supported by vanilla clients/servers. Sending this
+                // version-check RPC through an official Among Us server can trigger its
+                // anti-cheat and disconnect the joining client/host with Reason:Hacking.
+                if (!GameStates.IsVanillaServer)
+                {
+                    LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
+                }
+                else
+                {
+                    Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
+                }
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame)
