@@ -15,7 +15,7 @@ public class LobbyStartPatch
     public static void Prefix()
     {
         LobbyPaintSprite = Utils.LoadSprite("BHR.Resources.Images.LobbyPaint.png", 290f);
-        DropshipDecorationsSprite = Utils.LoadSprite("BHR.Resources.Images.Dropship-Decorations.png", 60f);
+        DropshipDecorationsSprite = Utils.LoadSprite("BHR.Resources.Images.Lobby_Decoration.png", 60f);
     }
     public static void Postfix(LobbyBehaviour __instance)
     {
