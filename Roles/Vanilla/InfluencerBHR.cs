@@ -6,7 +6,7 @@ using static BHR.Options;
 using static BHR.Translator;
 using static BHR.Utils;
 
-namespace BHR.Roles._Ghosts_.Crewmate;
+namespace BHR.Roles.Vanilla;
 
 /// <summary>
 /// BHR adaptation of the vanilla Influencer ghost role.

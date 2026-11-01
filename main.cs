@@ -730,6 +730,7 @@ public enum CustomRoles
     TrackerBHR,
     DetectiveBHR,
     JudgeBHR,
+    influecerBHR,
 
     // Impostor Vanilla Remakes
     ImpostorBHR,
