@@ -42,7 +42,7 @@ internal static class OnGameJoinedPatch
 
         ChatUpdatePatch.DoBlockChat = false;
         Main.CurrentServerIsVanilla = GameStates.IsVanillaServer && !GameStates.IsLocalGame;
-        // GameStates.InGame = false;
+        GameStates.InGame = false;
         ErrorText.Instance.Clear();
         EAC.Init();
         Main.AllClientRealNames.Clear();
@@ -174,7 +174,7 @@ class DisconnectInternalPatch
 {
     public static void Prefix(InnerNetClient __instance, DisconnectReasons reason, string stringReason)
     {
-        // GameStates.InGame = false;
+        GameStates.InGame = false;
         Logger.Info($"Disconnect (Reason:{reason}:{stringReason}, ping:{__instance.Ping})", "Reason Disconnect");
         RehostManager.OnDisconnectInternal(reason);
 
@@ -406,266 +406,6 @@ class OnPlayerLeftPatch
                 Utils.NotifyRoles(ForceLoop: true);
         }
     }
-    static void Old_Prefix([HarmonyArgument(0)] ClientData data)
-    {
-        // StartingProcessing = true;
-        LeftPlayerId = data?.Character?.PlayerId ?? byte.MaxValue;
-
-        if (data != null && data.Character != null)
-            StartGameHostPatch.DataDisconnected[data.Character.PlayerId] = true;
-
-        if (GameStates.IsInGame)
-        {
-            Main.PlayerStates[data.Character.PlayerId].Disconnected = true;
-        }
-
-        if (!AmongUsClient.Instance.AmHost) return;
-
-        if (Main.AssignRolesIsStarted)
-        {
-            Logger.Warn($"Assign roles not ended, try remove player {data.Character.PlayerId} from role assign", "OnPlayerLeft");
-            RoleAssign.RoleResult?.Remove(data.Character.PlayerId);
-            RpcSetRoleReplacer.Senders?.Remove(data.Character.OwnerId);
-        }
-
-        if (GameStates.IsNormalGame && GameStates.IsInGame)
-        {
-            // if (data.Character != null) CustomNetObject.DespawnOnQuit(data.Character.PlayerId);
-            MurderPlayerPatch.AfterPlayerDeathTasks(data?.Character, data?.Character, GameStates.IsMeeting);
-        }
-
-        if (AmongUsClient.Instance.AmHost && data.Character != null)
-        {
-            // Remove messages sending to left player
-            // for (int i = 0; i < Main.MessagesToSend.Count; i++)
-            // {
-            //     var (msg, sendTo, title) = Main.MessagesToSend[i];
-            //     if (sendTo == data.Character.PlayerId)
-            //     {
-            //         Main.MessagesToSend.RemoveAt(i);
-            //         i--;
-            //     }
-            // }
-
-            // This LateTask is to make sure that the player control is completely despawned for everyone so nobody gonna disconnect itself
-            var netid = data.Character.NetId;
-            _ = new LateTask(() =>
-            {
-                if (GameStates.IsOnlineGame && AmongUsClient.Instance.AmHost)
-                {
-                    var message = new DespawnGameDataMessage(netid);
-                    RpcUtils.LateBroadcastReliableMessage(message);
-                }
-            }, 2.5f, "Repeat Despawn", false);
-        }
-    }
-    public static void Old_Postfix(AmongUsClient __instance, [HarmonyArgument(0)] ClientData data, [HarmonyArgument(1)] DisconnectReasons reason)
-    {
-        try
-        {
-            if (GameStates.IsNormalGame && GameStates.IsInGame)
-            {
-                if (data.Character.Is(CustomRoles.Lovers) && data.Character.IsAlive())
-                {
-                    Lovers.OnPartnerLeft(data.Character.PlayerId);
-                }
-
-                Spiritualist.RemoveTarget(data.Character.PlayerId);
-
-                var state = Main.PlayerStates[data.Character.PlayerId];
-                state.Disconnected = true;
-                state.SetDead();
-
-                // If the player left while he had a Notice message, clear it
-                if (NameNotifyManager.Notifying(data.Character))
-                {
-                    NameNotifyManager.Notifies.Remove(data.Character.PlayerId);
-                    //Utils.DoNotifyRoles(SpecifyTarget: data.Character, ForceLoop: true);
-                }
-
-                if (AmongUsClient.Instance.AmHost)
-                {
-                    try
-                    {
-                        data.Character.RpcSetName(state.NormalOutfit.PlayerName);
-                    }
-                    catch
-                    { }
-                }
-
-                NameNotifyManager.Notifies.Remove(data.Character.PlayerId);
-                AntiBlackout.OnDisconnect(data.Character.Data);
-                PlayerGameOptionsSender.RemoveSender(data.Character);
-            }
-
-            if (Main.HostClientId != data.Id && Main.playerVersion.ContainsKey(data.Id))
-                Main.playerVersion.Remove(data.Id);
-
-            if (Main.HostClientId == data.Id && Main.playerVersion.ContainsKey(data.Id))
-            {
-                var clientId = -1;
-                var player = PlayerControl.LocalPlayer;
-                var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
-                var name = player?.Data?.PlayerName;
-                var msg = "";
-                if (GameStates.IsInGame)
-                {
-                    CriticalErrorManager.SetCriticalError("Host exits the game", false);
-                    CriticalErrorManager.CheckEndGame();
-                    msg = GetString("Message.HostLeftGameInGame");
-                }
-                else if (GameStates.IsLobby)
-                    msg = GetString("Message.HostLeftGameInLobby");
-
-                player.SetName(title);
-                DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-                player.SetName(name);
-
-                // On become Host is called before OnPlayerLeft, so this is safe to use
-                if (AmongUsClient.Instance.AmHost)
-                {
-                    if (data != null && data.Character != null)
-                    {
-                        uint netid = data.Character.NetId;
-
-                        _ = new LateTask(() =>
-                        {
-                            if (GameStates.IsOnlineGame)
-                            {
-                                var message = new DespawnGameDataMessage(netid);
-                                AmongUsClient.Instance.LateBroadcastReliableMessage(message.CastFast<IGameDataMessage>());
-                            }
-
-                            // if (GameStates.IsLobby)
-                            //     Utils.DirtyName.Add(PlayerControl.LocalPlayer.PlayerId);
-                        }, 2.5f, "Repeat Despawn", false);
-                    }
-                    var writer = CustomRpcSender.Create("MessagesToSend", SendOption.None);
-                    writer.StartMessage(clientId);
-                    writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
-                        .Write(player.Data.NetId)
-                        .Write(title)
-                        .EndRpc();
-                    writer.StartRpc(player.NetId, (byte)RpcCalls.SendChat)
-                        .Write(msg)
-                        .EndRpc();
-                    writer.StartRpc(player.NetId, (byte)RpcCalls.SetName)
-                        .Write(player.Data.NetId)
-                        .Write(player.Data.PlayerName)
-                        .EndRpc();
-                    writer.EndMessage();
-                    writer.SendMessage();
-                }
-                Main.HostClientId = AmongUsClient.Instance.HostId;
-                // We won't notify vanilla players for Host's quit because Niko doesn't know how to prevent message spamming
-                _ = new LateTask(() =>
-                {
-                    if (!GameStates.IsOnlineGame) return;
-                    if (Main.playerVersion.ContainsKey(AmongUsClient.Instance.HostId))
-                    {
-                        if (AmongUsClient.Instance.AmHost)
-                        {
-                            Utils.SendMessage(string.Format(GetString("Message.HostLeftGameNewHostIsMod"), AmongUsClient.Instance.GetHost().Character?.GetRealName() ?? "null"));
-                            _ = new LateTask(() =>
-                            {
-                                CustomWinnerHolder.ResetAndSetWinner(CustomWinner.Error);
-                                GameManager.Instance.enabled = false;
-                                // Utils.NotifyGameEnding();
-                                GameManager.Instance.RpcEndGame(GameOverReason.ImpostorDisconnect, false);
-                            }, 3f, "Disconnect Error Auto-end");
-                        }
-                    }
-                    else
-                    {
-                        var player = PlayerControl.LocalPlayer;
-                        var title = "<color=#aaaaff>" + GetString("DefaultSystemMessageTitle") + "</color>";
-                        var name = player?.Data?.PlayerName;
-                        var msg = string.Format(GetString("Message.HostLeftGameNewHostIsNotMod"), AmongUsClient.Instance.GetHost().Character?.GetRealName() ?? "null");
-                        player.SetName(title);
-                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(player, msg);
-                        player.SetName(name);
-                    }
-                }, 0.5f, "On Host Disconnected");
-            }
-
-            switch (reason)
-            {
-                case DisconnectReasons.Hacking:
-                    Logger.SendInGame(string.Format(GetString("PlayerLeftByAU-Anticheat"), data?.PlayerName));
-                    break;
-                case DisconnectReasons.Error when !GameStates.IsLobby:
-                    Logger.SendInGame(string.Format(GetString("PlayerLeftByError"), data?.PlayerName));
-                    break;
-            }
-
-            Logger.Info($"{data?.PlayerName} - (ClientID:{data?.Id} / FriendCode:{data?.FriendCode} / HashPuid:{data?.GetHashedPuid()} / Platform:{data?.PlatformData.Platform}) Disconnect (Reason:{reason} / Ping:{AmongUsClient.Instance.Ping})", "Session OnPlayerLeftPatch");
-
-            // End the game when a player exits game during assigning roles (AntiBlackOut Protect)
-            if (Main.AssignRolesIsStarted)
-            {
-                CriticalErrorManager.SetCriticalError("The player left the game during assigning roles", true);
-            }
-
-
-            if (data != null)
-            {
-                Main.playerVersion.Remove(data.Id);
-                Main.SayStartTimes.Remove(data.Id);
-                Main.SayBanwordsTimes.Remove(data.Id);
-            }
-
-            if (AmongUsClient.Instance.AmHost)
-            {
-                if (GameStates.IsLobby && !GameStates.IsLocalGame)
-                {
-                    if (data?.GetHashedPuid() != "" && Options.TempBanPlayersWhoKeepQuitting.GetBool()
-                        && !BanManager.CheckAllowList(data?.FriendCode))
-                    {
-                        if (!Main.PlayerQuitTimes.ContainsKey(data?.GetHashedPuid()))
-                            Main.PlayerQuitTimes.Add(data?.GetHashedPuid(), 1);
-                        else Main.PlayerQuitTimes[data?.GetHashedPuid()]++;
-
-                        if (Main.PlayerQuitTimes[data?.GetHashedPuid()] >= Options.QuitTimesTillTempBan.GetInt())
-                        {
-                            BanManager.TempBanWhiteList.Add(data?.GetHashedPuid());
-                            // Should ban on player's next join game
-                        }
-                    }
-                }
-
-                if (GameStates.IsMeeting)
-                {
-                    Swapper.CheckSwapperTarget(data.Character.PlayerId);
-
-                    // Prevent double check end voting
-                    if (MeetingHud.Instance.state is MeetingHud.MeetingStates.Discussion or MeetingHud.MeetingStates.NotVoted or MeetingHud.MeetingStates.Voted)
-                    {
-                        MeetingHud.Instance.CheckForEndVoting();
-                    }
-                }
-
-                if (GameStates.IsInGame)
-                {
-                    if (data != null)
-                    {
-                        var networkedPlayerInfo = GameData.Instance.GetPlayerByClient(data);
-                        if (networkedPlayerInfo != null)
-                        {
-                            networkedPlayerInfo.PlayerName = Main.AllClientRealNames[networkedPlayerInfo.ClientId];
-                            networkedPlayerInfo.MarkDirty();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception error)
-        {
-            Logger.Error(error.ToString(), "OnPlayerLeftPatch.Postfix");
-            //Logger.SendInGame("Error: " + error.ToString());
-        }
-
-        // StartingProcessing = false;
-    }
 }
 [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.Spawn))]
 class InnerNetClientSpawnPatch
@@ -684,6 +424,18 @@ class InnerNetClientSpawnPatch
         else
         {
             LateTask.New(() => OptionItem.SyncAllOptions(client.Id), 3f, "Sync All Options For New Player");
+
+            // The official server disconnects the host (Hacking) ~15s after lobby creation unless a SetName RPC has been sent.
+            if (client.Character.AmOwner && GameStates.IsOnlineGame)
+            {
+                LateTask.New(() =>
+                {
+                    var host = PlayerControl.LocalPlayer;
+                    if (host == null || !GameStates.IsLobby) return;
+                    Logger.Info($"Sending host SetName: {host.Data.PlayerName}", "HostSetName");
+                    host.RpcSetName(host.Data.PlayerName);
+                }, 3.5f, "Host SetName");
+            }
 
             LateTask.New(() =>
             {
