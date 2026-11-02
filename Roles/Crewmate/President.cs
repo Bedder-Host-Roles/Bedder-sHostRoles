@@ -69,7 +69,7 @@ internal class President : RoleBase
 
         var originMsg = text;
 
-        if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return;
+        if (!GameStates.IsMeeting || player == null || GameStates.IsExilling || player.Data.IsDead) return;
         if (!player.Is(CustomRoles.President)) return;
 
         if (player.GetAbilityUseLimit() < 1)
@@ -101,7 +101,7 @@ internal class President : RoleBase
 
         var originMsg = text;
 
-        if (!GameStates.IsMeeting || player == null || GameStates.IsExilling) return;
+        if (!GameStates.IsMeeting || player == null || GameStates.IsExilling || player.Data.IsDead) return;
         if (!player.Is(CustomRoles.President)) return;
 
         if (RevealLimit[player.PlayerId] < 1)
