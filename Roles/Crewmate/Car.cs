@@ -76,7 +76,7 @@ internal class Car : RoleBase
 
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl pc, CustomRoles role, ref bool guesserSuicide)
     {
-        if (role != CustomRoles.Workaholic) return false;
+        if (role != CustomRoles.Car) return false;
         return true;
     }
 
