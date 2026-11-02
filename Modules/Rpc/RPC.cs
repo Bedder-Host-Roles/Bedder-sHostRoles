@@ -80,7 +80,7 @@ public enum CustomRPC : byte // 182/255 USED
     SniperSync,
     // SetLoversPlayers,
     SetLoverPairs,
-    
+
     // BetterAmongUs (BAU) RPC, This is sent to allow other BAU users know who's using BAU!
     BetterCheck = 150,
 
@@ -189,7 +189,7 @@ internal class RPCHandlerPatch
         MessageReader subReader = MessageReader.Get(reader);
         try
         {
-            if (EAC.PlayerControlReceiveRpc(__instance, callId, reader)) 
+            if (EAC.PlayerControlReceiveRpc(__instance, callId, reader))
             {
                 subReader.Recycle();
                 return false;
@@ -200,7 +200,7 @@ internal class RPCHandlerPatch
                 case RpcCalls.SetName: //SetNameRPC
                     subReader.ReadUInt32();
                     string name = subReader.ReadString();
-                    if (subReader.BytesRemaining > 0 && subReader.ReadBoolean()) 
+                    if (subReader.BytesRemaining > 0 && subReader.ReadBoolean())
                     {
                         subReader.Recycle();
                         return false;
@@ -888,6 +888,20 @@ internal static class RPC
         try
         {
             while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.HostId < 0 || PlayerControl.LocalPlayer.GetClientId() < 0) await Task.Delay(500);
+
+            // Never send BHR custom RPCs from a BHR client into an official
+            // vanilla-hosted lobby.  The official server/host does not know
+            // CustomRPC.VersionCheck and can classify the packet as invalid
+            // mod traffic.  This is especially important during the first
+            // seconds after joining, when the official region is being resolved.
+            if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+            {
+                Logger.Info("Skipping BHR version-check RPC on a vanilla host.", "VersionCheck");
+                Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
+                    new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
+                return;
+            }
+
             var hostId = AmongUsClient.Instance.HostId;
             if (Main.playerVersion.ContainsKey(hostId) || !Main.VersionCheat.Value)
             {
@@ -914,6 +928,11 @@ internal static class RPC
     public static async void RpcRequestRetryVersionCheck()
     {
         while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null) await Task.Delay(500);
+
+        // The retry is also a BHR-only custom RPC.  Do not send it to a vanilla
+        // host/official server.
+        if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+            return;
 
         var writer = CustomRpcSender.Create("RpcRequestRetryVersionCheck", SendOption.Reliable);
         writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck)

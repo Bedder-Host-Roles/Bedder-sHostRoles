@@ -1,4 +1,4 @@
-﻿using AmongUs.GameOptions;
+using AmongUs.GameOptions;
 using System;
 using BHR.Modules;
 using BHR.Modules.Rpc;
@@ -688,17 +688,37 @@ public static class GameStates
     public static bool IsEnded => AmongUsClient.Instance.IsGameOver || GameStates.IsLobby || GameEndCheckerForNormal.GameIsEnded;
     public static bool IsNotJoined => AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.NotJoined;
     public static bool IsOnlineGame => AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;
+    /// <summary>
+    /// True when the current connection should be treated as an official/vanilla
+    /// Among Us connection.  This is deliberately fail-safe: if the region has
+    /// not been populated yet, we must NOT start Reactor/custom-server
+    /// authentication or send mod-only matchmaking packets.
+    ///
+    /// Official servers reject modded-host/auth traffic with a Hacking
+    /// disconnect.  During the first few seconds after joining, CurrentRegion
+    /// can be null, which used to make this check return false and allowed the
+    /// custom authentication path to run.
+    /// </summary>
     public static bool IsVanillaServer
     {
         get
         {
             if (IsLocalGame && !IsNotJoined) return true;
-            const string Domain = "among.us";
 
-            // From Reactor.gg
-            return ServerManager.Instance.CurrentRegion?.CastFast<StaticHttpRegionInfo>() is { } regionInfo &&
-                   regionInfo.PingServer.EndsWith(Domain, StringComparison.Ordinal) &&
-                   regionInfo.Servers.All(serverInfo => serverInfo.Ip.EndsWith(Domain, StringComparison.Ordinal));
+            const string Domain = "among.us";
+            var region = ServerManager.Instance?.CurrentRegion?.CastFast<StaticHttpRegionInfo>();
+
+            // Be conservative while matchmaking/connection information is still
+            // being populated.  It is safer to skip custom-server auth than to
+            // send it to an official server.
+            if (region == null) return true;
+
+            if (!region.PingServer.EndsWith(Domain, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return region.Servers.Count > 0 &&
+                   region.Servers.All(serverInfo =>
+                       serverInfo?.Ip?.EndsWith(Domain, StringComparison.OrdinalIgnoreCase) == true);
         }
     }
     public static bool IsLocalGame => AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame;
