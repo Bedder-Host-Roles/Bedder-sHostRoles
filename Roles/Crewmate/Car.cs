@@ -74,6 +74,12 @@ internal class Car : RoleBase
         CarId = byte.MaxValue;
     }
 
+    public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl pc, CustomRoles role, ref bool guesserSuicide)
+    {
+        if (role != CustomRoles.Workaholic) return false;
+        return true;
+    }
+
     public override void OnFixedUpdate(PlayerControl pc, bool lowLoad, long nowTime, int timerLowLoad)
     {
         if (!AmongUsClient.Instance.AmHost) return;
