@@ -56,7 +56,7 @@ public class Main : BasePlugin
 
     public static ConfigEntry<string> DebugKeyInput { get; private set; }
 
-    public const string PluginGuid = "com.batmenzdw.bedderhostroles";
+    public const string PluginGuid = "com.bhr.bedderhostroles";
     public const string PluginGuid4 = "90759289-1d0d-494b-b36c-839f93ae0df1"; // for matchmaking token
     public const string PluginVersion = "2026.1025.103.00001"; // YEAR.MMDD.VERSION.CANARYDEV
     public const string PluginDisplayVersion = "1.0.3 dev 5";

@@ -42,7 +42,7 @@ public class ModNews
         return result;
     }
     public static List<ModNews> AllModNews = [];
-    public static string ModNewsURL = "https://raw.githubusercontent.com/BatmenzDW/TownofHost-Enhanced/refs/heads/main/Resources/Announcements/modNews-";
+    public static string ModNewsURL = "https://raw.githubusercontent.com/Bedder-Host-Roles/Bedder-sHostRoles/refs/heads/main/Resources/Announcements/modNews-";
     static bool downloaded = false;
     public ModNews(int Number, string Title, string SubTitle, string ShortTitle, string Text, string Date)
     {

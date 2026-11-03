@@ -5,7 +5,7 @@
 		<GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
 		<GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
 		<Description>BHR</Description>
-		<Authors>BatmenzDW</Authors>
+		<Authors>BatmenzDW, ItIsSimonttv</Authors>
 		<LangVersion>12.0</LangVersion>
 		<Platforms>Windows</Platforms>
 		<AmongUs>/home/batmenzdw/.steam/debian-installation/steamapps/common/Among Us</AmongUs>
