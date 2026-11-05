@@ -229,6 +229,11 @@ public class CustomRpcSender
                 throw new InvalidOperationException(errorMsg);
         }
 
+        if (shouldLog)
+        {
+            Logger.Info($"Sending RPC: {RPC.GetRpcName(callId)} to {targetNetId}", "CustomRpcSender");
+        }
+
         ExperimentManager.Record("StartRpc", $"{name}, targetNetId: {targetNetId}, callId: {callId}, currentRpcTarget: {currentRpcTarget}");
 
         if (messages >= AmongUsClient.Instance.GetMaxMessagePackingLimit())
