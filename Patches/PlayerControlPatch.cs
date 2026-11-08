@@ -1055,8 +1055,7 @@ class FixedUpdateInNormalGamePatch
 
         try
         {
-            // Among Us 2026.9.29 FixedUpdate has no lowLoad parameter.
-            DoPostfix(__instance, lowLoad: true);
+            DoPostfix(__instance);
         }
         catch (Exception ex)
         {
@@ -1067,7 +1066,7 @@ class FixedUpdateInNormalGamePatch
         }
     }
 
-    private static void DoPostfix(PlayerControl __instance, bool lowLoad)
+    private static void DoPostfix(PlayerControl __instance)
     {
         // FixedUpdate is called 30 times every 1 second
         // If count only one player
@@ -1102,33 +1101,12 @@ class FixedUpdateInNormalGamePatch
 
         var nowTime = Utils.TimeStamp;
 
-        // // The code is called once every 1 second (by one player)
-        // bool lowLoad = false;
+        var timerLowLoad = BufferTime.GetValueOrDefault(playerId, 30);
+        bool lowLoad = FixedUpdateSchedule.Advance(ref timerLowLoad, Options.LowLoadMode.GetBool());
+        BufferTime[playerId] = timerLowLoad;
 
-        if (!BufferTime.TryGetValue(player.PlayerId, out var timerLowLoad))
-        {
-            BufferTime[player.PlayerId] = 30;
-            timerLowLoad = 30;
-        }
-
-        // timerLowLoad--;
-
-        // if (timerLowLoad > 0)
-        // {
-        //     if (Options.LowLoadMode.GetBool())
-        //         lowLoad = true;
-        // }
-        // else
-        // {
-        //     timerLowLoad = 30;
-        // }
-
-        // BufferTime[player.PlayerId] = timerLowLoad;
-
-        // if (__instance.AmOwner && timerLowLoad == 30)
-        // {
-        //     TeleportBuffer.Clear();
-        // }
+        if (__instance.AmOwner && timerLowLoad == 30)
+            TeleportBuffer.Clear();
 
         if (self)
         {

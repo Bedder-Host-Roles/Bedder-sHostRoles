@@ -249,7 +249,8 @@ public class ExtendedPlayerControlTests
 
     [Theory]
     [InlineData(10, 10, SendOption.None)]
-    [InlineData(16, 10, SendOption.Reliable)]
+    [InlineData(5, 10, SendOption.None)]
+    [InlineData(4, 10, SendOption.Reliable)]
     public void TryGetTeleportSendOption_UpdatesOrRateLimitsByElapsedBufferTime(int bufferTime, int previousBufferTime, SendOption expectedSendOption)
     {
         var teleportBuffers = new Dictionary<byte, int> { [4] = previousBufferTime };

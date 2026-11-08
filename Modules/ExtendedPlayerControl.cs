@@ -967,7 +967,7 @@ public static class ExtendedPlayerControl
         if (!isVanillaServer || !bypassRateLimit) return true;
         if (!bufferTimes.TryGetValue(playerId, out var bufferTime)) return false;
 
-        if (!teleportBuffers.TryGetValue(playerId, out var teleportBuffer) || bufferTime >= teleportBuffer + 6)
+        if (!teleportBuffers.TryGetValue(playerId, out var teleportBuffer) || bufferTime <= teleportBuffer - 6)
         {
             teleportBuffers[playerId] = bufferTime;
             return true;
