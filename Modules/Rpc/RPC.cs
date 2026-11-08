@@ -894,13 +894,13 @@ internal static class RPC
             // CustomRPC.VersionCheck and can classify the packet as invalid
             // mod traffic.  This is especially important during the first
             // seconds after joining, when the official region is being resolved.
-            if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
-            {
-                Logger.Info("Skipping BHR version-check RPC on a vanilla host.", "VersionCheck");
-                Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
-                    new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
-                return;
-            }
+            // if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+            // {
+            //     Logger.Info("Skipping BHR version-check RPC on a vanilla host.", "VersionCheck");
+            //     Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
+            //         new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
+            //     return;
+            // }
 
             var hostId = AmongUsClient.Instance.HostId;
             if (Main.playerVersion.ContainsKey(hostId) || !Main.VersionCheat.Value)
@@ -931,8 +931,8 @@ internal static class RPC
 
         // The retry is also a BHR-only custom RPC.  Do not send it to a vanilla
         // host/official server.
-        if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
-            return;
+        // if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+        //     return;
 
         var writer = CustomRpcSender.Create("RpcRequestRetryVersionCheck", SendOption.Reliable);
         writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck)
