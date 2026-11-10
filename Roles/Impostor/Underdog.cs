@@ -4,7 +4,7 @@ internal class Underdog : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Underdog;
-    public const int Id = 2700;
+    private const int Id = 2700;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

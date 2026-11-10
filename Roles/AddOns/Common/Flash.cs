@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Flash : IAddon
 {
     public CustomRoles Role => CustomRoles.Flash;
-    public const int Id = 26100;
+    private const int Id = 26100;
     public AddonTypes Type => AddonTypes.Helpful;
 
     private static OptionItem OptionSpeed;

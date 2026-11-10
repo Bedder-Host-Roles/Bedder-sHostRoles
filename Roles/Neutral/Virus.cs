@@ -14,7 +14,7 @@ internal class Virus : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Virus;
-    public const int Id = 18300;
+    private const int Id = 18300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Virus);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

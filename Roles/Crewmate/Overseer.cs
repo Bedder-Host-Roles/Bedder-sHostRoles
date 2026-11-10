@@ -15,7 +15,7 @@ internal class Overseer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Overseer;
-    public const int Id = 12200;
+    private const int Id = 12200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;

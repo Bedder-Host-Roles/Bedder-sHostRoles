@@ -16,7 +16,7 @@ internal class Summoner : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Summoner;
-    public const int Id = 32700;
+    private const int Id = 32700;
     public override bool IsDesyncRole => true;
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -8,7 +8,7 @@ internal class SuperStar : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.SuperStar;
-    public const int Id = 7150;
+    private const int Id = 7150;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\

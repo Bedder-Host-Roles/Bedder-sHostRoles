@@ -12,7 +12,7 @@ internal class Stoner : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Stoner;
-    public const int Id = 33100;
+    private const int Id = 33100;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\

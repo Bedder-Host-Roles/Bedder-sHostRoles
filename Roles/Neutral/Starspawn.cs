@@ -13,7 +13,7 @@ internal class Starspawn : PariahManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Starspawn;
-    public const int Id = 32500;
+    private const int Id = 32500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Starspawn);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

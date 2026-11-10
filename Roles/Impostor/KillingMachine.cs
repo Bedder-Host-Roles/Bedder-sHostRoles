@@ -7,7 +7,7 @@ internal class KillingMachine : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.KillingMachine;
-    public const int Id = 23800;
+    private const int Id = 23800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

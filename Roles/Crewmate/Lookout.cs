@@ -7,7 +7,7 @@ internal class Lookout : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lookout;
-    public const int Id = 11800;
+    private const int Id = 11800;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\

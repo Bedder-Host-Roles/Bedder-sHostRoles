@@ -9,7 +9,7 @@ internal partial class Mayor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Mayor;
-    public const int Id = 12000;
+    private const int Id = 12000;
     public override CustomRoles ThisRoleBase => MayorHasPortableButton.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     public override bool BlockMoveInVent(PlayerControl pc) => true;

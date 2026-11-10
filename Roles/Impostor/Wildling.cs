@@ -13,7 +13,7 @@ internal class Wildling : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Wildling;
-    public const int Id = 5200;
+    private const int Id = 5200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Wildling);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;

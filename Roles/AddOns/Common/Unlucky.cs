@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Unlucky : IAddon
 {
     public CustomRoles Role => CustomRoles.Unlucky;
-    public const int Id = 21000;
+    private const int Id = 21000;
     public AddonTypes Type => AddonTypes.Harmful;
 
     private static OptionItem UnluckyTaskSuicideChance;

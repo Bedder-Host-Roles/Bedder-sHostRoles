@@ -8,7 +8,7 @@ internal class Shaman : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Shaman;
-    public const int Id = 13600;
+    private const int Id = 13600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Shaman);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

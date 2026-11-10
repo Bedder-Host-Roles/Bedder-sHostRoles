@@ -9,7 +9,7 @@ internal class Marshall : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Marshall;
-    public const int Id = 11900;
+    private const int Id = 11900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\

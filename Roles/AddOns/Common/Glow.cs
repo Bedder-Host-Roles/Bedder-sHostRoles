@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Glow : IAddon
 {
     public CustomRoles Role => CustomRoles.Glow;
-    public const int Id = 22000;
+    private const int Id = 22000;
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Experimental;
 

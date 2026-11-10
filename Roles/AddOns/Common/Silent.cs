@@ -4,7 +4,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Silent : IAddon
 {
     public CustomRoles Role => CustomRoles.Silent;
-    public const int Id = 26600;
+    private const int Id = 26600;
     public AddonTypes Type => AddonTypes.Helpful;
     public void SetupCustomOption()
     {

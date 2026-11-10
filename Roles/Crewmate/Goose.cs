@@ -14,7 +14,7 @@ internal class Goose : RoleBase
 {
     public override CustomRoles Role => CustomRoles.Goose;
 
-    public const int Id = 33000;
+    private const int Id = 33000;
 
     public static bool HasEnabled =>
         CustomRoleManager.HasEnabled(CustomRoles.Goose);

@@ -12,7 +12,7 @@ internal class Anonymous : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Anonymous;
-    public const int Id = 5300;
+    private const int Id = 5300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Anonymous);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;

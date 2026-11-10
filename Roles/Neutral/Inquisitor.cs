@@ -17,7 +17,7 @@ internal class Inquisitor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Inquisitor;
-    public const int Id = 32000;
+    private const int Id = 32000;
     public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

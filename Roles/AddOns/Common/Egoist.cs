@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Egoist : IAddon
 {
     public CustomRoles Role => CustomRoles.Egoist;
-    public const int Id = 23500;
+    private const int Id = 23500;
     public AddonTypes Type => AddonTypes.Misc;
 
     public static OptionItem CrewCanBeEgoist;

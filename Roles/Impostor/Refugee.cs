@@ -7,7 +7,7 @@ internal class Refugee : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Refugee;
-    public const int Id = 60009;
+    private const int Id = 60009;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.Madmate;
     //==================================================================\\

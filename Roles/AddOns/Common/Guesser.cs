@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Guesser : IAddon
 {
     public CustomRoles Role => CustomRoles.Guesser;
-    public const int Id = 22200;
+    private const int Id = 22200;
     public AddonTypes Type => AddonTypes.Guesser;
 
     public static OptionItem ImpCanBeGuesser;

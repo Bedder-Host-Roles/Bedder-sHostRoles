@@ -7,7 +7,7 @@ internal class SerialKiller : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.SerialKiller;
-    public const int Id = 17900;
+    private const int Id = 17900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;

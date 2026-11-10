@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Impostor;
 public class Stealer : IAddon
 {
     public CustomRoles Role => CustomRoles.Stealer;
-    public const int Id = 23200;
+    private const int Id = 23200;
     public AddonTypes Type => AddonTypes.Impostor;
 
     private static OptionItem TicketsPerKill;

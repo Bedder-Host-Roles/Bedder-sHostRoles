@@ -15,7 +15,7 @@ internal class Dictator : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Dictator;
-    public const int Id = 11600;
+    private const int Id = 11600;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\

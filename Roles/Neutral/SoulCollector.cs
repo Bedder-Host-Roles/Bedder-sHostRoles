@@ -12,7 +12,7 @@ internal class SoulCollector : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.SoulCollector;
-    public const int Id = 15300;
+    private const int Id = 15300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.SoulCollector);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

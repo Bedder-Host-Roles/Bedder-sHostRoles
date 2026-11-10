@@ -13,7 +13,7 @@ internal class Shroud : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Shroud;
-    public const int Id = 18000;
+    private const int Id = 18000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Shroud);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

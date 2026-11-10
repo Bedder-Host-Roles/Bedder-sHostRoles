@@ -13,7 +13,7 @@ internal class Hawk : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Hawk;
-    public const int Id = 28000;
+    private const int Id = 28000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Hawk);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;

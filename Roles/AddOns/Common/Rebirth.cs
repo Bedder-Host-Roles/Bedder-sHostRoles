@@ -8,7 +8,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Rebirth : IAddon
 {
     public CustomRoles Role => CustomRoles.Rebirth;
-    public const int Id = 29500;
+    private const int Id = 29500;
     public AddonTypes Type => AddonTypes.Helpful;
     public static OptionItem RebirthUses;
     public static OptionItem OnlyVoted;

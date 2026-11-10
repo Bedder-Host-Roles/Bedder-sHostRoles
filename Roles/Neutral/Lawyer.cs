@@ -13,7 +13,7 @@ internal class Lawyer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lawyer;
-    public const int Id = 13100;
+    private const int Id = 13100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Lawyer);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;

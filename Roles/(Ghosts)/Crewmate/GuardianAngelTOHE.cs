@@ -8,7 +8,7 @@ internal class GuardianAngelBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.GuardianAngelBHR;
-    public const int Id = 20900;
+    private const int Id = 20900;
 
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanillaGhosts;

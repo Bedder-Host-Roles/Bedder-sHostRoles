@@ -10,7 +10,7 @@ internal class Spy : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Spy;
-    public const int Id = 9700;
+    private const int Id = 9700;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;
     //==================================================================\\

@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Youtuber : IAddon
 {
     public CustomRoles Role => CustomRoles.Youtuber;
-    public const int Id = 25500;
+    private const int Id = 25500;
     public AddonTypes Type => AddonTypes.Misc;
 
     public static OptionItem KillerWinsWithYouTuber;

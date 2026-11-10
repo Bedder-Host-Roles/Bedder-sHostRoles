@@ -11,7 +11,7 @@ internal class Maverick : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Maverick;
-    public const int Id = 13200;
+    private const int Id = 13200;
     public static bool HasEnabled = CustomRoleManager.HasEnabled(CustomRoles.Maverick);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

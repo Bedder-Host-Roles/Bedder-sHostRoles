@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Watcher : IAddon
 {
     public CustomRoles Role => CustomRoles.Watcher;
-    public const int Id = 20400;
+    private const int Id = 20400;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public void SetupCustomOption()

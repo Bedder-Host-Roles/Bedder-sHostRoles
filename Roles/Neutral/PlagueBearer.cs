@@ -12,7 +12,7 @@ internal class PlagueBearer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.PlagueBearer;
-    public const int Id = 17600;
+    private const int Id = 17600;
     public static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
 

@@ -11,7 +11,7 @@ internal class Shocker : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Shocker;
-    public const int Id = 31000;
+    private const int Id = 31000;
     public static byte? playerId;
     public static bool HasEnabled => playerId.HasValue;
     public override bool IsExperimental => true;

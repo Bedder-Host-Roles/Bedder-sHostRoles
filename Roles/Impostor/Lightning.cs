@@ -11,7 +11,7 @@ internal class Lightning : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lightning;
-    public const int Id = 24100;
+    private const int Id = 24100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

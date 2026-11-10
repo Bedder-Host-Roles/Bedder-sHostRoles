@@ -14,7 +14,7 @@ internal class Puppeteer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Puppeteer;
-    public const int Id = 4300;
+    private const int Id = 4300;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

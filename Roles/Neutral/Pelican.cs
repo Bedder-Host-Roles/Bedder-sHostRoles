@@ -17,7 +17,7 @@ internal class Pelican : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pelican;
-    public const int Id = 17300;
+    private const int Id = 17300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pelican);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

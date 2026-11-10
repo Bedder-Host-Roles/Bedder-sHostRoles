@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Diseased : IAddon
 {
     public CustomRoles Role => CustomRoles.Diseased;
-    public const int Id = 21800;
+    private const int Id = 21800;
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;
 

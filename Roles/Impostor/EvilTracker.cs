@@ -12,7 +12,7 @@ internal class EvilTracker : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.EvilTracker;
-    public const int Id = 1400;
+    private const int Id = 1400;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
 

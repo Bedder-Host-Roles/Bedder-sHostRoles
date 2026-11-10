@@ -11,7 +11,7 @@ internal class Grenadier : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Grenadier;
-    public const int Id = 8200;
+    private const int Id = 8200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Grenadier);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

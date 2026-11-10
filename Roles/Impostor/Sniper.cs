@@ -12,7 +12,7 @@ internal class Sniper : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Sniper;
-    public const int Id = 2400;
+    private const int Id = 2400;
     private static readonly HashSet<byte> PlayerIdList = [];
     public static bool HasEnabled => PlayerIdList.Any();
 

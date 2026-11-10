@@ -14,7 +14,7 @@ internal class Illusionist : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Illusionist;
-    public const int Id = 30400;
+    private const int Id = 30400;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;

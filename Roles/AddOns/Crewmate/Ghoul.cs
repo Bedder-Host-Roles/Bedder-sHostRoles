@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Crewmate;
 public class Ghoul : IAddon
 {
     public CustomRoles Role => CustomRoles.Ghoul;
-    public const int Id = 21900;
+    private const int Id = 21900;
     public AddonTypes Type => AddonTypes.Mixed;
 
     public static bool IsEnable;

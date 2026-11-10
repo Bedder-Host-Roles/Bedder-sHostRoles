@@ -8,7 +8,7 @@ internal class Innocent : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Innocent;
-    public const int Id = 14300;
+    private const int Id = 14300;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;

@@ -15,7 +15,7 @@ internal class Chameleon : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Chameleon;
-    public const int Id = 7600;
+    private const int Id = 7600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Chameleon);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

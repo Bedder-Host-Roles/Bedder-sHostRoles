@@ -12,7 +12,7 @@ internal class DollMaster : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.DollMaster;
-    public const int Id = 28500;
+    private const int Id = 28500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.DollMaster);
     public override bool IsExperimental => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;

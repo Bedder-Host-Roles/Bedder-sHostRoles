@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Bewilder : IAddon
 {
     public CustomRoles Role => CustomRoles.Bewilder;
-    public const int Id = 18900;
+    private const int Id = 18900;
     public AddonTypes Type => AddonTypes.Helpful;
 
     private static OptionItem BewilderVision;

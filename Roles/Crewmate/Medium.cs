@@ -14,7 +14,7 @@ internal class Medium : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Medium;
-    public const int Id = 8700;
+    private const int Id = 8700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Medium);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;

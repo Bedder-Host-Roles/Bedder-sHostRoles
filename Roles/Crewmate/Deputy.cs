@@ -10,7 +10,7 @@ internal class Deputy : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Deputy;
-    public const int Id = 7800;
+    private const int Id = 7800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

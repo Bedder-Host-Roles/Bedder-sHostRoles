@@ -13,7 +13,7 @@ internal class Coroner : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Coroner;
-    public const int Id = 7700;
+    private const int Id = 7700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Coroner);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;

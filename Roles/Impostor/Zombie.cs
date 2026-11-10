@@ -7,7 +7,7 @@ internal class Zombie : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Zombie;
-    public const int Id = 23900;
+    private const int Id = 23900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

@@ -12,7 +12,7 @@ internal class Demon : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Demon;
-    public const int Id = 16200;
+    private const int Id = 16200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Demon);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -6,7 +6,7 @@ internal class PhantomBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.PhantomBHR;
-    public const int Id = 450;
+    private const int Id = 450;
     public override CustomRoles ThisRoleBase => CustomRoles.Phantom;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\

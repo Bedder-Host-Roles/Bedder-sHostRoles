@@ -4,7 +4,7 @@ namespace BHR.Roles.AddOns.Impostor;
 public class Mimic : IAddon
 {
     public CustomRoles Role => CustomRoles.Mimic;
-    public const int Id = 23100;
+    private const int Id = 23100;
     public AddonTypes Type => AddonTypes.Impostor;
 
     private static OptionItem CanSeeDeadRolesOpt;

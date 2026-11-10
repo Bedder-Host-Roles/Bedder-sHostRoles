@@ -10,7 +10,7 @@ internal class Stealth : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Stealth;
-    public const int Id = 27400;
+    private const int Id = 27400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Stealth);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;

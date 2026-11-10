@@ -13,7 +13,7 @@ internal class BloodKnight : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.BloodKnight;
-    public const int Id = 16100;
+    private const int Id = 16100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.BloodKnight);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

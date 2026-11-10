@@ -11,7 +11,7 @@ namespace BHR;
 
 public static class SpeedRun
 {
-    public const int Id = 67_225_001;
+    private const int Id = 67_225_001;
 
     public static OptionItem SpeedRun_NumCommonTasks;
     public static OptionItem SpeedRun_NumShortTasks;

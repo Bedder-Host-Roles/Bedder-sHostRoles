@@ -11,7 +11,7 @@ internal class CursedSoul : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.CursedSoul;
-    public const int Id = 14000;
+    private const int Id = 14000;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralEvil;

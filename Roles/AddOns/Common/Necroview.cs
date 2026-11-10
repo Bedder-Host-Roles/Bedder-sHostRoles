@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Necroview : IAddon
 {
     public CustomRoles Role => CustomRoles.Necroview;
-    public const int Id = 19600;
+    private const int Id = 19600;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public void SetupCustomOption()

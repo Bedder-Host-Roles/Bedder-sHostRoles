@@ -9,7 +9,7 @@ internal class Deceiver : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Deceiver;
-    public const int Id = 10500;
+    private const int Id = 10500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Deceiver);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -14,7 +14,7 @@ internal class Ghastly : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Ghastly;
-    public const int Id = 22060;
+    private const int Id = 22060;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Ghastly);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;

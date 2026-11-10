@@ -6,7 +6,7 @@ internal class JudgeBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.JudgeBHR;
-    public const int Id = 32800;
+    private const int Id = 32800;
     public override CustomRoles ThisRoleBase => CustomRoles.Judge;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
     //==================================================================\\

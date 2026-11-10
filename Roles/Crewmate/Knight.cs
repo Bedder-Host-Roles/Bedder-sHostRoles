@@ -10,7 +10,7 @@ internal class Knight : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Knight;
-    public const int Id = 10800;
+    private const int Id = 10800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Knight);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -11,7 +11,7 @@ internal class Witch : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Witch;
-    public const int Id = 2500;
+    private const int Id = 2500;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
 

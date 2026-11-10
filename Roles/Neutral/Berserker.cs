@@ -14,7 +14,7 @@ internal class Berserker : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Berserker;
-    public const int Id = 600;
+    private const int Id = 600;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralApocalypse;

@@ -8,7 +8,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Aware : IAddon
 {
     public CustomRoles Role => CustomRoles.Aware;
-    public const int Id = 21600;
+    private const int Id = 21600;
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;
 

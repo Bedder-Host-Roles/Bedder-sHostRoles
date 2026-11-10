@@ -21,7 +21,7 @@ namespace BHR.Roles.Vanilla;
 internal sealed class Influencer : RoleBase
 {
     public override CustomRoles Role => CustomRoles.Influencer;
-    public const int Id = 28300;
+    private const int Id = 28300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Influencer);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;

@@ -13,7 +13,7 @@ internal class Solsticer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Solsticer;
-    public const int Id = 26200;
+    private const int Id = 26200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Solsticer);
     public override CustomRoles ThisRoleBase => SolsticerCanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;

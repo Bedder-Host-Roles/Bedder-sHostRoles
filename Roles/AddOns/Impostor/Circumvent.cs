@@ -4,7 +4,7 @@ namespace BHR.Roles.AddOns.Impostor;
 public class Circumvent : IAddon
 {
     public CustomRoles Role => CustomRoles.Circumvent;
-    public const int Id = 22600;
+    private const int Id = 22600;
     public AddonTypes Type => AddonTypes.Impostor;
 
     public void SetupCustomOption()

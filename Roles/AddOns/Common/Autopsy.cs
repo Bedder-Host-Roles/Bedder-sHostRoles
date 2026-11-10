@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Autopsy : IAddon
 {
     public CustomRoles Role => CustomRoles.Autopsy;
-    public const int Id = 18600;
+    private const int Id = 18600;
     public AddonTypes Type => AddonTypes.Helpful;
     public void SetupCustomOption()
     {

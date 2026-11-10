@@ -12,7 +12,7 @@ internal class Investigator : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Investigator;
-    public const int Id = 24900;
+    private const int Id = 24900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;

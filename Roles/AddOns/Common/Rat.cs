@@ -7,7 +7,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Rat : IAddon
 {
     public CustomRoles Role => CustomRoles.Rat;
-    public const int Id = 31900;
+    private const int Id = 31900;
     public AddonTypes Type => AddonTypes.Helpful;
     private static readonly HashSet<byte> playerList = [];
     public static bool IsEnable = false;

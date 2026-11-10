@@ -12,7 +12,7 @@ internal class Gangster : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Gangster;
-    public const int Id = 3300;
+    private const int Id = 3300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Gangster);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;

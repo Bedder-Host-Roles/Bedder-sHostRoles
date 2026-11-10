@@ -14,7 +14,7 @@ internal class Romantic : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Romantic;
-    public const int Id = 13500;
+    private const int Id = 13500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Romantic);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

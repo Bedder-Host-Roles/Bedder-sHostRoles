@@ -8,7 +8,7 @@ internal class Reverie : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Reverie;
-    public const int Id = 11100;
+    private const int Id = 11100;
 
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -11,7 +11,7 @@ internal class Jackal : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Jackal;
-    public const int Id = 16700;
+    private const int Id = 16700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Jackal);
     public static readonly HashSet<byte> Playerids = [];
     public override bool IsDesyncRole => true;

@@ -16,7 +16,7 @@ public class GeneralRoleTests
             {
                 var field = type.GetField(
                     "Id",
-                    BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+                    BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
 
                 Assert.NotNull(field);
                 Assert.True(field.IsLiteral);

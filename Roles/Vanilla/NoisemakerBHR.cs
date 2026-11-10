@@ -7,7 +7,7 @@ internal class NoisemakerBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.NoisemakerBHR;
-    public const int Id = 6230;
+    private const int Id = 6230;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
 

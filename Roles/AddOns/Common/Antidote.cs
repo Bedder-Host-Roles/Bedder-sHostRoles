@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Antidote : IAddon
 {
     public CustomRoles Role => CustomRoles.Antidote;
-    public const int Id = 21400;
+    private const int Id = 21400;
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;
 

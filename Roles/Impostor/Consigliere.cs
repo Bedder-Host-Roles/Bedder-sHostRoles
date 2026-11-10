@@ -9,7 +9,7 @@ internal class Consigliere : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Consigliere;
-    public const int Id = 3100;
+    private const int Id = 3100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\

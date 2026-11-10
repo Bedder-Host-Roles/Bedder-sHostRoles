@@ -4,7 +4,7 @@ internal class Trickster : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Trickster;
-    public const int Id = 4800;
+    private const int Id = 4800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

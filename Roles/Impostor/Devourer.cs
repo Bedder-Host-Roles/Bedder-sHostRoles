@@ -13,7 +13,7 @@ internal class Devourer : RoleBase
 
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Devourer;
-    public const int Id = 5500;
+    private const int Id = 5500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Devourer);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;

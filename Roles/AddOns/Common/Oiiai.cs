@@ -10,7 +10,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Oiiai : IAddon
 {
     public CustomRoles Role => CustomRoles.Oiiai;
-    public const int Id = 25700;
+    private const int Id = 25700;
     private readonly static List<byte> playerIdList = [];
     public static bool IsEnable = false;
     public AddonTypes Type => AddonTypes.Mixed;

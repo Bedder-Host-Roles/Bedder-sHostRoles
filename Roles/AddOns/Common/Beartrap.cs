@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Trapper : IAddon
 {
     public CustomRoles Role => CustomRoles.Trapper;
-    public const int Id = 18800;
+    private const int Id = 18800;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public static OptionItem TrapperBlockMoveTime;

@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Loyal : IAddon
 {
     public CustomRoles Role => CustomRoles.Loyal;
-    public const int Id = 19400;
+    private const int Id = 19400;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public static OptionItem ImpCanBeLoyal;

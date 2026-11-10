@@ -10,7 +10,7 @@ internal class Agitater : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Agitater;
-    public const int Id = 15800;
+    private const int Id = 15800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;

@@ -12,7 +12,7 @@ internal class Kamikaze : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Kamikaze;
-    public const int Id = 26900;
+    private const int Id = 26900;
     public static readonly HashSet<byte> Playerids = [];
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Kamikaze);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

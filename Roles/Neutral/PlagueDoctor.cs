@@ -15,7 +15,7 @@ internal class PlagueDoctor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.PlagueDoctor;
-    public const int Id = 27600;
+    private const int Id = 27600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.PlagueDoctor);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

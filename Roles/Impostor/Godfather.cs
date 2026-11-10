@@ -10,7 +10,7 @@ internal class Godfather : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Godfather;
-    public const int Id = 3400;
+    private const int Id = 3400;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\

@@ -9,7 +9,7 @@ internal class Bomber : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Bomber;
-    public const int Id = 700;
+    private const int Id = 700;
     public override bool UsesCNOs => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;

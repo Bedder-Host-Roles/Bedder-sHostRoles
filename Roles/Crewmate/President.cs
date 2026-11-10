@@ -12,7 +12,7 @@ internal class President : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.President;
-    public const int Id = 12300;
+    private const int Id = 12300;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmatePower;
     //==================================================================\\

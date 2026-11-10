@@ -17,7 +17,7 @@ internal class MoonDancer : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.MoonDancer;
-    public const int Id = 30500;
+    private const int Id = 30500;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;

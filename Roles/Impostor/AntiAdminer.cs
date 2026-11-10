@@ -12,7 +12,7 @@ internal class AntiAdminer : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.AntiAdminer;
-    public const int Id = 2800;
+    private const int Id = 2800;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool HasEnabled => playerIdList.Any();
 

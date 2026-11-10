@@ -11,7 +11,7 @@ internal class Troller : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Troller;
-    public const int Id = 28700;
+    private const int Id = 28700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Troller);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralBenign;

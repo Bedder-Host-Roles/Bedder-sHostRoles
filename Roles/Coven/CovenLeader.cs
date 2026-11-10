@@ -13,7 +13,7 @@ internal class CovenLeader : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.CovenLeader;
-    public const int Id = 30900;
+    private const int Id = 30900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenPower;

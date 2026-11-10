@@ -9,7 +9,7 @@ internal class Jester : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Jester;
-    public const int Id = 14400;
+    private const int Id = 14400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Jester);
 
     public override CustomRoles ThisRoleBase => CanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;

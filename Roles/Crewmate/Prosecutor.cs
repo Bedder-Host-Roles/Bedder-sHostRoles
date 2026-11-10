@@ -19,7 +19,7 @@ internal class Prosecutor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Prosecutor;
-    public const int Id = 10700;
+    private const int Id = 10700;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\

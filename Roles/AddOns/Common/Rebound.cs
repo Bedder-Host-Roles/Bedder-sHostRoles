@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Rebound : IAddon
 {
     public CustomRoles Role => CustomRoles.Rebound;
-    public const int Id = 22300;
+    private const int Id = 22300;
     public AddonTypes Type => AddonTypes.Guesser;
 
     public void SetupCustomOption()

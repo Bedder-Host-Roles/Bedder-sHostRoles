@@ -13,7 +13,7 @@ internal class Glitch : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Glitch;
-    public const int Id = 16300;
+    private const int Id = 16300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Glitch);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;

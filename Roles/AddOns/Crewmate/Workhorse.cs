@@ -7,7 +7,7 @@ namespace BHR.Roles.AddOns.Crewmate;
 public class Workhorse : IAddon
 {
     public CustomRoles Role => CustomRoles.Workhorse;
-    public const int Id = 23730;
+    private const int Id = 23730;
     public AddonTypes Type => AddonTypes.Misc;
     private static readonly HashSet<byte> playerIdList = [];
     public static bool IsEnable = false;

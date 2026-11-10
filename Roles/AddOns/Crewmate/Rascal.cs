@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Crewmate;
 public class Rascal : IAddon
 {
     public CustomRoles Role => CustomRoles.Rascal;
-    public const int Id = 20800;
+    private const int Id = 20800;
     public AddonTypes Type => AddonTypes.Harmful;
 
     private static OptionItem RascalAppearAsMadmate;

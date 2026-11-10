@@ -3,7 +3,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Susceptible : IAddon
 {
     public CustomRoles Role => CustomRoles.Susceptible;
-    public const int Id = 27100;
+    private const int Id = 27100;
     public AddonTypes Type => AddonTypes.Mixed;
     private static OptionItem EnabledDeathReasons;
 

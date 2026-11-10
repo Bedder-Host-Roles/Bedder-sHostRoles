@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Crewmate;
 public class Lazy : IAddon
 {
     public CustomRoles Role => CustomRoles.Lazy;
-    public const int Id = 19300;
+    private const int Id = 19300;
     public AddonTypes Type => AddonTypes.Helpful;
 
     private static OptionItem TasklessCrewCanBeLazy;

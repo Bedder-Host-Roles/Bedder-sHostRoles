@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Onbound : IAddon
 {
     public CustomRoles Role => CustomRoles.Onbound;
-    public const int Id = 25800;
+    private const int Id = 25800;
     public AddonTypes Type => AddonTypes.Guesser;
 
     public void SetupCustomOption()
