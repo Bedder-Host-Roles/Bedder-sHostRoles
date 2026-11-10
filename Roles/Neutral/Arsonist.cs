@@ -34,14 +34,14 @@ internal class Arsonist : RoleBase
 
     public override void SetupCustomOption()
     {
-        SetupRoleOptions(id, TabGroup.NeutralRoles, CustomRoles.Arsonist);
-        ArsonistDouseTime = FloatOptionItem.Create(id + 10, "ArsonistDouseTime", new(0f, 10f, 1f), 0f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist])
+        SetupRoleOptions(Id, TabGroup.NeutralRoles, CustomRoles.Arsonist);
+        ArsonistDouseTime = FloatOptionItem.Create(Id + 10, "ArsonistDouseTime", new(0f, 10f, 1f), 0f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist])
             .SetValueFormat(OptionFormat.Seconds);
-        ArsonistCooldown = FloatOptionItem.Create(id + 11, GeneralOption.Cooldown, new(0f, 180f, 1f), 25f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist])
+        ArsonistCooldown = FloatOptionItem.Create(Id + 11, GeneralOption.Cooldown, new(0f, 180f, 1f), 25f, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist])
             .SetValueFormat(OptionFormat.Seconds);
-        ArsonistCanIgniteAnytimeOpt = BooleanOptionItem.Create(id + 12, "ArsonistCanIgniteAnytime", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist]);
-        ArsonistMinPlayersToIgnite = IntegerOptionItem.Create(id + 13, "ArsonistMinPlayersToIgnite", new(1, 14, 1), 1, TabGroup.NeutralRoles, false).SetParent(ArsonistCanIgniteAnytimeOpt);
-        ArsonistMaxPlayersToIgnite = IntegerOptionItem.Create(id + 14, "ArsonistMaxPlayersToIgnite", new(1, 14, 1), 3, TabGroup.NeutralRoles, false).SetParent(ArsonistCanIgniteAnytimeOpt);
+        ArsonistCanIgniteAnytimeOpt = BooleanOptionItem.Create(Id + 12, "ArsonistCanIgniteAnytime", true, TabGroup.NeutralRoles, false).SetParent(CustomRoleSpawnChances[CustomRoles.Arsonist]);
+        ArsonistMinPlayersToIgnite = IntegerOptionItem.Create(Id + 13, "ArsonistMinPlayersToIgnite", new(1, 14, 1), 1, TabGroup.NeutralRoles, false).SetParent(ArsonistCanIgniteAnytimeOpt);
+        ArsonistMaxPlayersToIgnite = IntegerOptionItem.Create(Id + 14, "ArsonistMaxPlayersToIgnite", new(1, 14, 1), 3, TabGroup.NeutralRoles, false).SetParent(ArsonistCanIgniteAnytimeOpt);
     }
     public override void Init()
     {

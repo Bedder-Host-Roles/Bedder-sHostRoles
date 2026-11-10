@@ -14,7 +14,6 @@ public abstract class RoleBase
     public PlayerControl _Player => _state != null ? Utils.GetPlayerById(_state.PlayerId) ?? null : null;
     public List<byte> _playerIdList => [.. Main.PlayerStates.Values.Where(x => x != null && x.MainRole == _state?.MainRole).Select(x => x.PlayerId).Cast<byte>()];
 #pragma warning restore IDE1006
-    public const int Id = -1;
     public virtual bool IsEnable { get; set; } = false;
     public bool HasVoted = false;
     public virtual bool IsExperimental => false;
