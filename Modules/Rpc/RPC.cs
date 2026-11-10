@@ -917,6 +917,13 @@ internal static class RPC
 
             bool isHost = AmongUsClient.Instance.AmHost;
             int hostId = AmongUsClient.Instance.HostId;
+            int rpcTarget = isHost ? targetClientId : hostId;
+            if (rpcTarget < 0)
+            {
+                Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
+                    new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
+                return;
+            }
 
             // Never send BHR custom RPCs from a BHR client into an official
             // vanilla-hosted lobby.  The official server/host does not know
@@ -965,6 +972,9 @@ internal static class RPC
         // host/official server.
         // if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
         //     return;
+
+        int hostId = AmongUsClient.Instance.HostId;
+        if (AmongUsClient.Instance.AmHost || hostId < 0) return;
 
         var writer = CustomRpcSender.Create("RpcRequestRetryVersionCheck", SendOption.Reliable);
         writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck, hostId)
