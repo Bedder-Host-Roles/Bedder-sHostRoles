@@ -11,7 +11,7 @@ internal class Ventguard : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Ventguard;
-    private const int Id = 30000;
+    public const int Id = 30000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Ventguard);
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateSupport;

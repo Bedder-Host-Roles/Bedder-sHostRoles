@@ -6,7 +6,7 @@ internal class ViperBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.ViperBHR;
-    private const int Id = 35000;
+    public const int Id = 35000;
     public override CustomRoles ThisRoleBase => CustomRoles.Viper;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\

@@ -15,7 +15,7 @@ internal class DoubleAgent : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.DoubleAgent;
-    private const int Id = 29000;
+    public const int Id = 29000;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\

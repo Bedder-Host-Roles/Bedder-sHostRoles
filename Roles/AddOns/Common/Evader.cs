@@ -4,7 +4,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Evader : IAddon
 {
     public CustomRoles Role => CustomRoles.Evader;
-    private const int Id = 29600;
+    public const int Id = 29600;
     public AddonTypes Type => AddonTypes.Helpful;
 
     private static OptionItem SkillLimitTimes;

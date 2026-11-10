@@ -6,7 +6,7 @@ internal class ShapeshifterBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.ShapeshifterBHR;
-    private const int Id = 400;
+    public const int Id = 400;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\

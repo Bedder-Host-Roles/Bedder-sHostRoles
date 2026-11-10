@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Mundane : IAddon
 {
     public CustomRoles Role => CustomRoles.Mundane;
-    private const int Id = 26700;
+    public const int Id = 26700;
     public AddonTypes Type => AddonTypes.Harmful;
 
     public static OptionItem CanBeOnCrew;

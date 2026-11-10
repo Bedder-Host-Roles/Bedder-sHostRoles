@@ -3,7 +3,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Sleuth : IAddon
 {
     public CustomRoles Role => CustomRoles.Sleuth;
-    private const int Id = 20100;
+    public const int Id = 20100;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public static OptionItem SleuthCanKnowKillerRole;

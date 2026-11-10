@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Prohibited : IAddon
 {
     public CustomRoles Role => CustomRoles.Prohibited;
-    private const int Id = 29900;
+    public const int Id = 29900;
     public AddonTypes Type => AddonTypes.Harmful;
 
     private static OptionItem CountBlockedVentsInSkeld;

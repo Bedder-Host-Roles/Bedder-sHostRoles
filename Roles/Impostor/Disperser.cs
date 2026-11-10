@@ -11,7 +11,7 @@ internal class Disperser : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Disperser;
-    private const int Id = 24400;
+    public const int Id = 24400;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;
     //==================================================================\\

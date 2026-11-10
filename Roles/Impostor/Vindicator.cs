@@ -4,7 +4,7 @@ internal class Vindicator : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Vindicator;
-    private const int Id = 3800;
+    public const int Id = 3800;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\

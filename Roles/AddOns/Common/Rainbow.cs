@@ -8,7 +8,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Rainbow : IAddon
 {
     public CustomRoles Role => CustomRoles.Rainbow;
-    private const int Id = 27700;
+    public const int Id = 27700;
     public AddonTypes Type => AddonTypes.Misc;
 
     private static OptionItem RainbowColorChangeCoolDown;

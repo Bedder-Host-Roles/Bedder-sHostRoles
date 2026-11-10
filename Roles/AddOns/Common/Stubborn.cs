@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Stubborn : IAddon
 {
     public CustomRoles Role => CustomRoles.Stubborn;
-    private const int Id = 22500;
+    public const int Id = 22500;
     public AddonTypes Type => AddonTypes.Mixed;
 
     public void SetupCustomOption()

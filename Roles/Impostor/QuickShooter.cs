@@ -11,7 +11,7 @@ internal class QuickShooter : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.QuickShooter;
-    private const int Id = 2200;
+    public const int Id = 2200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.QuickShooter);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;

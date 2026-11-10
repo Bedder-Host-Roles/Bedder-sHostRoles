@@ -6,7 +6,7 @@ internal class TrackerBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.TrackerBHR;
-    private const int Id = 6250;
+    public const int Id = 6250;
     public override CustomRoles ThisRoleBase => CustomRoles.Tracker;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
     //==================================================================\\

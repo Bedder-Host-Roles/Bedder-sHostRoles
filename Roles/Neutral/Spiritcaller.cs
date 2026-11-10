@@ -10,7 +10,7 @@ internal class Spiritcaller : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Spiritcaller;
-    private const int Id = 25200;
+    public const int Id = 25200;
     public static bool HasEnabled = CustomRoleManager.HasEnabled(CustomRoles.Spiritcaller);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

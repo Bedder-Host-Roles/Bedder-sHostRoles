@@ -3,7 +3,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Tiebreaker : IAddon
 {
     public CustomRoles Role => CustomRoles.Tiebreaker;
-    private const int Id = 20200;
+    public const int Id = 20200;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public static readonly HashSet<byte> VoteFor = [];

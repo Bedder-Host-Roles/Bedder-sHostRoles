@@ -9,7 +9,7 @@ internal class Mortician : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Mortician;
-    private const int Id = 8900;
+    public const int Id = 8900;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\

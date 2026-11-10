@@ -13,7 +13,7 @@ internal class Revolutionist : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Revolutionist;
-    private const int Id = 15200;
+    public const int Id = 15200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;

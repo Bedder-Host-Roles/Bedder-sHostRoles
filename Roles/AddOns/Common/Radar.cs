@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Radar : IAddon
 {
     public CustomRoles Role => CustomRoles.Radar;
-    private const int Id = 28200;
+    public const int Id = 28200;
     public AddonTypes Type => AddonTypes.Helpful;
 
     private static readonly Dictionary<byte, byte> ClosestPlayer = [];

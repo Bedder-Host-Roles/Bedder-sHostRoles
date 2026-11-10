@@ -18,7 +18,7 @@ internal class Pirate : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pirate;
-    private const int Id = 15000;
+    public const int Id = 15000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Pirate);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

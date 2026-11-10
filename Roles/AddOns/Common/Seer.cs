@@ -4,7 +4,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Seer : IAddon
 {
     public CustomRoles Role => CustomRoles.Seer;
-    private const int Id = 20000;
+    public const int Id = 20000;
     public AddonTypes Type => AddonTypes.Helpful;
 
     public void SetupCustomOption()

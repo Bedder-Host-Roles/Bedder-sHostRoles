@@ -7,7 +7,7 @@ internal class ScientistBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.ScientistBHR;
-    private const int Id = 6200;
+    public const int Id = 6200;
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateVanilla;
     //==================================================================\\

@@ -4,7 +4,7 @@ internal class Inhibitor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Inhibitor;
-    private const int Id = 1600;
+    public const int Id = 1600;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

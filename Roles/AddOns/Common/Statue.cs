@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Statue : IAddon
 {
     public CustomRoles Role => CustomRoles.Statue;
-    private const int Id = 13800;
+    public const int Id = 13800;
     public AddonTypes Type => AddonTypes.Harmful;
     public static bool IsEnable = false;
 

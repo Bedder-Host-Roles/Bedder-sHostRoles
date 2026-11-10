@@ -11,7 +11,7 @@ internal class Bandit : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Bandit;
-    private const int Id = 16000;
+    public const int Id = 16000;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bandit);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

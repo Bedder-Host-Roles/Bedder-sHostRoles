@@ -11,7 +11,7 @@ internal class Sorceress : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Sorceress;
-    private const int Id = 32600;
+    public const int Id = 32600;
     public override bool IsDesyncRole => true;
     public override bool IsExperimental => true;
     public override bool UsesCNOs => true;

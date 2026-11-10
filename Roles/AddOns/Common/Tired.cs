@@ -7,7 +7,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Tired : IAddon
 {
     public CustomRoles Role => CustomRoles.Tired;
-    private const int Id = 27300;
+    public const int Id = 27300;
     public AddonTypes Type => AddonTypes.Harmful;
     private static readonly Dictionary<byte, bool> playerIdList = []; // Target Action player for Vision
 

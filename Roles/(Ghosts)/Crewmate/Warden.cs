@@ -11,7 +11,7 @@ internal class Warden : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Warden;
-    private const int Id = 27800;
+    public const int Id = 27800;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Warden);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;

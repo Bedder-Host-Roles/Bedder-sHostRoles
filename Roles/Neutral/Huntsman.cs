@@ -14,7 +14,7 @@ internal class Huntsman : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Huntsman;
-    private const int Id = 16500;
+    public const int Id = 16500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Huntsman);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

@@ -13,7 +13,7 @@ internal class Wraith : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Wraith;
-    private const int Id = 18500;
+    public const int Id = 18500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Wraith);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

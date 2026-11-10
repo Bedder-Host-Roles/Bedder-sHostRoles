@@ -8,7 +8,7 @@ internal class Juggernaut : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Juggernaut;
-    private const int Id = 16900;
+    public const int Id = 16900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;

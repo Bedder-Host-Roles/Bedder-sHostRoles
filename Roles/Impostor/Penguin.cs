@@ -14,7 +14,7 @@ internal class Penguin : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Penguin;
-    private const int Id = 27500;
+    public const int Id = 27500;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Penguin);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;

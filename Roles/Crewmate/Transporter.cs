@@ -8,7 +8,7 @@ internal class Transporter : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Transporter;
-    private const int Id = 7400;
+    public const int Id = 7400;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\

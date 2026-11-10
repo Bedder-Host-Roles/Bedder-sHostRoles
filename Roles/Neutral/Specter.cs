@@ -7,7 +7,7 @@ internal class Specter : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Specter;
-    private const int Id = 14900;
+    public const int Id = 14900;
     public override CustomRoles ThisRoleBase => CanVent.GetBool() ? CustomRoles.Engineer : CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
     //==================================================================\\

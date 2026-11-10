@@ -17,7 +17,7 @@ internal class Cupid : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Cupid;
-    private const int Id = 32400;
+    public const int Id = 32400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Cupid);
     public override bool IsExperimental => true;
     public override bool IsDesyncRole => true;

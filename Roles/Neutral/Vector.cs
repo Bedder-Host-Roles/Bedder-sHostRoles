@@ -12,7 +12,7 @@ internal class Vector : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Vector;
-    private const int Id = 15500;
+    public const int Id = 15500;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
     public override bool BlockMoveInVent(PlayerControl pc) => VectorInVentMaxTime.GetFloat() <= 1f;

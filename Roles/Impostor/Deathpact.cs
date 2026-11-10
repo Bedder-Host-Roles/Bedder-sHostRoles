@@ -14,7 +14,7 @@ internal class Deathpact : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Deathpact;
-    private const int Id = 1200;
+    public const int Id = 1200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Deathpact);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;

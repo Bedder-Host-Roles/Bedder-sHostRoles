@@ -3,7 +3,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Influenced : IAddon
 {
     public CustomRoles Role => CustomRoles.Influenced;
-    private const int Id = 21200;
+    public const int Id = 21200;
     public AddonTypes Type => AddonTypes.Harmful;
 
     public void SetupCustomOption()

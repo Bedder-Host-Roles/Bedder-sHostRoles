@@ -9,7 +9,7 @@ internal class Crusader : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Crusader;
-    private const int Id = 10400;
+    public const int Id = 10400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Crusader);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

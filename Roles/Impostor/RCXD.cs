@@ -12,7 +12,7 @@ namespace BHR.Roles.Impostor;
 internal sealed class RCXD : RoleBase
 {
     public override CustomRoles Role => CustomRoles.RCXD;
-    private const int Id = 91000;
+    public const int Id = 91000;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
 

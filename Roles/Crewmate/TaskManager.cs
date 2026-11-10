@@ -13,7 +13,7 @@ internal class TaskManager : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.TaskManager;
-    private const int Id = 7200;
+    public const int Id = 7200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.TaskManager);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;

@@ -7,7 +7,7 @@ internal class Bodyguard : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Bodyguard;
-    private const int Id = 10300;
+    public const int Id = 10300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bodyguard);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;

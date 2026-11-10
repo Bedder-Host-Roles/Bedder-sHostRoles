@@ -12,7 +12,7 @@ internal class Oracle : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Oracle;
-    private const int Id = 9100;
+    public const int Id = 9100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Oracle);
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;

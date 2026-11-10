@@ -12,7 +12,7 @@ internal class Necromancer : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Necromancer;
-    private const int Id = 17100;
+    public const int Id = 17100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenUtility;

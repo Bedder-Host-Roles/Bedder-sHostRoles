@@ -11,7 +11,7 @@ internal class Infectious : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Infectious;
-    private const int Id = 16600;
+    public const int Id = 16600;
     private static readonly HashSet<byte> PlayerIds = [];
     public static bool HasEnabled => PlayerIds.Any();
     public override bool IsDesyncRole => true;

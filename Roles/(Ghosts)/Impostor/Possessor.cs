@@ -10,7 +10,7 @@ internal class Possessor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Possessor;
-    private const int Id = 28900;
+    public const int Id = 28900;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Possessor);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;

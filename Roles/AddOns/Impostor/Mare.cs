@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Impostor;
 public class Mare : IAddon
 {
     public CustomRoles Role => CustomRoles.Mare;
-    private const int Id = 23000;
+    public const int Id = 23000;
     public AddonTypes Type => AddonTypes.Impostor;
     public static readonly HashSet<byte> playerIdList = [];
 

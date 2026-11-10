@@ -13,7 +13,7 @@ internal class Seeker : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Seeker;
-    private const int Id = 14600;
+    public const int Id = 14600;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Seeker);
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;

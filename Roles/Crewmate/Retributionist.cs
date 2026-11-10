@@ -15,7 +15,7 @@ internal class Retributionist : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Retributionist;
-    private const int Id = 11000;
+    public const int Id = 11000;
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateKilling;
     //==================================================================\\

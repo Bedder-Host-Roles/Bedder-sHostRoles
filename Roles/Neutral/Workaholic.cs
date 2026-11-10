@@ -10,7 +10,7 @@ internal class Workaholic : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Workaholic;
-    private const int Id = 15700;
+    public const int Id = 15700;
     public override CustomRoles ThisRoleBase => CustomRoles.Engineer;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralChaos;
     //==================================================================\\

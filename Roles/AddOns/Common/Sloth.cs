@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Sloth : IAddon
 {
     public CustomRoles Role => CustomRoles.Sloth;
-    private const int Id = 29700;
+    public const int Id = 29700;
     public AddonTypes Type => AddonTypes.Harmful;
 
     private static OptionItem OptionSpeed;

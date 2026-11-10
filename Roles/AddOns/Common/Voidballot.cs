@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class VoidBallot : IAddon
 {
     public CustomRoles Role => CustomRoles.VoidBallot;
-    private const int Id = 21100;
+    public const int Id = 21100;
     public AddonTypes Type => AddonTypes.Harmful;
 
     public void SetupCustomOption()

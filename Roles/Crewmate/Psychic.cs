@@ -12,7 +12,7 @@ internal class Psychic : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Psychic;
-    private const int Id = 9400;
+    public const int Id = 9400;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Psychic);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;

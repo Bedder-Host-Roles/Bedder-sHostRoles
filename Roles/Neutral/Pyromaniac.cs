@@ -9,7 +9,7 @@ internal class Pyromaniac : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Pyromaniac;
-    private const int Id = 17800;
+    public const int Id = 17800;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;

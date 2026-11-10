@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Unreportable : IAddon
 {
     public CustomRoles Role => CustomRoles.Unreportable;
-    private const int Id = 20500;
+    public const int Id = 20500;
     public AddonTypes Type => AddonTypes.Harmful;
 
     public void SetupCustomOption()

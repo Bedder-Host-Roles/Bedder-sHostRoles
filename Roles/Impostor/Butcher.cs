@@ -9,7 +9,7 @@ internal class Butcher : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Butcher;
-    private const int Id = 24300;
+    public const int Id = 24300;
 
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;

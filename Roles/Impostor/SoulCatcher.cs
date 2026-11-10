@@ -11,7 +11,7 @@ internal class SoulCatcher : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.SoulCatcher;
-    private const int Id = 4600;
+    public const int Id = 4600;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

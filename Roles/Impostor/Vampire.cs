@@ -15,7 +15,7 @@ internal class Vampire : RoleBase
 
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Vampire;
-    private const int Id = 5000;
+    public const int Id = 5000;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

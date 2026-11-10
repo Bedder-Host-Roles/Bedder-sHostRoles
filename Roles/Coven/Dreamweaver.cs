@@ -14,7 +14,7 @@ internal class Dreamweaver : CovenManager
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Dreamweaver;
-    private const int Id = 31100;
+    public const int Id = 31100;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenTrickery;

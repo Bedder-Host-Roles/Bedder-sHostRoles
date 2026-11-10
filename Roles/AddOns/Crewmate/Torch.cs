@@ -6,7 +6,7 @@ namespace BHR.Roles.AddOns.Crewmate;
 public class Torch : IAddon
 {
     public CustomRoles Role => CustomRoles.Torch;
-    private const int Id = 20300;
+    public const int Id = 20300;
     public AddonTypes Type => AddonTypes.Helpful;
     private static OptionItem TorchVision;
     private static OptionItem TorchAffectedByLights;

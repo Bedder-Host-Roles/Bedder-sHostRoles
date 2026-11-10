@@ -8,7 +8,7 @@ internal class Hater : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Hater;
-    private const int Id = 12900;
+    public const int Id = 12900;
     public static readonly HashSet<byte> playerIdList = [];
 
     public override bool IsDesyncRole => true;

@@ -6,7 +6,7 @@ internal class Lurker : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Lurker;
-    private const int Id = 1900;
+    public const int Id = 1900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

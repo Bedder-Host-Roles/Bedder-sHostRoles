@@ -19,7 +19,7 @@ internal class Conjurer : CovenManager
     }
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Conjurer;
-    private const int Id = 30300;
+    public const int Id = 30300;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CovenKilling;

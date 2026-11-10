@@ -6,7 +6,7 @@ internal class Visionary : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Visionary;
-    private const int Id = 3900;
+    public const int Id = 3900;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //==================================================================\\

@@ -8,7 +8,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Lovers : IAddon
 {
     public CustomRoles Role => CustomRoles.Lovers;
-    private const int Id = 23600;
+    public const int Id = 23600;
     public AddonTypes Type => AddonTypes.Misc;
     private static readonly List<(byte, byte)> loverPairs = [];
     private static readonly Dictionary<(byte, byte), bool> hasHeartbreak = [];

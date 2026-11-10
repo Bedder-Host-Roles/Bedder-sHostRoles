@@ -6,7 +6,7 @@ internal class Revenant : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Revenant;
-    private const int Id = 30200;
+    public const int Id = 30200;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Revenant);
 
     public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;

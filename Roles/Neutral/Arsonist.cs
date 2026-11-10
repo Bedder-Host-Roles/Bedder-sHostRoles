@@ -15,7 +15,7 @@ internal class Arsonist : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Arsonist;
-    private const int id = 15900;
+    public const int Id = 15900;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => CanIgniteAnytime() ? Custom_RoleType.NeutralKilling : Custom_RoleType.NeutralEvil;

@@ -7,7 +7,7 @@ internal class Arrogance : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Arrogance;
-    private const int Id = 500;
+    public const int Id = 500;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

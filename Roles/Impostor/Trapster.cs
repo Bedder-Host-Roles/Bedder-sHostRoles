@@ -4,7 +4,7 @@ internal class Trapster : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Trapster;
-    private const int Id = 2600;
+    public const int Id = 2600;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorKilling;
     //==================================================================\\

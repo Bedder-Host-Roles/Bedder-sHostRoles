@@ -11,7 +11,7 @@ internal class Mastermind : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Mastermind;
-    private const int Id = 4100;
+    public const int Id = 4100;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     public override bool IsExperimental => true;

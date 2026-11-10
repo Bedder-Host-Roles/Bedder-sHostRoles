@@ -5,7 +5,7 @@ namespace BHR.Roles.AddOns.Common;
 public class Fragile : IAddon
 {
     public CustomRoles Role => CustomRoles.Fragile;
-    private const int Id = 20600;
+    public const int Id = 20600;
     public AddonTypes Type => AddonTypes.Harmful;
 
     private static OptionItem ImpCanKillFragile;

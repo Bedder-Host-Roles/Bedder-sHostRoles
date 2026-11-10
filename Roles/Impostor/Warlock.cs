@@ -11,7 +11,7 @@ internal class Warlock : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Warlock;
-    private const int Id = 5100;
+    public const int Id = 5100;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;
     //==================================================================\\

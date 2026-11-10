@@ -9,7 +9,7 @@ namespace BHR.Roles.Neutral;
 internal class Randomizer : RoleBase
 {
     //===========================SETUP================================\\
-    private const int Id = 82000; // Unique ID for Randomizer
+    public const int Id = 82000; // Unique ID for Randomizer
     public static readonly HashSet<byte> playerIdList = [];
     private static readonly Dictionary<byte, List<CustomRoles>> KeptAddons = [];
     public override bool IsDesyncRole => true;

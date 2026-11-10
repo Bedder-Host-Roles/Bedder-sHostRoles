@@ -12,7 +12,7 @@ internal class Swooper : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Swooper;
-    private const int Id = 4700;
+    public const int Id = 4700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Swooper);
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorConcealing;

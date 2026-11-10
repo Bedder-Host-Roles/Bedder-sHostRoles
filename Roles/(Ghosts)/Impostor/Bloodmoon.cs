@@ -14,7 +14,7 @@ internal class Bloodmoon : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Bloodmoon;
-    private const int Id = 28100;
+    public const int Id = 28100;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Bloodmoon);
     public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorGhosts;

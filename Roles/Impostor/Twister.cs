@@ -11,7 +11,7 @@ internal class Twister : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Twister;
-    private const int Id = 5700;
+    public const int Id = 5700;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Twister);
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorHindering;

@@ -8,7 +8,7 @@ internal class Doctor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Doctor;
-    private const int Id = 6700;
+    public const int Id = 6700;
     public override CustomRoles ThisRoleBase => CustomRoles.Scientist;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateBasic;
     //==================================================================\\

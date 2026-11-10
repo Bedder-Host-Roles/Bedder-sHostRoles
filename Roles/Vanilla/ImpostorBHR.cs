@@ -5,7 +5,7 @@ internal class ImpostorBHR : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.ImpostorBHR;
-    private const int Id = 300;
+    public const int Id = 300;
     public override CustomRoles ThisRoleBase => CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorVanilla;
     //==================================================================\\

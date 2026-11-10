@@ -7,7 +7,7 @@ internal class Morphling : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Morphling;
-    private const int Id = 3500;
+    public const int Id = 3500;
     public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.ImpostorSupport;
     //===========================SETUP================================\\

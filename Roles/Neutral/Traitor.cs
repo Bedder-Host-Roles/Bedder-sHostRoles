@@ -7,7 +7,7 @@ internal class Traitor : RoleBase
 {
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Traitor;
-    private const int Id = 18200;
+    public const int Id = 18200;
     public override bool IsDesyncRole => true;
     public override CustomRoles ThisRoleBase => LegacyTraitor.GetBool() ? CustomRoles.Shapeshifter : CustomRoles.Impostor;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.NeutralKilling;
