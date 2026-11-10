@@ -918,15 +918,18 @@ internal static class RPC
             bool isHost = AmongUsClient.Instance.AmHost;
             int hostId = AmongUsClient.Instance.HostId;
 
-            // Clients announce themselves only to the current host. Hosts reply
-            // only to the BHR client that requested/started the handshake.
-            int rpcTarget = isHost ? targetClientId : hostId;
-            if (rpcTarget < 0)
-            {
-                Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
-                    new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
-                return;
-            }
+            // Never send BHR custom RPCs from a BHR client into an official
+            // vanilla-hosted lobby.  The official server/host does not know
+            // CustomRPC.VersionCheck and can classify the packet as invalid
+            // mod traffic.  This is especially important during the first
+            // seconds after joining, when the official region is being resolved.
+            // if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+            // {
+            //     Logger.Info("Skipping BHR version-check RPC on a vanilla host.", "VersionCheck");
+            //     Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
+            //         new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
+            //     return;
+            // }
 
             var cheating = Main.VersionCheat.Value;
             if (cheating && !Main.playerVersion.ContainsKey(hostId)) return;
@@ -958,10 +961,10 @@ internal static class RPC
         while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null)
             await Task.Delay(500);
 
-        // The joining BHR client initiates the handshake, addressed only to the
-        // host. The host must never probe an unknown (possibly vanilla) client.
-        int hostId = AmongUsClient.Instance.HostId;
-        if (AmongUsClient.Instance.AmHost || hostId < 0) return;
+        // The retry is also a BHR-only custom RPC.  Do not send it to a vanilla
+        // host/official server.
+        // if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+        //     return;
 
         var writer = CustomRpcSender.Create("RpcRequestRetryVersionCheck", SendOption.Reliable);
         writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck, hostId)

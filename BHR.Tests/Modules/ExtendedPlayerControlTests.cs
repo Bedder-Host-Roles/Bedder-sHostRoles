@@ -249,7 +249,8 @@ public class ExtendedPlayerControlTests
 
     [Theory]
     [InlineData(10, 10, SendOption.None)]
-    [InlineData(16, 10, SendOption.Reliable)]
+    [InlineData(5, 10, SendOption.None)]
+    [InlineData(4, 10, SendOption.Reliable)]
     public void TryGetTeleportSendOption_UpdatesOrRateLimitsByElapsedBufferTime(int bufferTime, int previousBufferTime, SendOption expectedSendOption)
     {
         var teleportBuffers = new Dictionary<byte, int> { [4] = previousBufferTime };
@@ -481,21 +482,23 @@ public class ExtendedPlayerControlTests
     [Fact]
     public void ShouldDeferBlackScreenFix_WhenAllConditionsAreClear_ReturnsFalse()
     {
-        Assert.False(ExtendedPlayerControl.ShouldDeferBlackScreenFix(false, false, false, false, false, false));
+        Assert.False(ExtendedPlayerControl.ShouldDeferBlackScreenFix(false, false, false, false, false, false, false));
     }
 
     [Theory]
-    [InlineData(true, false, false, false, false, false)]
-    [InlineData(false, true, false, false, false, false)]
-    [InlineData(false, false, true, false, false, false)]
-    [InlineData(false, false, false, true, false, false)]
-    [InlineData(false, false, false, false, true, false)]
-    [InlineData(false, false, false, false, false, true)]
+    [InlineData(true, false, false, false, false, false, false)]
+    [InlineData(false, true, false, false, false, false, false)]
+    [InlineData(false, false, true, false, false, false, false)]
+    [InlineData(false, false, false, true, false, false, false)]
+    [InlineData(false, false, false, false, true, false, false)]
+    [InlineData(false, false, false, false, false, true, false)]
+    [InlineData(false, false, false, false, false, false, true)]
     public void ShouldDeferBlackScreenFix_WhenAnyBlockingConditionIsPresent_ReturnsTrue(bool isMeeting,
-        bool hasExileController, bool isSkippingTasks, bool isInVent, bool isUsingMovingPlatform, bool isOnLadder)
+        bool hasExileController, bool isSkippingTasks, bool isInVent, bool isUsingMovingPlatform, bool isOnLadder,
+        bool isWaitingForSpawn)
     {
         Assert.True(ExtendedPlayerControl.ShouldDeferBlackScreenFix(isMeeting, hasExileController, isSkippingTasks,
-            isInVent, isUsingMovingPlatform, isOnLadder));
+            isInVent, isUsingMovingPlatform, isOnLadder, isWaitingForSpawn));
     }
 
     private static Mock<IPlayerControl> CreatePlayer(CustomRoles role, List<CustomRoles>? subRoles = null, CountTypes countTypes = CountTypes.Crew)

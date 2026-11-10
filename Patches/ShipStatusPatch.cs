@@ -285,6 +285,17 @@ class ShipStatusBeginPatch
 [HarmonyPatch(typeof(ShipStatus), nameof(ShipStatus.SpawnPlayer))]
 class ShipStatusSpawnPlayerPatch
 {
+    private static readonly PostMeetingSpawnTracker SpawnTracker = new();
+
+    public static bool HasPendingSpawns => SpawnTracker.HasPendingSpawns;
+
+    public static void ScheduleSpawn(PlayerControl player, Vector2 position, string name)
+    {
+        _ = new LateTask(SpawnTracker.Track(
+            () => player?.RpcTeleport(position, isRandomSpawn: true, sendInfoInLogs: false)),
+            1.5f, name, shoudLog: false);
+    }
+
     public static bool Prefix(ShipStatus __instance, PlayerControl player, int numPlayers, bool initialSpawn)
     {
         // Skip first spawn and modded clients
@@ -294,10 +305,7 @@ class ShipStatusSpawnPlayerPatch
         Vector2 position = __instance.MeetingSpawnCenter + direction * __instance.SpawnRadius + new Vector2(0.0f, 0.3636f);
 
         // Delay teleport because the map will stop updating player positions too late
-        _ = new LateTask(() =>
-        {
-            player?.RpcTeleport(position, isRandomSpawn: true, sendInfoInLogs: false);
-        }, 1.5f, $"ShipStatus Spawn Player {player.PlayerId}", shoudLog: false);
+        ScheduleSpawn(player, position, $"ShipStatus Spawn Player {player.PlayerId}");
         return false;
     }
 }
@@ -317,10 +325,7 @@ class PolusShipStatusSpawnPlayerPatch
             : __instance.MeetingSpawnCenter + Vector2.right * num2 * 0.6f;
 
         // Delay teleport because the map will stop updating player positions too late
-        _ = new LateTask(() =>
-        {
-            player?.RpcTeleport(position, isRandomSpawn: true, sendInfoInLogs: false);
-        }, 1.5f, $"PolusShipStatus Spawn Player {player.PlayerId}", shoudLog: false);
+        ShipStatusSpawnPlayerPatch.ScheduleSpawn(player, position, $"PolusShipStatus Spawn Player {player.PlayerId}");
         return false;
     }
 }

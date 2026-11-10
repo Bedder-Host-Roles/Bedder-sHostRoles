@@ -967,7 +967,7 @@ public static class ExtendedPlayerControl
         if (!isVanillaServer || !bypassRateLimit) return true;
         if (!bufferTimes.TryGetValue(playerId, out var bufferTime)) return false;
 
-        if (!teleportBuffers.TryGetValue(playerId, out var teleportBuffer) || bufferTime >= teleportBuffer + 6)
+        if (!teleportBuffers.TryGetValue(playerId, out var teleportBuffer) || bufferTime <= teleportBuffer - 6)
         {
             teleportBuffers[playerId] = bufferTime;
             return true;
@@ -1822,8 +1822,8 @@ public static class ExtendedPlayerControl
 
         if (pc.IsModded()) return;
 
-        if (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks
-            || pc.inVent || pc.inMovingPlat || pc.onLadder)
+        var playerId = pc.PlayerId;
+        if (ShouldWait())
         {
             if (BlackScreenWaitingPlayers.Add(pc.PlayerId))
                 Main.Instance.StartCoroutine(Wait());
@@ -1831,27 +1831,33 @@ public static class ExtendedPlayerControl
 
             IEnumerator Wait()
             {
-                while (GameStates.InGame && !GameStates.IsEnded && !CancelBlackScreenFix.Contains(pc.PlayerId)
-                    && (GameStates.IsMeeting || ExileController.Instance || AntiBlackout.SkipTasks
-                        || pc.inVent || pc.inMovingPlat || pc.onLadder))
+                while (pc != null && pc.Data != null && !pc.Data.Disconnected && GameStates.InGame && !GameStates.IsEnded
+                    && !CancelBlackScreenFix.Contains(playerId)
+                    && ShouldWait())
                     yield return null;
 
-                if (CancelBlackScreenFix.Remove(pc.PlayerId) || !GameStates.InGame || GameStates.IsEnded)
+                if (CancelBlackScreenFix.Remove(playerId) || pc == null || pc.Data == null || pc.Data.Disconnected
+                    || !GameStates.InGame || GameStates.IsEnded)
                 {
-                    BlackScreenWaitingPlayers.Remove(pc.PlayerId);
+                    BlackScreenWaitingPlayers.Remove(playerId);
                     yield break;
                 }
 
                 yield return new WaitForSecondsRealtime(pc.IsAlive() ? 1f : 3f);
-                BlackScreenWaitingPlayers.Remove(pc.PlayerId);
-                if (GameStates.InGame && !GameStates.IsEnded) pc.FixBlackScreen();
+                BlackScreenWaitingPlayers.Remove(playerId);
+                if (CancelBlackScreenFix.Remove(playerId) || pc == null || pc.Data == null || pc.Data.Disconnected
+                    || !GameStates.InGame || GameStates.IsEnded)
+                    yield break;
+                pc.FixBlackScreen();
             }
         }
 
         var systemtype = GetBlackScreenRepairSystemType(Utils.GetActiveMapId());
         var playerName = pc.GetNameWithRole();
         var targetClientId = pc.OwnerId;
-        var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive(), out var dummyGhost);
+        // An Airship ghost that has not spawned can still be moved by its spawn selection.
+        var hasDeadGhost = Main.EnumeratePlayerControls().FindFirst(x => !x.IsAlive()
+            && (!GameStates.AirshipIsActive || Main.PlayerStates.TryGetValue(x.PlayerId, out var state) && state.HasSpawned), out var dummyGhost);
         var cameraProxy = hasDeadGhost ? dummyGhost : pc;
 
         // Do not manufacture a fake corpse for a living vanilla player. The old
@@ -2026,12 +2032,20 @@ public static class ExtendedPlayerControl
             repair.SendMessage();
             Logger.Msg($"[BHR-BS-FIX] EHR-style targeted camera recovery sequence sent to {playerName} (alive={pc.IsAlive()}).", "FixBlackScreen");
         }, 1f + (AmongUsClient.Instance.Ping / 1000f));
+
+        bool ShouldWait()
+        {
+            var waitingForAirshipSpawn = GameStates.AirshipIsActive && pc.IsAlive()
+                && Main.PlayerStates.TryGetValue(pc.PlayerId, out var state) && !state.HasSpawned;
+            return ShouldDeferBlackScreenFix(GameStates.IsMeeting, ExileController.Instance, AntiBlackout.SkipTasks,
+                pc.inVent, pc.inMovingPlat, pc.onLadder, ShipStatusSpawnPlayerPatch.HasPendingSpawns || waitingForAirshipSpawn);
+        }
     }
 
     public static bool ShouldDeferBlackScreenFix(bool isMeeting, bool hasExileController, bool isSkippingTasks,
-        bool isInVent, bool isUsingMovingPlatform, bool isOnLadder)
+        bool isInVent, bool isUsingMovingPlatform, bool isOnLadder, bool isWaitingForSpawn)
     {
-        return isMeeting || hasExileController || isSkippingTasks || isInVent || isUsingMovingPlatform || isOnLadder;
+        return isMeeting || hasExileController || isSkippingTasks || isInVent || isUsingMovingPlatform || isOnLadder || isWaitingForSpawn;
     }
 
     public static SystemTypes GetBlackScreenRepairSystemType(int mapId)

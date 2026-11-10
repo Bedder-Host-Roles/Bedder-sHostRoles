@@ -66,7 +66,7 @@ public class Main : BasePlugin
     ];
 
     // Change this to change alpha/beta/full release
-    public static readonly Release RELEASE = Release.ALPHA;
+    public static readonly Release RELEASE = Release.BETA;
 
 #pragma warning disable IDE1006 // Naming Styles
     public static bool devRelease => RELEASE == Release.ALPHA; // Latest: 
