@@ -129,7 +129,8 @@ internal static class OnGameJoinedPatch
             try
             {
                 if (!GameStates.IsOnlineGame) return;
-                if (!GameStates.IsModHost)
+                // Do not send BHR-only handshake RPCs to an official/vanilla host.
+                if ((!GameStates.IsVanillaServer || GameStates.IsLocalGame) && !GameStates.IsModHost)
                     RPC.RpcRequestRetryVersionCheck();
                 if (BanManager.CheckEACList(EOSManager.Instance.FriendCode, BanManager.GetHashedPuid(EOSManager.Instance.ProductUserId)) && GameStates.IsOnlineGame)
                 {
@@ -453,33 +454,12 @@ class InnerNetClientSpawnPatch
                     return;
                 }
 
-                Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
+                Logger.Info($"Waiting for client {client.Id} to initiate its BHR version handshake; no probe is sent to unknown clients.", "RPC Request Retry Version Check");
             }, 3f, "RPC Request Retry Version Check");
 
-            if (GameStates.IsOnlineGame && !client.Character.IsHost())
-            {
-                LateTask.New(() =>
-                {
-                    if (GameStates.IsLobby && client.Character != null && LobbyBehaviour.Instance != null && GameStates.IsVanillaServer)
-                    {
-                        // Only for vanilla
-                        if (!client.Character.IsModded())
-                        {
-                            // MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(LobbyBehaviour.Instance.NetId, (byte)RpcCalls.LobbyTimeExpiring, SendOption.Reliable, client.Id);
-                            // writer.WritePacked((int)GameStartManagerPatch.timer);
-                            // writer.Write(false);
-                            // AmongUsClient.Instance.FinishRpcImmediately(writer);
-                        }
-                        // Non-host modded client
-                        else
-                        {
-                            MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.SyncLobbyTimer, SendOption.Reliable, client.Id);
-                            writer.Write((int)GameStartManagerPatch.timer);
-                            AmongUsClient.Instance.FinishRpcImmediately(writer);
-                        }
-                    }
-                }, IRandom.Instance.Next(7, 13), "Sync Lobby Timer RPC");
-            }
+            // The old vanilla-server timer path sent CustomRPC.SyncLobbyTimer to
+            // modded clients through the official server. That RPC is not part of
+            // the vanilla protocol, so leave the vanilla lobby timer untouched.
         }
 
         if (client != null && client.Character != null) Main.GuessNumber[client.Character.PlayerId] = [-1, 7];
@@ -584,14 +564,9 @@ class InnerNetClientSpawnPatch
                 // BHR custom RPCs are not supported by vanilla clients/servers. Sending this
                 // version-check RPC through an official Among Us server can trigger its
                 // anti-cheat and disconnect the joining client/host with Reason:Hacking.
-                if (!GameStates.IsVanillaServer)
-                {
-                    LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, client.Id);
-                }
-                else
-                {
-                    Logger.Info($"Skipping BHR RequestRetryVersionCheck for client {client.Id} on a vanilla server.", "RPC Request Retry Version Check");
-                }
+                // Unknown clients are not probed with BHR-only RPCs. A BHR client
+                // initiates the handshake and addresses its request to the host.
+                Logger.Info($"Waiting for client {client.Id} to initiate its BHR version handshake.", "RPC Request Retry Version Check");
             }, 3f, "RPC Request Retry Version Check");
 
             if (GameStates.IsOnlineGame)

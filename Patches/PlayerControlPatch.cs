@@ -1019,6 +1019,9 @@ class FixedUpdateInNormalGamePatch
     {
         if (__instance == null || __instance.PlayerId >= 254) return;
 
+        // Local-only Pocket Circuit appearance for Car-role players.
+        CarVisualManager.UpdatePlayer(__instance);
+
         CheckMurderPatch.Update(__instance.PlayerId);
 
         if (AmongUsClient.Instance.AmHost && __instance.AmOwner)
@@ -1981,10 +1984,10 @@ class PlayerControlCheckNamePatch
 
         _ = new LateTask(() =>
         {
-            if (__instance != null && !__instance.Data.Disconnected && !__instance.IsModded())
-            {
-                LegacyRpcSenders.SendRequestRetryVersionCheck(PlayerControl.LocalPlayer.NetId, __instance.OwnerId);
-            }
+            // Do not probe an unclassified player with a BHR-only RPC.
+            // BHR clients initiate the version handshake themselves, targeted
+            // to the host; vanilla clients never receive a BHR packet.
+
 
             var sender = CustomRpcSender.Create("LobbyTagsSender", SendOption.Reliable);
             foreach (var player in Main.EnumeratePlayerControls())

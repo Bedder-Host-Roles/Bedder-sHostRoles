@@ -80,9 +80,9 @@ public static class LegacyRpcSenders
         EndAndSend(sender);
     }
 
-    public static void SendSyncAllPlayerNames(uint netId)
+    public static void SendSyncAllPlayerNames(uint netId, int targetClientId)
     {
-        var sender = StartCustom(nameof(CustomRPC.SyncAllPlayerNames), netId, CustomRPC.SyncAllPlayerNames);
+        var sender = StartCustom(nameof(CustomRPC.SyncAllPlayerNames), netId, CustomRPC.SyncAllPlayerNames, targetClientId);
         sender.stream.WritePacked(Main.AllPlayerNames.Count);
         foreach (var name in Main.AllPlayerNames)
         {
@@ -428,64 +428,64 @@ public static class LegacyRpcSenders
             case QuickChatSpamMode.QuickChatSpam_Disabled:
                 goto case QuickChatSpamMode.QuickChatSpam_Random20;
             case QuickChatSpamMode.QuickChatSpam_Random20:
-            {
-                var random = IRandom.Instance;
-                var stringNamesValues = System.Enum.GetValues(typeof(StringNames)).Cast<StringNames>().ToArray();
-                for (int i = 0; i < 21; i++)
                 {
-                    var randomString = stringNamesValues[random.Next(stringNamesValues.Length)];
-                    var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, randomString, 0, null));
-                    message.Serialize(sender.stream);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
+                    var random = IRandom.Instance;
+                    var stringNamesValues = System.Enum.GetValues(typeof(StringNames)).Cast<StringNames>().ToArray();
+                    for (int i = 0; i < 21; i++)
+                    {
+                        var randomString = stringNamesValues[random.Next(stringNamesValues.Length)];
+                        var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, randomString, 0, null));
+                        message.Serialize(sender.stream);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(randomString), false);
+                    }
+                    break;
                 }
-                break;
-            }
             case QuickChatSpamMode.QuickChatSpam_How2PlayNormal:
-            {
-                foreach (var names in Main.how2playN)
                 {
-                    var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
-                    message.Serialize(sender.stream);
-                    message.Serialize(sender.stream);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    foreach (var names in Main.how2playN)
+                    {
+                        var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
+                        message.Serialize(sender.stream);
+                        message.Serialize(sender.stream);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    }
+                    break;
                 }
-                break;
-            }
             case QuickChatSpamMode.QuickChatSpam_How2PlayHidenSeek:
-            {
-                foreach (var names in Main.how2playHnS)
                 {
-                    var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
-                    message.Serialize(sender.stream);
-                    message.Serialize(sender.stream);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    foreach (var names in Main.how2playHnS)
+                    {
+                        var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
+                        message.Serialize(sender.stream);
+                        message.Serialize(sender.stream);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    }
+                    break;
                 }
-                break;
-            }
             case QuickChatSpamMode.QuickChatSpam_EzHacked:
-            {
-                foreach (var names in Main.how2playEzHacked)
                 {
-                    var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
-                    message.Serialize(sender.stream);
-                    message.Serialize(sender.stream);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    foreach (var names in Main.how2playEzHacked)
+                    {
+                        var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.ComplexPhrase, names, 0, null));
+                        message.Serialize(sender.stream);
+                        message.Serialize(sender.stream);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(names), false);
+                    }
+                    break;
                 }
-                break;
-            }
             case QuickChatSpamMode.QuickChatSpam_Empty:
-            {
-                var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.SimplePhrase, StringNames.None, 0, null));
-                for (var i = 0; i < 21; i++)
                 {
-                    message.Serialize(sender.stream);
-                    DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(StringNames.None), false);
+                    var message = new RpcSendQuickChatMessage(firstAlivePlayer.NetId, new(QuickChatPhraseType.SimplePhrase, StringNames.None, 0, null));
+                    for (var i = 0; i < 21; i++)
+                    {
+                        message.Serialize(sender.stream);
+                        DestroyableSingleton<HudManager>.Instance.Chat.AddChat(firstAlivePlayer, GetString(StringNames.None), false);
+                    }
+                    break;
                 }
-                break;
-            }
         }
 
         firstAlivePlayer.Data.PlayerName = name;

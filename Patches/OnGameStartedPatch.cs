@@ -247,6 +247,7 @@ internal class ChangeRoleSettings
             AntiBlackout.Reset();
             NameNotifyManager.Reset();
             CustomNetObject.Reset();
+            CarVisualManager.Reset();
 
             SabotageSystemPatch.SabotageSystemTypeRepairDamagePatch.Initialize();
             DoorsReset.Initialize();

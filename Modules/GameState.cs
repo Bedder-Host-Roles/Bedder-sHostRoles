@@ -699,26 +699,51 @@ public static class GameStates
     /// can be null, which used to make this check return false and allowed the
     /// custom authentication path to run.
     /// </summary>
+    private static bool IsOfficialAmongUsEndpoint(string endpoint)
+    {
+        if (string.IsNullOrWhiteSpace(endpoint)) return false;
+
+        // Region endpoints may be stored as full URLs, bare hostnames, or
+        // hostnames with a trailing path/port. Compare the actual hostname.
+        string host = endpoint.Trim();
+        if (Uri.TryCreate(host, UriKind.Absolute, out var uri))
+        {
+            host = uri.Host;
+        }
+        else
+        {
+            int slash = host.IndexOf('/');
+            if (slash >= 0) host = host[..slash];
+
+            int colon = host.LastIndexOf(':');
+            if (colon > 0) host = host[..colon];
+        }
+
+        return host.Equals("among.us", StringComparison.OrdinalIgnoreCase)
+            || host.EndsWith(".among.us", StringComparison.OrdinalIgnoreCase);
+    }
+
     public static bool IsVanillaServer
     {
         get
         {
             if (IsLocalGame && !IsNotJoined) return true;
 
-            const string Domain = "among.us";
             var region = ServerManager.Instance?.CurrentRegion?.CastFast<StaticHttpRegionInfo>();
 
             // Be conservative while matchmaking/connection information is still
-            // being populated.  It is safer to skip custom-server auth than to
-            // send it to an official server.
+            // being populated. It is safer to skip custom-server traffic than
+            // to send it to an official server.
             if (region == null) return true;
 
-            if (!region.PingServer.EndsWith(Domain, StringComparison.OrdinalIgnoreCase))
-                return false;
+            // PingServer is the region's authoritative matchmaking endpoint.
+            // Do not require every advertised game-server address to be a
+            // hostname: official regions can advertise numeric/rotating hosts.
+            if (IsOfficialAmongUsEndpoint(region.PingServer)) return true;
 
             return region.Servers.Count > 0 &&
                    region.Servers.All(serverInfo =>
-                       serverInfo?.Ip?.EndsWith(Domain, StringComparison.OrdinalIgnoreCase) == true);
+                       IsOfficialAmongUsEndpoint(serverInfo?.Ip));
         }
     }
     public static bool IsLocalGame => AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame;

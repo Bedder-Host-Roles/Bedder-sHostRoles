@@ -267,7 +267,9 @@ internal class RPCHandlerPatch
                 break;
 
             case CustomRPC.RequestRetryVersionCheck:
-                RPC.RpcVersionCheck();
+                // Reply only to the BHR client that initiated the handshake.
+                // A broadcast would expose this BHR-only RPC to vanilla clients.
+                RPC.RpcVersionCheck(__instance.GetClientId());
                 break;
 
             // case CustomRPC.SetFriendCode:
@@ -726,7 +728,8 @@ internal class RPCHandlerPatch
 
             if (!Main.playerVersion.TryGetValue(__instance.GetClientId(), out _))
             {
-                RPC.RpcVersionCheck();
+                // The host's version response must be addressed to this BHR client only.
+                RPC.RpcVersionCheck(__instance.GetClientId());
             }
 
             Main.playerVersion[__instance.GetClientId()] = new PlayerVersion(version, tag, forkId);
@@ -822,13 +825,25 @@ internal static class RPC
     //SyncCustomSettingsRPC Sender
     public static void SyncCustomSettingsRPC(int targetId = -1)
     {
-        if (targetId != -1)
+        // BHR option data is private protocol data; never send it through official servers.
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return;
+        if (!AmongUsClient.Instance.AmHost || PlayerControl.AllPlayerControls.Count <= 1) return;
+
+        // A negative target used to broadcast BHR settings to every player,
+        // including vanilla clients. Fan out only to clients that completed
+        // the BHR version handshake.
+        if (targetId < 0)
         {
-            ClientData client = Utils.GetClientById(targetId);
-            if (client == null || client.Character == null || !Main.playerVersion.ContainsKey(client.Character.PlayerId)) return;
+            foreach (int clientId in Main.playerVersion.Keys.ToArray())
+            {
+                if (clientId == AmongUsClient.Instance.ClientId) continue;
+                SyncCustomSettingsRPC(clientId);
+            }
+            return;
         }
 
-        if (!AmongUsClient.Instance.AmHost || PlayerControl.AllPlayerControls.Count <= 1) return;
+        ClientData client = Utils.GetClientById(targetId);
+        if (client == null || client.Character == null || !Main.playerVersion.ContainsKey(targetId)) return;
 
         int amount = OptionItem.AllOptions.Count;
         int divideBy = amount / 10;
@@ -840,7 +855,7 @@ internal static class RPC
         if (targetId != -1)
         {
             ClientData client = Utils.GetClientById(targetId);
-            if (client == null || client.Character == null || !Main.playerVersion.ContainsKey(client.Character.PlayerId)) return;
+            if (client == null || client.Character == null || !Main.playerVersion.ContainsKey(targetId)) return;
         }
 
         if (!AmongUsClient.Instance.AmHost || PlayerControl.AllPlayerControls.Count <= 1) return;
@@ -875,67 +890,81 @@ internal static class RPC
     }
     public static void SyncAllPlayerNames()
     {
-        if (!AmongUsClient.Instance.AmHost) return;
-        LegacyRpcSenders.SendSyncAllPlayerNames(PlayerControl.LocalPlayer.NetId);
+        if (!AmongUsClient.Instance.AmHost || PlayerControl.LocalPlayer == null) return;
+
+        // This is a BHR-only RPC. Never broadcast it to vanilla clients.
+        foreach (int clientId in Main.playerVersion.Keys.ToArray())
+        {
+            if (clientId == AmongUsClient.Instance.ClientId) continue;
+            LegacyRpcSenders.SendSyncAllPlayerNames(PlayerControl.LocalPlayer.NetId, clientId);
+        }
     }
     public static void ShowPopUp(this PlayerControl pc, string message, string title = "")
     {
         if (!AmongUsClient.Instance.AmHost) return;
         LegacyRpcSenders.SendShowPopUp(pc.NetId, pc.PlayerId, message, title);
     }
-    public static async void RpcVersionCheck()
+    public static async void RpcVersionCheck(int targetClientId = -1)
     {
+        // Official Among Us servers do not support BHR custom RPCs.
+        // Never send the BHR version handshake through a vanilla server.
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return;
+
         try
         {
-            while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.HostId < 0 || PlayerControl.LocalPlayer.GetClientId() < 0) await Task.Delay(500);
+            while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.HostId < 0 || PlayerControl.LocalPlayer.GetClientId() < 0)
+                await Task.Delay(500);
 
-            // Never send BHR custom RPCs from a BHR client into an official
-            // vanilla-hosted lobby.  The official server/host does not know
-            // CustomRPC.VersionCheck and can classify the packet as invalid
-            // mod traffic.  This is especially important during the first
-            // seconds after joining, when the official region is being resolved.
-            if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
+            bool isHost = AmongUsClient.Instance.AmHost;
+            int hostId = AmongUsClient.Instance.HostId;
+
+            // Clients announce themselves only to the current host. Hosts reply
+            // only to the BHR client that requested/started the handshake.
+            int rpcTarget = isHost ? targetClientId : hostId;
+            if (rpcTarget < 0)
             {
-                Logger.Info("Skipping BHR version-check RPC on a vanilla host.", "VersionCheck");
                 Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
                     new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
                 return;
             }
 
-            var hostId = AmongUsClient.Instance.HostId;
-            if (Main.playerVersion.ContainsKey(hostId) || !Main.VersionCheat.Value)
-            {
-                var cheating = Main.VersionCheat.Value;
+            var cheating = Main.VersionCheat.Value;
+            if (cheating && !Main.playerVersion.ContainsKey(hostId)) return;
 
-                var writer = CustomRpcSender.Create("RpcVersionCheck", SendOption.Reliable);
-                writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VersionCheck)
-                    .Write(cheating ? Main.playerVersion[hostId].version.ToString() : Main.PluginVersion)
-                    .Write(cheating ? Main.playerVersion[hostId].tag : $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})")
-                    .Write(cheating ? Main.playerVersion[hostId].forkId : Main.ForkId)
-                    .Write(cheating)
-                    .EndRpc();
+            var writer = CustomRpcSender.Create("RpcVersionCheck", SendOption.Reliable);
+            writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.VersionCheck, rpcTarget)
+                .Write(cheating ? Main.playerVersion[hostId].version.ToString() : Main.PluginVersion)
+                .Write(cheating ? Main.playerVersion[hostId].tag : $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})")
+                .Write(cheating ? Main.playerVersion[hostId].forkId : Main.ForkId)
+                .Write(cheating)
+                .EndRpc();
 
-                writer.SendMessage();
-            }
-            Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] = new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
+            writer.SendMessage();
+            Main.playerVersion[PlayerControl.LocalPlayer.GetClientId()] =
+                new PlayerVersion(Main.PluginVersion, $"{ThisAssembly.Git.Commit}({ThisAssembly.Git.Branch})", Main.ForkId);
         }
-        catch
+        catch (Exception ex)
         {
-            Logger.Error("Error while trying to send RPCVersionCheck, retry later", "RpcVersionCheck");
-            _ = new LateTask(() => RpcVersionCheck(), 1f, "Retry RPCVersionCheck");
+            Logger.Error($"Error while trying to send RPCVersionCheck: {ex}", "RpcVersionCheck");
+            _ = new LateTask(() => RpcVersionCheck(targetClientId), 1f, "Retry RPCVersionCheck");
         }
     }
+
     public static async void RpcRequestRetryVersionCheck()
     {
-        while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null) await Task.Delay(500);
+        // A vanilla host cannot answer BHR's custom version-check RPC.
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return;
 
-        // The retry is also a BHR-only custom RPC.  Do not send it to a vanilla
-        // host/official server.
-        if (!AmongUsClient.Instance.AmHost && GameStates.IsVanillaServer)
-            return;
+        while (PlayerControl.LocalPlayer == null || AmongUsClient.Instance.GetHost() == null)
+            await Task.Delay(500);
+
+        // The joining BHR client initiates the handshake, addressed only to the
+        // host. The host must never probe an unknown (possibly vanilla) client.
+        int hostId = AmongUsClient.Instance.HostId;
+        if (AmongUsClient.Instance.AmHost || hostId < 0) return;
 
         var writer = CustomRpcSender.Create("RpcRequestRetryVersionCheck", SendOption.Reliable);
-        writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck)
+        writer.AutoStartRpc(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.RequestRetryVersionCheck, hostId)
             .EndRpc();
         writer.SendMessage();
     }

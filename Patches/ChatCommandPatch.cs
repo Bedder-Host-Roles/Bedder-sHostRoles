@@ -81,7 +81,7 @@ internal class Command(string commandKey, string arguments, string description, 
     public bool CanUseCommand(PlayerControl pc, bool checkTime = true, bool sendErrorMessage = false)
     {
         if (!PlayerControl.LocalPlayer.IsHost()) return true; // Permission lvls are handled by host
-        
+
         if (UsageLevel == UsageLevels.Everyone && UsageTime == UsageTimes.Always) return true;
 
         if (UsageLevel == UsageLevels.RoleSpecific && Main.Daybreak)
@@ -102,28 +102,28 @@ internal class Command(string commandKey, string arguments, string description, 
 
             case UsageLevels.Modded when !pc.IsModded():
 
-            case UsageLevels.HostOrVIP when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerVIP(pc.FriendCode) 
+            case UsageLevels.HostOrVIP when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerVIP(pc.FriendCode)
                 && !Utils.IsPlayerModerator(pc.FriendCode) && !pc.FriendCode.GetDevUser().IsDev:
 
-            case UsageLevels.HostOrModerator when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrModerator when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev:
 
-            case UsageLevels.HostOrExePerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrExePerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && !TagManager.CanUseExecuteCommand(pc.FriendCode):
 
-            case UsageLevels.HostOrEndPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrEndPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && !TagManager.CanUseEndCommand(pc.FriendCode):
 
-            case UsageLevels.HostOrSayPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrSayPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && !TagManager.CanUseSayCommand(pc.FriendCode):
 
-            case UsageLevels.HostOrWarnPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrWarnPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && permLvl < 2:
 
-            case UsageLevels.HostOrStartPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrStartPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && permLvl < 3:
 
-            case UsageLevels.HostOrBanPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode) 
+            case UsageLevels.HostOrBanPerm when !pc.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(pc.FriendCode)
                 && !pc.FriendCode.GetDevUser().IsDev && permLvl < 4:
 
             case UsageLevels.RoleSpecific when RequiredRole == null || !RequiredRole.Contains(pc.GetCustomRole()) && !RequiredRole.Any(x => pc.GetCustomSubRoles().Contains(x)):
@@ -180,7 +180,7 @@ internal class Command(string commandKey, string arguments, string description, 
 
         if (description.StartsWith("CommandDescription."))
             description = GetString(description);
-        
+
         if (argsDescriptions != null)
             for (int i = 0; i < argsDescriptions.Length; i++)
             {
@@ -241,12 +241,12 @@ internal class ChatCommands
 
     public static readonly List<string> ChatHistory = [];
     public static readonly Dictionary<byte, long> LastSentCommand = [];
-    
+
     private static bool WaitingToSend;
 
     public static void LoadCommands()
     {
-#region Commands
+        #region Commands
         Command.Create("Command.Dump", "", GetString("CommandDescription.Dump"), Command.UsageLevels.Modded, Command.UsageTimes.Always, DumpCommand, false, false); // ["dump", "дамп", "лог", "导出日志", "日志", "导出"]
         Command.Create("Command.Version", "", GetString("CommandDescription.Version"), Command.UsageLevels.Modded, Command.UsageTimes.Always, VersionCommand, false, false); // ["v", "version", "в", "версия", "检查版本", "versão", "版本"]
         Command.Create("Command.Save", "[filePath]", GetString("CommandDescription.Save"), Command.UsageLevels.Modded, Command.UsageTimes.InLobby, SaveCommand, false, false, [GetString("CommandArgs.Save.Path")]); // ["save", "savepreset"]
@@ -314,8 +314,8 @@ internal class ChatCommands
         Command.Create("Command.ModColor", "{Color} <Gradient Color>", "CommandDescription.ModColor", Command.UsageLevels.HostOrModerator, Command.UsageTimes.InLobby, ModColorCommand, true, true, ["CommandArgs.ModColor.Color", "CommandArgs.ModColor.GradientColor"]);
         Command.Create("Command.VipColor", "{Color} <Gradient Color>", "CommandDescription.VipColor", Command.UsageLevels.HostOrModerator, Command.UsageTimes.InLobby, ModColorCommand, true, true, ["CommandArgs.ModColor.Color", "CommandArgs.ModColor.GradientColor"]);
 
-#endregion
-#region Role Commands
+        #endregion
+        #region Role Commands
         Command.Create("Command.Guess", "{id} {role}", GetString("CommandDescription.Guess"), Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, GuessManager.GuessCommand, false, false, [GetString("CommandArgs.Guess.Id"), GetString("CommandArgs.Guess.Role")], requiresCmdPrefix: true); // ["shoot", "guess", "bet", "st", "gs", "bt", "猜", "赌", "賭"]
         Command.Create("Command.Trial", "{id}", GetString("CommandDescription.Trial"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Prosecutor.TrialCommand, false, false, [GetString("CommandArgs.Trial.Id")], [CustomRoles.Prosecutor, CustomRoles.Councillor], requiresCmdPrefix: true); // ["sp", "jj","tl", "trial", "审判", "判", "审", "審判", "審", "Murder"]
         Command.Create("Command.Finish", "", GetString("CommandDescription.Finish"), Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, President.FinishCommand, false, false, requiredRole: [CustomRoles.President], requiresCmdPrefix: true); // ["finish", "结束", "结束会议", "結束", "結束會議"]
@@ -333,11 +333,11 @@ internal class ChatCommands
         Command.Create("Command.Daybreak", "", "CommandDescription.Daybreak", Command.UsageLevels.RoleSpecific, Command.UsageTimes.InMeeting, Starspawn.DaybreakCommand, false, false, requiredRole: [CustomRoles.Starspawn], requiresCmdPrefix: true); // ["db", "daybreak"]
         Command.Create("Command.Answer", "{letter}", "CommandDescription.Answer", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.AnswerCommand, false, false, ["CommandArgs.Answer.ABC"]); // ["ans", "asw", "answer", "回答"]
         Command.Create("Command.ShowQuestion", "", "CommandDescription.ShowQuestion", Command.UsageLevels.Everyone, Command.UsageTimes.InMeeting, Quizmaster.ShowQuestionCommand, false, false); // ["qmquiz", "提问"]
-#endregion            
+        #endregion
 
-            /*
-            /vipcolor
-            */
+        /*
+        /vipcolor
+        */
     }
 
     public static bool Prefix(ChatController __instance)
@@ -345,7 +345,7 @@ internal class ChatCommands
         if (__instance.quickChatField.visible) return true;
 
         __instance.freeChatField.textArea.text = __instance.freeChatField.textArea.text.Replace("\b", string.Empty).Replace("\r", string.Empty);
-        
+
         __instance.timeSinceLastMessage = 3f;
 
         var canceled = false;
@@ -354,7 +354,7 @@ internal class ChatCommands
         string originalText = text;
 
         bool cmdPrefix = text.StartsWith("/cmd ");
-        if (cmdPrefix) 
+        if (cmdPrefix)
         {
             text = text[5..];
             if (!text.StartsWith("/")) text = "/" + text;
@@ -398,7 +398,7 @@ internal class ChatCommands
 
                 if (!command.CanUseCommand(PlayerControl.LocalPlayer, sendErrorMessage: true))
                     goto Canceled;
-                
+
                 if (command.RequiresCmdPrefix && !cmdPrefix)
                 {
                     Utils.SendMessage("\n", PlayerControl.LocalPlayer.PlayerId, GetString($"Commands.RequiresCmdPrefix"));
@@ -415,10 +415,10 @@ internal class ChatCommands
             goto Canceled;
 
         goto Skip;
-        Canceled:
+    Canceled:
         Main.isChatCommand = false;
         canceled = true;
-        Skip:
+    Skip:
 
         if (ExileController.Instance)
             canceled = true;
@@ -448,7 +448,7 @@ internal class ChatCommands
         {
             if (!WaitingToSend) Main.Instance.StartCoroutine(Wait());
             return false;
-            
+
             IEnumerator Wait()
             {
                 WaitingToSend = true;
@@ -495,10 +495,10 @@ internal class ChatCommands
             canceled = true;
             return;
         }
-        
+
         string originalText = text;
         bool hasCmdPrefix = text.StartsWith("/cmd ");
-        if (hasCmdPrefix) 
+        if (hasCmdPrefix)
         {
             text = text[5..];
             if (!text.StartsWith("/")) text = "/" + text;
@@ -778,6 +778,10 @@ internal class ChatCommands
             return;
         }
 
+        // BHR command processing requires a BHR host. Never send its private RPC
+        // to an official/vanilla host.
+        if (GameStates.IsVanillaServer && !GameStates.IsLocalGame) return;
+
         PlayerControl pc = PlayerControl.LocalPlayer;
         MessageWriter w = AmongUsClient.Instance.StartRpcImmediately(pc.NetId, (byte)CustomRPC.RequestCommandProcessing, SendOption.Reliable, AmongUsClient.Instance.HostId);
         w.Write(commandKey);
@@ -792,8 +796,8 @@ internal class ChatCommands
         return values.Contains(arg);
     }
 
-#region Command Handlers
-    
+    #region Command Handlers
+
     private static void FixCommand(PlayerControl player, string commandKey, string text, string[] args)
     {
         if (!AmongUsClient.Instance.AmHost)
@@ -1053,7 +1057,7 @@ internal class ChatCommands
                 // Utils.NotifyGameEnding();
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmateDisconnect, false);
                 break;
-            
+
             case var _ when CheckArg("CommandArgs.Disconnect.Imp", subArgs): // ["imp", "impostor", "内鬼", "伪装者"]
                 GameManager.Instance.enabled = false;
                 // Utils.NotifyGameEnding();
@@ -1062,7 +1066,7 @@ internal class ChatCommands
 
             default:
                 if (!HudManager.InstanceExists) break;
-                    HudManager.Instance.Chat.AddChat(player, GetString("CommandArgs.Disconnect.Team")); // ["crew | imp"]
+                HudManager.Instance.Chat.AddChat(player, GetString("CommandArgs.Disconnect.Team")); // ["crew | imp"]
                 break;
         }
         ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Admin, 0);
@@ -1357,7 +1361,7 @@ internal class ChatCommands
 
         if (args.Length > 1)
         {
-            if (player.IsHost()) 
+            if (player.IsHost())
             {
                 Utils.SendMessage(args.Skip(1).Join(delimiter: " "), title: $"<color=#ff0000>{GetString("MessageFromTheHost")} ~ <size=1.25>{player.GetRealName(clientData: true)}</size></color>");
             }
@@ -1379,7 +1383,7 @@ internal class ChatCommands
                 {
                     var modTitle = (Utils.IsPlayerModerator(player.FriendCode) || TagManager.ReadPermission(player.FriendCode) >= 2) ? $"<color=#8bbee0>{GetString("MessageFromModerator")}" : $"<color=#ffff00>{GetString("MessageFromVIP")}";
                     Utils.SendMessage(args.Skip(1).Join(delimiter: " "), title: $"{modTitle} ~ <size=1.25>{player.GetRealName(clientData: true)}</size></color>");
-                    
+
                     string modLogname3 = Main.AllPlayerNames.TryGetValue(player.PlayerId, out var n4) ? n4 : "";
 
                     string moderatorFriendCode3 = player.FriendCode.ToString();
@@ -1503,7 +1507,7 @@ internal class ChatCommands
         }
         else
             textToSend += "Reason : Not specified\n";
-        
+
         if (GameStates.IsInGame)
         {
             textToSend += $" {GetString("KickCommandKickedRole")} {GetString(kickedPlayer.GetCustomRole().ToString())}";
@@ -1948,7 +1952,7 @@ internal class ChatCommands
 
         if (args.Length < 2 || args[1] == "start")
         {
-            if (!player.IsHost() && !Utils.IsPlayerModerator(player.FriendCode)&& !player.FriendCode.GetDevUser().IsDev) return;
+            if (!player.IsHost() && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
 
             var startResult = DraftAssign.StartDraft();
 
@@ -1972,7 +1976,7 @@ internal class ChatCommands
         }
         else if (args[1] == "add")
         {
-            if (!player.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(player.FriendCode)&& !player.FriendCode.GetDevUser().IsDev) return;
+            if (!player.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
 
             var addResult = DraftAssign.DraftActive;
 
@@ -1990,7 +1994,7 @@ internal class ChatCommands
         }
         else if (args[1] == "reset")
         {
-            if (!player.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(player.FriendCode)&& !player.FriendCode.GetDevUser().IsDev) return;
+            if (!player.IsHost() && !AmongUsClient.Instance.AmHost && !Utils.IsPlayerModerator(player.FriendCode) && !player.FriendCode.GetDevUser().IsDev) return;
 
             DraftAssign.Reset();
         }
@@ -2569,7 +2573,7 @@ internal class ChatCommands
             Utils.SendMessage(GetString("VipColorCommandDisabled"), player.PlayerId);
             return;
         }
-        
+
         if (!Options.GradientTagsOpt.GetBool())
         {
             var subArgs = args.Length != 2 ? "" : args[1];
@@ -2610,7 +2614,7 @@ internal class ChatCommands
         }
     }
 
-#endregion
+    #endregion
 }
 [HarmonyPatch(typeof(ChatController), nameof(ChatController.Update))]
 class ChatUpdatePatch
