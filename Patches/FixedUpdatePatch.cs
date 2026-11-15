@@ -16,6 +16,22 @@ public static class FixedUpdatePatch
 {
     private static int NonLowLoadPlayerIndex;
 
+    // The custom HUD target refresh must not select players that the host-side
+    // CheckMurder validation will always reject. In particular, a dead or
+    // disconnected player can otherwise remain the nearest target and make the
+    // kill button appear to do nothing.
+    private static bool IsValidKillButtonTarget(PlayerControl killer, PlayerControl target)
+    {
+        return target != null
+            && target != killer
+            && target.Data != null
+            && !target.Data.Disconnected
+            && target.IsAlive()
+            && !target.inVent
+            && !target.onLadder
+            && !target.inMovingPlat;
+    }
+
     [HarmonyPostfix]
     public static void Postfix()
     {
@@ -72,7 +88,7 @@ public static class FixedUpdatePatch
             {
                 if (HudManager.InstanceExists && GameStates.IsInTask && !ExileController.Instance && !AntiBlackout.SkipTasks && PlayerControl.LocalPlayer.CanUseKillButton())
                 {
-                    List<PlayerControl> players = PlayerControl.LocalPlayer.GetPlayersInAbilityRangeSorted(_ => true);
+                    List<PlayerControl> players = PlayerControl.LocalPlayer.GetPlayersInAbilityRangeSorted(target => IsValidKillButtonTarget(PlayerControl.LocalPlayer, target));
                     PlayerControl closest = players.Count == 0 ? null : players[0];
 
                     KillButton killButton = HudManager.Instance.KillButton;
@@ -221,7 +237,10 @@ public static class FixedUpdatePatch
     private readonly static Dictionary<byte, (bool, bool, bool)> killButtonStateCache = [];
     public static void UpdateHud(HudManager __instance)
     {
-        if (!GameStates.IsModHost || __instance == null) return;
+        // The local modded host must maintain its custom HUD even when the
+        // matchmaking region itself is vanilla. Keep IsModHost unchanged for
+        // all other systems and remote clients.
+        if ((!GameStates.IsModHost && !AmongUsClient.Instance.AmHost) || __instance == null) return;
 
         var player = PlayerControl.LocalPlayer;
         if (player == null) return;
@@ -313,16 +332,45 @@ public static class FixedUpdatePatch
                     killButtonStateCache[player.PlayerId] = state;
                 }
 
-                // if (player.CanUseKillButton())
-                // {
-                //     __instance.KillButton.ToggleVisible(player.IsAlive() && GameStates.IsInTask);
-                //     player.Data.Role.CanUseKillButton = true;
-                // }
-                // else
-                // {
-                //     __instance.KillButton.SetDisabled();
-                //     __instance.KillButton.ToggleVisible(false);
-                // }
+                // BHR roles intentionally use custom roles even when the vanilla
+                // client-side RoleTypes is Crewmate. Explicitly control the kill
+                // button instead of letting vanilla HUD state hide it.
+                bool inTask = GameStates.IsInTask && !GameStates.IsMeeting && !ExileController.Instance;
+                bool canKill = player.CanUseKillButton();
+
+                __instance.KillButton.ToggleVisible(inTask && canKill);
+
+                if (!canKill)
+                {
+                    __instance.KillButton.SetDisabled();
+                }
+
+                // The vanilla HUD can clear currentTarget after meetings or role
+                // changes. Re-select the nearest target every FixedUpdate.
+                if (player == PlayerControl.LocalPlayer && inTask && canKill && !player.Data.IsDead)
+                {
+                    var players = player.GetPlayersInAbilityRangeSorted(target => IsValidKillButtonTarget(player, target));
+                    PlayerControl closest = players.Count == 0 ? null : players[0];
+
+                    if (__instance.KillButton.currentTarget && __instance.KillButton.currentTarget != closest)
+                        __instance.KillButton.currentTarget.ToggleHighlight(false, RoleTeamTypes.Impostor);
+
+                    __instance.KillButton.currentTarget = closest;
+
+                    if (player.GetRoleClass() is BHR.Roles.Impostor.RCXD rcxd && rcxd.IsDeployed)
+                    {
+                        __instance.KillButton.SetEnabled();
+                    }
+                    else if (closest)
+                    {
+                        closest.ToggleHighlight(true, RoleTeamTypes.Impostor);
+                        __instance.KillButton.SetEnabled();
+                    }
+                    else
+                    {
+                        __instance.KillButton.SetDisabled();
+                    }
+                }
 
                 __instance.ImpostorVentButton.ToggleVisible(player.CanUseImpostorVentButton());
                 player.Data.Role.CanVent = player.CanUseVents();

@@ -265,9 +265,9 @@ public static class LegacyRpcSenders
         EndAndSend(sender);
     }
 
-    public static void SendSyncDeadPassedMeetingList(uint netId, HashSet<byte> deadList)
+    public static void SendSyncDeadPassedMeetingList(uint netId, HashSet<byte> deadList, int targetClientId)
     {
-        var sender = StartCustom(nameof(CustomRPC.SyncDeadPassedMeetingList), netId, CustomRPC.SyncDeadPassedMeetingList);
+        var sender = StartCustom(nameof(CustomRPC.SyncDeadPassedMeetingList), netId, CustomRPC.SyncDeadPassedMeetingList, targetClientId);
         sender.stream.WritePacked(deadList.Count);
         foreach (var dead in deadList)
             sender.stream.Write(dead);
@@ -292,6 +292,26 @@ public static class LegacyRpcSenders
 
     public static void SendSetCustomRole(uint netId, byte playerId, CustomRoles role, int targetClientId = -1)
     {
+        // SetCustomRole is a BHR-only CustomRPC. A broadcast would also deliver
+        // this unknown RPC to vanilla clients and can cause them to disconnect.
+        // Fan out only to clients that completed the BHR version handshake.
+        if (targetClientId < 0)
+        {
+            foreach (var recipient in Main.EnumeratePlayerControls())
+            {
+                if (recipient == null || recipient.IsHost() || !recipient.IsModded())
+                    continue;
+
+                int recipientClientId = recipient.GetClientId();
+                if (recipientClientId < 0)
+                    continue;
+
+                SendSetCustomRole(netId, playerId, role, recipientClientId);
+            }
+
+            return;
+        }
+
         var sender = StartCustom(nameof(CustomRPC.SetCustomRole), netId, CustomRPC.SetCustomRole, targetClientId);
         sender.stream.Write(playerId);
         sender.stream.WritePacked((int)role);

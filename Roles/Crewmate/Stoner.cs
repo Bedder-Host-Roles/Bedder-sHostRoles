@@ -13,7 +13,7 @@ internal class Stoner : RoleBase
     //===========================SETUP================================\\
     public override CustomRoles Role => CustomRoles.Stoner;
     private const int Id = 33100;
-    public override CustomRoles ThisRoleBase => CustomRoles.Crewmate;
+    public override CustomRoles ThisRoleBase => CustomRoles.Shapeshifter;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateInvestigative;
     //==================================================================\\
 
@@ -71,8 +71,21 @@ internal class Stoner : RoleBase
         PlantStartTime[playerId] = Utils.TimeStamp;
         PlantReady.Remove(playerId);
 
-        // No joint is available until the plant finishes growing.
-        playerId.SetAbilityUseLimit(0);
+        // No joint is available until the plant finishes growing. This is
+        // local state on each client; the host separately owns the authoritative
+        // value and synchronizes it to modded clients.
+        playerId.SetAbilityUseLimit(0, rpc: false, log: false);
+
+        // Vanilla clients cannot run BHR's HUD patches. Keep their vanilla
+        // ability button hidden by desyncing them to Crewmate until the plant
+        // is ready; the host switches only that client's role to Shapeshifter
+        // when the Seer action becomes available.
+        var stoner = Utils.GetPlayerById(playerId);
+        if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost
+            && stoner != null && !stoner.IsModded())
+        {
+            stoner.RpcSetRoleDesync(RoleTypes.Crewmate, stoner.OwnerId);
+        }
     }
 
     public override void Remove(byte playerId)
@@ -83,10 +96,13 @@ internal class Stoner : RoleBase
 
     public override void OnFixedUpdate(PlayerControl player, bool lowLoad, long nowTime, int timerLowLoad)
     {
-        // The host owns plant completion so clients cannot independently unlock
-        // the ability at a different time.
-        if (!AmongUsClient.Instance.AmHost) return;
         if (player == null || !player.IsAlive()) return;
+
+        // The host tracks every Stoner. A non-host client also tracks its own
+        // local Stoner so its HUD can enable the button at the growth deadline;
+        // it must not attempt to authoritatively update another player's state.
+        bool isHost = AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost;
+        if (!isHost && player.PlayerId != PlayerControl.LocalPlayer?.PlayerId) return;
         if (!GameStates.IsInTask) return;
         if (!PlantStartTime.TryGetValue(player.PlayerId, out var startTime)) return;
         if (PlantReady.Contains(player.PlayerId)) return;
@@ -94,7 +110,19 @@ internal class Stoner : RoleBase
         if (nowTime - startTime < PlantGrowthTime.GetInt()) return;
 
         PlantReady.Add(player.PlayerId);
-        player.SetAbilityUseLimit(JointUses.GetInt());
+        player.SetAbilityUseLimit(
+            JointUses.GetInt(),
+            rpc: isHost,
+            log: isHost);
+
+        if (isHost)
+        {
+            // The vanilla Stoner receives the actual target-selecting button
+            // only after the plant has finished growing.
+            if (!player.IsModded())
+                player.RpcSetRoleDesync(RoleTypes.Shapeshifter, player.OwnerId);
+            player.RpcResetAbilityCooldown();
+        }
 
         if (player.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
         {
@@ -112,61 +140,109 @@ internal class Stoner : RoleBase
         return PlantReady.Contains(player.PlayerId) || player.GetAbilityUseLimit() > 0f;
     }
 
-    public override bool CanUseKillButton(PlayerControl player)
+    private static string GetPlantGrowingMessage(PlayerControl player)
     {
-        if (player == null || !player.IsAlive()) return false;
-        if (!IsPlantReady(player)) return false;
+        if (player == null || !PlantStartTime.TryGetValue(player.PlayerId, out var startTime))
+            return string.Format(GetString("StonerPlantGrowing"), 0);
 
-        return player.GetAbilityUseLimit() >= 1f;
+        float growthTime = MathF.Max(PlantGrowthTime.GetFloat(), 1f);
+        float elapsed = Math.Clamp(Utils.TimeStamp - startTime, 0f, growthTime);
+        int percent = (int)MathF.Round((elapsed / growthTime) * 100f);
+        return string.Format(GetString("StonerPlantGrowing"), percent);
     }
 
-    public override bool ForcedCheckMurderAsKiller(PlayerControl killer, PlayerControl target)
+    public override void ApplyGameOptions(IGameOptions opt, byte playerId)
     {
-        if (killer == null || target == null) return false;
-        if (killer.PlayerId == target.PlayerId) return false;
-        if (!killer.IsAlive() || !target.IsAlive()) return false;
-        if (!IsPlantReady(killer)) return false;
-        if (killer.GetAbilityUseLimit() < 1f) return false;
+        // The vanilla shapeshifter target picker is used as the Seer target
+        // selector. The actual transformation is rejected in OnCheckShapeshift.
+        AURoleOptions.ShapeshifterCooldown = Math.Max(1f, JointCooldown.GetFloat());
+        AURoleOptions.ShapeshifterDuration = 1f;
+    }
 
-        // The Kill button is only being used as the target-selection button.
-        // Never allow the normal murder to happen.
-        killer.RpcRemoveAbilityUse();
+    // Stoner never receives a lethal kill button. Its only active ability is
+    // the target-selecting Seer button supplied by the shapeshifter base role.
+    public override bool CanUseKillButton(PlayerControl player) => false;
 
-        var targetRole = target.GetCustomRole();
-        bool isImpostorAffiliation = targetRole.IsImpostorTeamV3();
+    public override bool OnCheckShapeshift(
+        PlayerControl shapeshifter,
+        PlayerControl target,
+        ref bool resetCooldown,
+        ref bool shouldAnimate)
+    {
+        resetCooldown = false;
+        shouldAnimate = false;
 
-        // Only the local Stoner should see the result. This is important when
-        // the host is processing a non-host Stoner's target request.
-        if (killer.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
+        if (shapeshifter == null || target == null || target.PlayerId == shapeshifter.PlayerId
+            || !shapeshifter.IsAlive() || !target.IsAlive() || !GameStates.IsInTask)
+            return false;
+
+        if (!IsPlantReady(shapeshifter))
+        {
+            string growingMessage = GetPlantGrowingMessage(shapeshifter);
+            if (shapeshifter.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
+                HudManager.Instance?.ShowPopUp(growingMessage);
+            else if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost && !shapeshifter.IsModded())
+                Utils.SendMessage(growingMessage, shapeshifter.PlayerId);
+            return false;
+        }
+
+        if (shapeshifter.GetAbilityUseLimit() < 1f)
+        {
+            if (shapeshifter.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
+                HudManager.Instance?.ShowPopUp("You have no Seer uses remaining.");
+            else if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost && !shapeshifter.IsModded())
+                Utils.SendMessage("You have no Seer uses remaining.", shapeshifter.PlayerId);
+            return false;
+        }
+
+        // Consume the charge on the authoritative host. Ability-use sync is
+        // sent only to BHR clients by the existing AbilityUseManager.
+        if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost)
+        {
+            shapeshifter.RpcRemoveAbilityUse();
+            if (shapeshifter.GetAbilityUseLimit() <= 0f && !shapeshifter.IsModded())
+                shapeshifter.RpcSetRoleDesync(RoleTypes.Crewmate, shapeshifter.OwnerId);
+        }
+
+        resetCooldown = true;
+        bool isImpostorAffiliation = target.GetCustomRole().IsImpostorTeamV3();
+        string result = isImpostorAffiliation
+            ? GetString("StonerResultImpostor")
+            : GetString("StonerResultSafe");
+
+        if (shapeshifter.PlayerId == PlayerControl.LocalPlayer?.PlayerId)
         {
             var resultColor = isImpostorAffiliation
                 ? new Color(1f, 0.10f, 0.10f, 0.50f)
                 : new Color(0.20f, 1f, 0.25f, 0.50f);
-
             Utils.FlashColor(resultColor, 0.65f);
-
-            string result = isImpostorAffiliation
-                ? GetString("StonerResultImpostor")
-                : GetString("StonerResultSafe");
-
-            HudManager.Instance.ShowPopUp(result);
+            HudManager.Instance?.ShowPopUp(result);
+        }
+        else if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost && !shapeshifter.IsModded())
+        {
+            Utils.SendMessage(result, shapeshifter.PlayerId);
         }
 
-        killer.ResetKillCooldown();
-        killer.SetKillCooldown();
-
+        // Never allow the vanilla transformation to complete.
         return false;
     }
 
     public override void SetKillCooldown(byte id)
     {
-        Main.AllPlayerKillCooldown[id] = JointCooldown.GetFloat();
+        Main.AllPlayerKillCooldown[id] = 300f;
     }
 
     public override void SetAbilityButtonText(HudManager hud, byte playerId)
     {
-        hud.KillButton.OverrideText(GetString("StonerButtonText"));
+        var player = Utils.GetPlayerById(playerId);
+        bool canUse = player != null && player.IsAlive()
+            && IsPlantReady(player) && player.GetAbilityUseLimit() > 0f;
+        hud.AbilityButton.OverrideText(GetString("StonerButtonText"));
+        hud.AbilityButton.ToggleVisible(canUse);
     }
+
+    public override Sprite GetAbilityButtonSprite(PlayerControl player, bool shapeshifting)
+        => CustomButton.Get("Examine");
 
     public override string GetLowerText(PlayerControl seer, PlayerControl target = null, bool isForMeeting = false, bool isForHud = false)
     {

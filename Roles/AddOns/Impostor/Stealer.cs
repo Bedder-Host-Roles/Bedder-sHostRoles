@@ -28,13 +28,13 @@ public class Stealer : IAddon
     { }
     public static int AddRealVotesNum(PlayerVoteArea ps)
     {
-        return (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == ps.PlayerId) * TicketsPerKill.GetFloat());
+        return (int)(Main.PlayerStates.Count(x => x.Value.GetRealKiller() == ps.PlayerId) * TicketsPerKill.GetFloat());
     }
     public static void AddVisualVotes(PlayerVoteArea votedPlayer, ref List<MeetingHud.VoterState> statesList)
     {
         if (HideAdditionalVotes.GetBool()) return;
 
-        var additionalVotes = (int)(Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == votedPlayer.PlayerId) * TicketsPerKill.GetFloat());
+        var additionalVotes = (int)(Main.PlayerStates.Count(x => x.Value.GetRealKiller() == votedPlayer.PlayerId) * TicketsPerKill.GetFloat());
 
         for (var i = 0; i < additionalVotes; i++)
         {
@@ -50,7 +50,7 @@ public class Stealer : IAddon
         _ = new LateTask(() =>
         {
             killer.Notify(string.Format(Translator.GetString("StealerGetTicket"),
-                (Main.EnumeratePlayerControls().Count(x => x.GetRealKiller()?.PlayerId == killer.PlayerId) * TicketsPerKill.GetFloat() + 1f)
+                (Main.PlayerStates.Count(x => x.Value.GetRealKiller() == killer.PlayerId) * TicketsPerKill.GetFloat() + 1f)
                 .ToString("0.0#####")));
         }, target.Is(CustomRoles.Burst) ? Burst.BurstKillDelay.GetFloat() : 0f, "BurstKillCheck");
     }

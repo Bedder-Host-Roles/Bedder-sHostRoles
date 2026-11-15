@@ -90,99 +90,105 @@ public abstract class CovenManager : RoleBase // NO, THIS IS NOT A ROLE
             return option.GetBool();
         }
     }
+    // Only living, actual Coven members may hold or receive the Necronomicon.
+    // Keep this check shared by initial assignment, meeting votes and death hand-off.
+    public static bool CanReceiveNecronomicon(PlayerControl player)
+        => player != null
+            && player.Data != null
+            && player.IsAlive()
+            && !player.Data.Disconnected
+            && player.IsPlayerCoven()
+            && !player.Is(CustomRoles.Summoned)
+            && Main.PlayerStates.TryGetValue(player.PlayerId, out var state)
+            && !state.IsRandomizer;
+
     public static void GiveNecronomicon()
     {
-        // Exclude Summoned players and Randomizer from the eligible list
-        var pcList = Main.EnumerateAlivePlayerControls()
-            .Where(pc => pc.IsPlayerCoven() && !pc.Is(CustomRoles.Summoned) && !Main.PlayerStates[pc.PlayerId].IsRandomizer)
+        var candidates = Main.EnumerateAlivePlayerControls()
+            .Where(CanReceiveNecronomicon)
             .ToList();
 
-        if (pcList.Any())
+        if (candidates.Count == 0)
         {
-            byte rp = pcList.RandomElement().PlayerId;
-            necroHolder = rp;
-            GetPlayerById(necroHolder).Notify(GetString("NecronomiconNotification"));
-            SendRPC(necroHolder);
-        }
-    }
-    public static void GiveNecronomicon(byte target)
-    {
-        if (GetPlayerById(target).Is(CustomRoles.Summoned)) return; // Prevent assignment to Summoned players
-
-        necroHolder = target;
-        GetPlayerById(necroHolder).Notify(GetString("NecronomiconNotification"));
-        SendRPC(necroHolder);
-    }
-    public static void GiveNecronomicon(PlayerControl target)
-    {
-        if (target.Is(CustomRoles.Summoned)) return; // Prevent assignment to Summoned players
-        if (Main.PlayerStates[target.PlayerId].IsRandomizer)
-        {
-            // Avoid giving Necronomicon to Randomizer
-            Logger.Info($"Randomizer {target.GetRealName()} was selected for Necronomicon, skipping.", "Coven");
-            GiveNecronomicon(); // Retry
+            necroHolder = byte.MaxValue;
+            Logger.Warn("No eligible living Coven player is available for the Necronomicon.", "Coven");
             return;
         }
+
+        GiveNecronomicon(candidates.RandomElement());
+    }
+
+    public static void GiveNecronomicon(byte target)
+    {
+        GiveNecronomicon(GetPlayerById(target));
+    }
+
+    public static void GiveNecronomicon(PlayerControl target)
+    {
+        if (!CanReceiveNecronomicon(target))
+        {
+            Logger.Warn($"Rejected Necronomicon transfer to invalid player id {target?.PlayerId.ToString() ?? "null"}.", "Coven");
+            // If the current holder has become invalid, immediately choose a valid replacement.
+            var currentHolder = GetPlayerById(necroHolder);
+            if (!CanReceiveNecronomicon(currentHolder))
+                GiveNecronomicon();
+            return;
+        }
+
+        if (necroHolder == target.PlayerId)
+            return;
+
         necroHolder = target.PlayerId;
         target.Notify(GetString("NecronomiconNotification"));
         SendRPC(necroHolder);
+        Logger.Info($"Necronomicon transferred to {target.GetRealName()} ({target.PlayerId}).", "Coven");
     }
-    
+
     public static void CheckNecroVotes()
     {
-        if (necroVotes.Count < 1) return;
-        if (necroVotes.Count == 1)
+        if (necroVotes.Count == 0) return;
+
+        try
         {
-            byte soloVote = necroVotes[necroVotes.Keys.First()];
-            GiveNecronomicon(soloVote);
-            Logger.Info($"Only one vote for Necronomicon, giving to {GetPlayerById(soloVote)?.GetRealName()}", "Coven");
-            necroVotes.Clear();
-            return;
-        }
-        Dictionary<byte, int> voteCount = [];
-        byte lastResult = byte.MinValue;
-        foreach (byte voter in necroVotes.Keys)
-        {
-            if (!voteCount.ContainsKey(necroVotes[voter]))
-                voteCount.Add(necroVotes[voter], 0);
-        }
-        foreach (byte voter in necroVotes.Keys)
-        {
-            voteCount[necroVotes[voter]]++;
-            Logger.Info($"{voteCount[necroVotes[voter]]} votes tallied for {GetPlayerById(necroVotes[voter])?.GetRealName()} Necronomicon", "Coven");
-        }
-        byte currentResult = voteCount.Keys.First();
-        foreach (byte vote in voteCount.Keys)
-        {
-            if (voteCount[vote] >= voteCount[currentResult] && currentResult != vote)
+            // Discard votes for players who died, disconnected, changed teams, or cannot hold it.
+            var validVotes = necroVotes
+                .Where(vote => CanReceiveNecronomicon(GetPlayerById(vote.Key))
+                    && CanReceiveNecronomicon(GetPlayerById(vote.Value)))
+                .GroupBy(vote => vote.Value)
+                .ToDictionary(group => group.Key, group => group.Count());
+
+            if (validVotes.Count == 0)
             {
-                lastResult = currentResult;
-                currentResult = vote;
-                Logger.Info($"{GetPlayerById(currentResult).GetRealName()} has more votes than {GetPlayerById(lastResult).GetRealName()}", "Coven");
+                Logger.Info("No valid Necronomicon votes were cast; keeping the current holder.", "Coven");
+                return;
             }
+
+            int highestVoteCount = validVotes.Values.Max();
+            var winners = validVotes
+                .Where(vote => vote.Value == highestVoteCount)
+                .Select(vote => vote.Key)
+                .ToList();
+
+            // A tied vote does not arbitrarily move the Necronomicon.
+            if (winners.Count != 1)
+            {
+                Logger.Info($"Necronomicon vote tied between {string.Join(", ", winners)}; keeping the current holder.", "Coven");
+                return;
+            }
+
+            GiveNecronomicon(winners[0]);
         }
-        if (currentResult == byte.MinValue && !necroVotes.ContainsKey(byte.MinValue))
+        finally
         {
-            Logger.Info($"currentResult == byte.MinValue, return", "Coven");
+            necroVotes.Clear();
         }
-        else if (voteCount.ContainsKey(lastResult) && voteCount[currentResult] == voteCount[lastResult] && currentResult != lastResult)
-        {
-            Logger.Info($"{GetPlayerById(currentResult).GetRealName()} and {GetPlayerById(lastResult).GetRealName()} had equal Necronomicon votes, not changing Necronomicon", "Coven");
-        }
-        else
-        {
-            GiveNecronomicon(currentResult);
-            Logger.Info($"{GetPlayerById(currentResult).GetRealName()} had the most Necronomicon votes, giving them Necronomicon", "Coven");
-        }
-        necroVotes.Clear();
     }
 
     public static void NecronomiconCheck()
     {
-        if (necroHolder == byte.MaxValue || !GetPlayerById(necroHolder).IsAlive() || !GetPlayerById(necroHolder).IsPlayerCoven())
-        {
+        var holder = GetPlayerById(necroHolder);
+        if (!CanReceiveNecronomicon(holder))
             GiveNecronomicon();
-        }
     }
     public static bool HasNecronomicon(PlayerControl pc) => necroHolder == pc.PlayerId;
     public static bool HasNecronomicon(byte playerId) => necroHolder == playerId;

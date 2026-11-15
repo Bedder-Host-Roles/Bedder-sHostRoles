@@ -70,7 +70,7 @@ class CheckProtectPatch
     }
 }
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckMurder))]
-class CheckMurderPatch
+public class CheckMurderPatch
 {
     public static Dictionary<byte, float> TimeSinceLastKill = [];
     public static void Update(byte playerId)
@@ -83,10 +83,28 @@ class CheckMurderPatch
     }
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, bool __state = false)
     {
-        if (!AmongUsClient.Instance.AmHost) return false;
+        // Non-host clients must run the vanilla CheckMurder method so the
+        // murder request is sent to the host. The host will run this prefix
+        // again and apply BHR's authoritative role checks there.
+        if (!AmongUsClient.Instance.AmHost) return true;
         if (GameStates.IsHideNSeek) return true;
 
         var killer = __instance;
+
+        // RC-XD uses vanilla CheckMurder(self) as its cross-client input
+        // transport. The first self-target deploys the car; the next one
+        // detonates it. It is never allowed to become a real self-kill.
+        if (killer == target && killer.Is(CustomRoles.RCXD))
+        {
+            if (killer.GetRoleClass() is RCXD rcxd)
+            {
+                if (rcxd.IsDeployed)
+                    rcxd.HostDetonate(killer);
+                else
+                    rcxd.HostDeploy(killer);
+            }
+            return false;
+        }
 
         AFKDetector.SetNotAFK(killer.PlayerId);
 
@@ -1554,6 +1572,8 @@ class FixedUpdateInNormalGamePatch
     }
 }
 
+
+
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.ClientInitialize))]
 class PlayerClientInitializePatch
 {
@@ -1561,6 +1581,7 @@ class PlayerClientInitializePatch
     {
         public Il2CppSystem.Collections.IEnumerator enumerator;
         public PlayerControl instance;
+
         public IEnumerator GetEnumerator()
         {
             instance.Visible = false;
@@ -1579,6 +1600,7 @@ class PlayerClientInitializePatch
 
             if (!instance.notRealPlayer || instance.PlayerId != 254)
                 instance.Visible = true;
+
             yield return null;
             yield break;
         }
@@ -1591,6 +1613,7 @@ class PlayerClientInitializePatch
             enumerator = __result,
             instance = __instance
         };
+
         __result = myEnumerator.GetEnumerator().WrapToIl2Cpp();
     }
 }
@@ -1909,6 +1932,7 @@ class PlayerControlCompleteTaskPatch
     }
 }
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.CheckName))]
+
 class PlayerControlCheckNamePatch
 {
     public static bool Prefix(PlayerControl __instance, ref string playerName)
@@ -1925,81 +1949,108 @@ class PlayerControlCheckNamePatch
 
         if (!AmongUsClient.Instance.AmHost || !GameStates.IsLobby) return false;
 
-        // Set name after check vanilla code
-        // The original "playerName" sometimes have randomized nickname
-        // So CheckName sets the original nickname but only saved it on "Data.PlayerName"
-        // playerName = __instance.Data?.PlayerName ?? playerName;
-
         if (BanManager.CheckDenyNamePlayer(__instance, playerName)) return false;
 
         if (!Main.AllClientRealNames.ContainsKey(__instance.OwnerId))
-        {
             Main.AllClientRealNames.Add(__instance.OwnerId, playerName);
-        }
 
-        // Standard nickname
         var name = playerName;
-        if (Options.FormatNameMode.GetInt() == 2 && __instance.Data.ClientId != AmongUsClient.Instance.ClientId)
+
+        if (Options.FormatNameMode.GetInt() == 2 &&
+            __instance.Data.ClientId != AmongUsClient.Instance.ClientId)
+        {
             name = Main.Get_TName_Snacks;
+        }
         else
         {
-            name = name.RemoveHtmlTags().Replace(@"\", string.Empty).Replace("/", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty).Replace("<", string.Empty).Replace(">", string.Empty);
-            if (name.Length > 10) name = name[..10];
-            if (Options.DisableEmojiName.GetBool()) name = Regex.Replace(name, @"\p{Cs}", string.Empty);
-            if (name.IsNullOrWhiteSpace() || Regex.Replace(Regex.Replace(name, @"\s", string.Empty), @"[\x01-\x1F,\x7F]", string.Empty).Length < 1) name = Main.Get_TName_Snacks;
+            name = name.RemoveHtmlTags()
+                .Replace(@"\", string.Empty)
+                .Replace("/", string.Empty)
+                .Replace("\n", string.Empty)
+                .Replace("\r", string.Empty)
+                .Replace("<", string.Empty)
+                .Replace(">", string.Empty);
+
+            if (name.Length > 10)
+                name = name[..10];
+
+            if (Options.DisableEmojiName.GetBool())
+                name = Regex.Replace(name, @"\p{Cs}", string.Empty);
+
+            if (name.IsNullOrWhiteSpace() ||
+                Regex.Replace(
+                    Regex.Replace(name, @"\s", string.Empty),
+                    @"[\x01-\x1F,\x7F]",
+                    string.Empty).Length < 1)
+            {
+                name = Main.Get_TName_Snacks;
+            }
         }
+
         Main.AllPlayerNames.Remove(__instance.PlayerId);
         Main.AllPlayerNames.TryAdd(__instance.PlayerId, name);
 
         Logger.Info($"PlayerId: {__instance.PlayerId} - playerName: {playerName} => {name}", "Name player");
 
         RPC.SyncAllPlayerNames();
-        if (__instance != null && !name.Equals(playerName))
+
+        // Always send the standard Among Us SetName RPC.
+        // Vanilla clients cannot read BHR-only name synchronization.
+        if (__instance != null)
         {
-            Logger.Warn($"Standard nickname: {playerName} => {name}", "Name Format");
+            if (!name.Equals(playerName))
+                Logger.Warn($"Standard nickname: {playerName} => {name}", "Name Format");
+
             __instance.RpcSetName(name);
         }
 
         _ = new LateTask(() =>
         {
-            // Do not probe an unclassified player with a BHR-only RPC.
-            // BHR clients initiate the version handshake themselves, targeted
-            // to the host; vanilla clients never receive a BHR packet.
-
-
+            // Synchronize existing player names with a newly joined client.
             var sender = CustomRpcSender.Create("LobbyTagsSender", SendOption.Reliable);
+
             foreach (var player in Main.EnumeratePlayerControls())
             {
-                if (player == null || player.PlayerId == __instance.PlayerId || player.Data == null || player.Data.Disconnected) continue;
+                if (player == null ||
+                    player.PlayerId == __instance.PlayerId ||
+                    player.Data == null ||
+                    player.Data.Disconnected)
+                    continue;
 
-                Main.AllClientRealNames.TryGetValue(player.OwnerId, out var rName);
+                var syncName = Main.AllPlayerNames.GetValueOrDefault(
+                    player.PlayerId,
+                    player.Data.PlayerName);
 
-                if (rName != null && rName != player.Data.PlayerName)
-                {
-                    sender.AutoStartRpc(player.NetId, (byte)RpcCalls.SetName, __instance.OwnerId);
-                    sender.Write(player.Data.NetId);
-                    sender.Write(player.Data.PlayerName);
-                    sender.EndRpc();
-                }
+                if (string.IsNullOrWhiteSpace(syncName))
+                    continue;
+
+                sender.AutoStartRpc(
+                    player.NetId,
+                    (byte)RpcCalls.SetName,
+                    __instance.OwnerId);
+
+                sender.Write(player.Data.NetId);
+                sender.Write(syncName);
+                sender.Write(false);
+                sender.EndRpc();
 
                 if (sender.Length > 800)
                 {
                     sender.SendMessage();
-                    sender = CustomRpcSender.Create("LobbyTagsSenderSub", SendOption.Reliable);
+                    sender = CustomRpcSender.Create(
+                        "LobbyTagsSenderSub",
+                        SendOption.Reliable);
                 }
             }
+
             sender.SendMessage();
 
         }, 0.6f, "Retry Version Check", false);
 
         return false;
     }
-
-    // public static void Postfix(PlayerControl __instance, ref string playerName)
-    // {
-
-    // }
 }
+
 [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetColor))]
 class RpcSetColorPatch
 {

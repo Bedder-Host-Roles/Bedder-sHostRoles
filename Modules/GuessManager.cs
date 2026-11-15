@@ -7,6 +7,7 @@ using BHR.Modules.ChatManager;
 using BHR.Modules.Rpc;
 using BHR.Patches;
 using BHR.Roles.AddOns.Common;
+using BHR.Roles.AddOns.Impostor;
 using BHR.Roles.Core;
 using BHR.Roles.Coven;
 using BHR.Roles.Crewmate;
@@ -70,16 +71,16 @@ public static class GuessManager
     public static void ShowInfoMessage(this PlayerControl player, bool isUI, string message, string title = "")
     {
         if (isUI) player.ShowPopUp(message, title);
-        else 
-        { 
+        else
+        {
             _ = new LateTask(
-                () => 
+                () =>
                 {
                     Utils.SendMessage(message, player.PlayerId, title);
                 },
                 0.2f, "ShowInfoMessage", shoudLog: false
             );
-            
+
         }
     }
 
@@ -168,7 +169,7 @@ public static class GuessManager
         Logger.Msg($" {target.PlayerId}", "Guesser - target.PlayerId");
         Logger.Msg($" {role}", "Guesser - role");
 
-        if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative && 
+        if (role.GetStaticRoleClass().ThisRoleType == Custom_RoleType.CrewmateInvestigative &&
             !Options.CanGuessCrewInvestigative.GetBool())
         {
             Logger.Info($"Guess disabled for Crewmate Investigative roles.", "GuessManager");
@@ -418,6 +419,12 @@ public static class GuessManager
 
                     Main.PlayersDiedInMeeting.Add(dp.PlayerId);
                     MurderPlayerPatch.AfterPlayerDeathTasks(pc, dp, true);
+
+                    // Guess kills happen during meetings, so the normal Stealer murder hook
+                    // (which intentionally ignores meeting deaths) is not invoked. Award the
+                    // Stealer notification for a successful guess kill; self-misguesses do not count.
+                    if (dp != pc && pc.Is(CustomRoles.Stealer))
+                        Stealer.OnMurderPlayer(pc, dp);
 
                     _ = new LateTask(() => { Utils.SendMessage(string.Format(GetString("GuessKill"), Name), 255, Utils.ColorString(Utils.GetRoleColor(CustomRoles.NiceGuesser), GetString("GuessKillTitle")), true); }, 0.6f, "Guess Msg");
 
@@ -901,13 +908,13 @@ public static class GuessManager
 
                 if (!listOfRoles.Contains(CustomRoles.PhantomBHR))
                     listOfRoles.Add(CustomRoles.PhantomBHR);
-                
+
                 if (!listOfRoles.Contains(CustomRoles.ViperBHR))
                     listOfRoles.Add(CustomRoles.ViperBHR);
 
                 if (!listOfRoles.Contains(CustomRoles.DetectiveBHR))
                     listOfRoles.Add(CustomRoles.DetectiveBHR);
-                
+
                 if (!listOfRoles.Contains(CustomRoles.JudgeBHR))
                     listOfRoles.Add(CustomRoles.JudgeBHR);
 

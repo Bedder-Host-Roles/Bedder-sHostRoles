@@ -352,7 +352,17 @@ namespace BHR.Modules
 
         public static void AfterMeetingTasks()
         {
-            // AllObjects.OfType<ShapeshiftMenuElement>().ToArray().Do(x => x.Despawn());
+            // CustomNetObject is implemented as a fake PlayerControl. Re-spawning
+            // those objects immediately after a meeting is unsafe for vanilla
+            // clients (especially console/mobile clients) and can leave them on
+            // the black transition screen. In mixed vanilla/modded lobbies, keep
+            // the meeting-safe state and do not recreate fake players.
+            if (Main.EnumeratePlayerControls().Any(x => x != null && !x.IsModded()))
+            {
+                TempDespawnedObjects.Clear();
+                return;
+            }
+
             TempDespawnedObjects.ForEach(x => x.CreateNetObject(x.Sprite, x.Position));
             TempDespawnedObjects.Clear();
         }

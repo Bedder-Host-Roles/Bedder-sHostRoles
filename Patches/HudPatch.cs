@@ -55,7 +55,7 @@ class SetHudActivePatch
         // Fix vanilla bug when report button displayed in the lobby
         if (GameStates.IsLobby || !isActive) __instance?.ReportButton?.ToggleVisible(false);
 
-        if (!GameStates.IsModHost || GameStates.IsHideNSeek) return;
+        if ((!GameStates.IsModHost && !AmongUsClient.Instance.AmHost) || GameStates.IsHideNSeek) return;
 
         if (!__instance)
         {
@@ -67,7 +67,7 @@ class SetHudActivePatch
 
         if (!isActive) return;
 
-        if (player == null) 
+        if (player == null)
         {
             __instance.KillButton.ToggleVisible(true);
             __instance.ReportButton.ToggleVisible(true);

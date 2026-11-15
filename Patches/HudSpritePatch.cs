@@ -22,7 +22,7 @@ public static class HudSpritePatch
     public static void Postfix(HudManager __instance, [HarmonyArgument(0)] PlayerControl localPlayer, [HarmonyArgument(2)] bool isActive)
     {
         if (!Main.EnableCustomButton.Value || __instance == null || !isActive || !localPlayer.IsAlive()) return;
-        if (GameStates.IsEnded || GameStates.IsLobby || GameStates.IsHideNSeek || !GameStates.IsModHost) return;
+        if (GameStates.IsEnded || GameStates.IsLobby || GameStates.IsHideNSeek || (!GameStates.IsModHost && !AmongUsClient.Instance.AmHost)) return;
 
         if (!AmongUsClient.Instance.IsGameStarted || !Main.IntroDestroyed)
         {
@@ -113,5 +113,26 @@ public static class AbilityButtonPatch
         __instance.buttonLabelText.fontSharedMaterial = settings.FontMaterial;
         __instance.buttonLabelText.text = DestroyableSingleton<TranslationController>.Instance.GetString(settings.Text, new Il2CppReferenceArray<Il2CppSystem.Object>(0));
         return false;
+    }
+}
+
+
+[HarmonyPatch(typeof(AbilityButton), nameof(AbilityButton.DoClick))]
+public static class BHRAbilityButtonClickPatch
+{
+    public static bool Prefix(AbilityButton __instance)
+    {
+        if (GameStates.IsHideNSeek || GameStates.IsMeeting || !GameStates.IsInTask)
+            return true;
+
+        var player = PlayerControl.LocalPlayer;
+        if (player == null || !player.IsAlive())
+            return true;
+
+        var role = player.GetRoleClass();
+        if (role?.OnAbilityButtonClick(player) == true)
+            return false;
+
+        return true;
     }
 }

@@ -53,7 +53,7 @@ public class Rebirth : IAddon
 
     public static bool IsViableSwapTarget(PlayerControl x)
     {
-        return !x.IsHost() 
+        return !x.IsHost()
             && AntiBlackout.ExilePlayerId != x.PlayerId
             && !x.Is(CustomRoles.Rebirth)
             && !x.IsAnySubRole(x => x.IsConverted())
@@ -68,10 +68,10 @@ public class Rebirth : IAddon
             && !x.Is(CustomRoles.Admirer)
             && !x.GetCustomRole().IsCoven()
             && !x.GetCustomRole().IsImpostor()
-            && !x.Is(CustomRoles.Lovers) 
-            && !x.Is(CustomRoles.Romantic) 
-            && !x.Is(CustomRoles.Doppelganger) 
-            && !x.Is(CustomRoles.Solsticer) 
+            && !x.Is(CustomRoles.Lovers)
+            && !x.Is(CustomRoles.Romantic)
+            && !x.Is(CustomRoles.Doppelganger)
+            && !x.Is(CustomRoles.Solsticer)
             && !x.Is(CustomRoles.NiceMini);
     }
 
@@ -102,6 +102,12 @@ public class Rebirth : IAddon
         Main.OvverideOutfit[ViablePlayer.PlayerId] = (Main.PlayerStates[pc.PlayerId].NormalOutfit, Main.PlayerStates[pc.PlayerId].NormalOutfit.PlayerName);
 
         Main.PlayerStates[pc.PlayerId].StolenId = ViablePlayer.PlayerId;
+
+        // Rebirth swaps both players' visible identities. Sync the updated names
+        // immediately so clients see the original Rebirth user and the player
+        // whose identity they have taken.
+        RPC.SyncAllPlayerNames();
+        Utils.NotifyRoles(SpecifyTarget: pc, NoCache: true);
 
         NewExiledPlayer = ViablePlayer.Data;
         if (Rebirths[pc.PlayerId] <= 0)

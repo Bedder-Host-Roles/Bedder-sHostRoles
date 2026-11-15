@@ -803,12 +803,18 @@ class CastVotePatch
             return false;
         }
 
-        // Coven Necronomicon Voting
-        if (voter.IsPlayerCoven() && Main.EnumerateAlivePlayerControls().Count(x => x.IsPlayerCoven() && !Main.PlayerStates[x.PlayerId].IsRandomizer) == 1)
+        // Coven Necronomicon voting. Validate both ends against the same eligibility
+        // rules used by the transfer code so votes cannot select dead, disconnected,
+        // summoned, randomizer, or non-Coven players.
+        bool voterCanVoteForNecro = CovenManager.CanReceiveNecronomicon(voter);
+        int eligibleCovenCount = Main.EnumerateAlivePlayerControls()
+            .Count(CovenManager.CanReceiveNecronomicon);
+
+        if (voterCanVoteForNecro && eligibleCovenCount == 1)
         {
-            Logger.Info("Solo Coven, Necronomicon Votes will not Activate", "CastVotePatch");
+            Logger.Info("Solo Coven, Necronomicon votes are disabled.", "CastVotePatch");
         }
-        else if (suspectPlayerId == 253 && voter.IsPlayerCoven() && !Main.PlayerStates[voter.PlayerId].IsRandomizer)
+        else if (suspectPlayerId == 253 && voterCanVoteForNecro)
         {
             if (!voter.GetRoleClass().HasVoted)
             {
@@ -818,12 +824,12 @@ class CastVotePatch
                 return false;
             }
         }
-        else if (voter.IsPlayerCoven() && target.IsPlayerCoven() && !Main.PlayerStates[voter.PlayerId].IsRandomizer && !Main.PlayerStates[target.PlayerId].IsRandomizer)
+        else if (voterCanVoteForNecro && CovenManager.CanReceiveNecronomicon(target))
         {
             if (!voter.GetRoleClass().HasVoted)
             {
                 voter.GetRoleClass().HasVoted = true;
-                CovenManager.necroVotes.Add(voter.PlayerId, target.PlayerId);
+                CovenManager.necroVotes[voter.PlayerId] = target.PlayerId;
                 SendMessage(string.Format(GetString("NecronomiconVote"), target.GetRealName()), voter.PlayerId);
                 ClearVoteForVoter(__instance, voter);
                 return false;

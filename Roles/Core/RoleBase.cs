@@ -105,7 +105,19 @@ public abstract class RoleBase
     /// <summary>
     /// A generic method to set if a Impostor/Shapeshifter base may use Kill button
     /// </summary>
-    public virtual bool CanUseKillButton(PlayerControl pc) => pc.Is(Custom_Team.Impostor) && pc.IsAlive();
+    public virtual bool CanUseKillButton(PlayerControl pc)
+    {
+        if (pc == null || !pc.IsAlive())
+            return false;
+
+        return ThisRoleBase.HasImpBasis();
+    }
+
+    /// <summary>
+    /// Handles a custom AbilityButton click without using the vanilla shapeshift action.
+    /// Return true when the click has been handled by the role.
+    /// </summary>
+    public virtual bool OnAbilityButtonClick(PlayerControl player) => false;
 
     /// <summary>
     /// A generic method to set if a Impostor/Shapeshifter base may Vent
@@ -458,7 +470,7 @@ public abstract class RoleBase
     {
         return false;
     }
-    
+
     public virtual void ReceiveRPC(MessageReader reader, PlayerControl pc)
     { }
 

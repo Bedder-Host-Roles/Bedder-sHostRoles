@@ -120,6 +120,7 @@ public enum CustomRPC : byte // 182/255 USED
     SyncFFANameNotify,
     //Speed run
     SyncSpeedRunStates,
+    RCXDState,
 }
 [Obfuscation(Exclude = true)]
 public enum Sounds
@@ -603,6 +604,13 @@ internal class RPCHandlerPatch
                 break;
             case CustomRPC.SyncSpeedRunStates:
                 SpeedRun.HandleSyncSpeedRunStates(reader);
+                break;
+            case CustomRPC.RCXDState:
+                var rcxdPlayerId = reader.ReadByte();
+                var rcxdDeployed = reader.ReadBoolean();
+                var rcxdPlayer = Utils.GetPlayerById(rcxdPlayerId);
+                if (rcxdPlayer?.GetRoleClass() is RCXD rcxdState)
+                    rcxdState.SetNetworkState(rcxdPlayer, rcxdDeployed);
                 break;
             case CustomRPC.SyncAllPlayerNames:
                 Main.AllPlayerNames.Clear();
@@ -1093,9 +1101,18 @@ internal static class RPC
     // }
     public static void SyncDeadPassedMeetingList()
     {
-        if (!AmongUsClient.Instance.AmHost) return;
-        LegacyRpcSenders.SendSyncDeadPassedMeetingList(PlayerControl.LocalPlayer.NetId, Main.DeadPassedMeetingPlayers);
+        if (!AmongUsClient.Instance.AmHost || PlayerControl.LocalPlayer == null) return;
 
+        // SyncDeadPassedMeetingList is a BHR custom RPC. Vanilla clients do not
+        // register this RPC, so never broadcast it to unknown/unmodded clients.
+        // The host already owns the authoritative list; only modded peers need it.
+        foreach (var client in Main.EnumeratePlayerControls().Where(pc => pc != null && pc.IsNonHostModdedClient()))
+        {
+            LegacyRpcSenders.SendSyncDeadPassedMeetingList(
+                PlayerControl.LocalPlayer.NetId,
+                Main.DeadPassedMeetingPlayers,
+                client.GetClientId());
+        }
     }
     public static void SendRpcLogger(uint targetNetId, byte callId, SendOption sendOption, int targetClientId = -1)
     {

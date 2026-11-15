@@ -1805,11 +1805,9 @@ public static class ExtendedPlayerControl
     public const MurderResultFlags ResultFlags = MurderResultFlags.Succeeded; //No need for DecisonByHost
     public static SendOption RpcSendOption => Main.CurrentServerIsVanilla && Options.BypassRateLimitAC.GetBool() ? SendOption.None : SendOption.Reliable;
 
-    // Credit to EHR
-    // Adapted from EndlessHostRoles 8.0.3's vanilla black-screen recovery.
-    // The important difference from the old BHR workaround is that the MurderPlayer
-    // transition is sent ONLY to the affected vanilla client's connection, and for
-    // a living player it targets an existing ghost object rather than the player.
+    // Credit to EHR for the original recovery approach.
+    // Living vanilla clients use only targeted system repair; never synthesize a
+    // MurderPlayer transition for them, as it can produce a kill animation/body.
     public static void FixBlackScreen(this PlayerControl pc)
     {
         if (pc == null || !AmongUsClient.Instance.AmHost) return;
@@ -1860,13 +1858,13 @@ public static class ExtendedPlayerControl
             && (!GameStates.AirshipIsActive || Main.PlayerStates.TryGetValue(x.PlayerId, out var state) && state.HasSpawned), out var dummyGhost);
         var cameraProxy = hasDeadGhost ? dummyGhost : pc;
 
-        // Do not manufacture a fake corpse for a living vanilla player. The old
-        // fallback used MurderPlayer with a temporary proxy, which could create a
-        // visible/reportable body and feed false positives into EAC. If no real
-        // ghost exists, use only the desync-system repair path.
-        if (!hasDeadGhost && pc.IsAlive())
+        // Never manufacture a kill/corpse transition for a living vanilla player.
+        // It can leave console clients with a visible kill animation or body and
+        // does not reliably restore the task HUD. Use only the targeted system
+        // repair path for every living vanilla client.
+        if (pc.IsAlive())
         {
-            Logger.Info($"[BHR-BS-FIX] No dead player available; using system-only recovery for {playerName}.", "FixBlackScreen");
+            Logger.Info($"[BHR-BS-FIX] Using targeted system-only recovery for living vanilla player {playerName}.", "FixBlackScreen");
             var safeSender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (safe)", SendOption.Reliable);
             safeSender.RpcDesyncRepairSystem(pc, systemtype, 128);
             safeSender.SendMessage();
@@ -2037,7 +2035,10 @@ public static class ExtendedPlayerControl
         {
             var waitingForAirshipSpawn = GameStates.AirshipIsActive && pc.IsAlive()
                 && Main.PlayerStates.TryGetValue(pc.PlayerId, out var state) && !state.HasSpawned;
-            return ShouldDeferBlackScreenFix(GameStates.IsMeeting, ExileController.Instance, AntiBlackout.SkipTasks,
+            // WrapUpFinalizer calls this recovery after ExileController.WrapUp.
+            // ExileController.Instance can remain stale on some clients; waiting
+            // for it to become null can defer recovery until the game ends.
+            return ShouldDeferBlackScreenFix(GameStates.IsMeeting, false, AntiBlackout.SkipTasks,
                 pc.inVent, pc.inMovingPlat, pc.onLadder, ShipStatusSpawnPlayerPatch.HasPendingSpawns || waitingForAirshipSpawn);
         }
     }
