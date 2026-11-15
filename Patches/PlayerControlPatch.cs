@@ -83,6 +83,15 @@ public class CheckMurderPatch
     }
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, bool __state = false)
     {
+        // Log the input-to-host boundary so a missing click can be separated
+        // from a host-side murder validation failure.
+        Logger.Info(
+            $"[KillButton] CheckMurder entered: killer={__instance.GetRealName()}; " +
+            $"target={(target != null ? target.GetRealName() : "<null>")}; " +
+            $"isHost={AmongUsClient.Instance.AmHost}; " +
+            $"canKill={__instance.CanUseKillButton()}",
+            "CheckMurder");
+
         // Non-host clients must run the vanilla CheckMurder method so the
         // murder request is sent to the host. The host will run this prefix
         // again and apply BHR's authoritative role checks there.
@@ -652,9 +661,12 @@ public static class CheckShapeshiftPatch
         //    logger.Info("Shapeshifting canceled because the shapeshifter is not a shapeshifter");
         //    return false;
         //}
-        if (instance.Data.Disconnected)
+        // Use BHR's authoritative connection state. GameData.Disconnected can
+        // be temporarily spoofed during role assignment and may be stale on
+        // vanilla clients immediately after the intro.
+        if (instance.IsDisconnected())
         {
-            logger.Info("Shapeshifting canceled because shapeshifter is disconnected");
+            logger.Info($"Shapeshifting canceled because shapeshifter is disconnected (Data.Disconnected={instance.Data.Disconnected})");
             return false;
         }
         if (target.IsMushroomMixupActive() && animate)

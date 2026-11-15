@@ -1858,26 +1858,47 @@ public static class ExtendedPlayerControl
             && (!GameStates.AirshipIsActive || Main.PlayerStates.TryGetValue(x.PlayerId, out var state) && state.HasSpawned), out var dummyGhost);
         var cameraProxy = hasDeadGhost ? dummyGhost : pc;
 
-        // Never manufacture a kill/corpse transition for a living vanilla player.
-        // It can leave console clients with a visible kill animation or body and
-        // does not reliably restore the task HUD. Use only the targeted system
-        // repair path for every living vanilla client.
+        // A living vanilla player must never be passed through MurderPlayer as
+        // a camera-reset trick: when there is no real ghost proxy that can create
+        // a visible self-body. Refresh the player's native role/HUD state and
+        // position with client-targeted RPCs instead.
         if (pc.IsAlive())
         {
-            Logger.Info($"[BHR-BS-FIX] Using targeted system-only recovery for living vanilla player {playerName}.", "FixBlackScreen");
-            var safeSender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (safe)", SendOption.Reliable);
+            var roleType = pc.GetCustomRole().GetRoleTypes();
+            var recoveryPosition = pc.GetCustomPosition();
+            Logger.Info(
+                $"[BHR-BS-FIX] No-corpse recovery for {playerName}; hasDeadGhost={hasDeadGhost}; role={roleType}; position={recoveryPosition}.",
+                "FixBlackScreen");
+
+            var safeSender = CustomRpcSender.Create($"Fix Black Screen For {playerName} (no-corpse)", SendOption.Reliable);
             safeSender.RpcDesyncRepairSystem(pc, systemtype, 128);
+            safeSender.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+            safeSender.WriteVector2(recoveryPosition);
+            safeSender.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+            safeSender.EndRpc();
             safeSender.SendMessage();
+
             _ = new LateTask(() =>
             {
-                if (pc == null || !GameStates.InGame || GameStates.IsEnded) return;
-                var restore = CustomRpcSender.Create($"Fix Black Screen For {playerName} (safe restore)", SendOption.Reliable);
+                if (pc == null || pc.Data == null || pc.IsDisconnected() || !GameStates.InGame || GameStates.IsEnded)
+                    return;
+
+                var restore = CustomRpcSender.Create($"Fix Black Screen For {playerName} (no-corpse restore)", SendOption.Reliable);
                 restore.RpcDesyncRepairSystem(pc, systemtype, 16);
                 if (systemtype == SystemTypes.HeliSabotage)
                     restore.RpcDesyncRepairSystem(pc, systemtype, 17);
+                restore.AutoStartRpc(pc.NetTransform.NetId, RpcCalls.SnapTo, targetClientId);
+                restore.WriteVector2(recoveryPosition);
+                restore.Write((ushort)(pc.NetTransform.lastSequenceId + 8));
+                restore.EndRpc();
                 restore.SendMessage();
+
+                // Re-applying the player's actual vanilla role refreshes the
+                // vanilla role HUD without creating a death or corpse.
+                pc.RpcSetRoleDesync(roleType, targetClientId);
                 pc.SetKillCooldown(Main.AllPlayerKillCooldown.TryGetValue(pc.PlayerId, out var cd) ? Math.Max(cd, 0.1f) : 20f);
                 pc.Notify(GetString("BlackScreenFixCompleteNotify"));
+                Logger.Info($"[BHR-BS-FIX] No-corpse role/HUD recovery sent to {playerName}.", "FixBlackScreen");
             }, 1f + (AmongUsClient.Instance.Ping / 1000f));
             return;
         }

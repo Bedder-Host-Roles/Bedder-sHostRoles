@@ -1390,7 +1390,21 @@ public static class Utils
         }
     }
 
-    private static bool HandleSplitTitle(int fullRpcSize, int fullRpcSizeLimit, int titleRpcSize, int titleRpcSizeLimit, int resetNameRpcSize, string title, string text, bool multiple, CustomRpcSender writer, PlayerControl sender, int targetClientId, SendOption sendOption, byte sendTo, bool addToHistory)
+    private static (bool handled, CustomRpcSender writer) HandleSplitTitle(
+        int fullRpcSize,
+        int fullRpcSizeLimit,
+        int titleRpcSize,
+        int titleRpcSizeLimit,
+        int resetNameRpcSize,
+        string title,
+        string text,
+        bool multiple,
+        CustomRpcSender writer,
+        PlayerControl sender,
+        int targetClientId,
+        SendOption sendOption,
+        byte sendTo,
+        bool addToHistory)
     {
         if ((fullRpcSize <= fullRpcSizeLimit && titleRpcSizeLimit <= titleRpcSize) || title.Length <= 100)
         {
@@ -1405,7 +1419,7 @@ public static class Utils
             {
                 Logger.SendInGame(GetString("MessageTooLong"), Color.red);
                 if (!multiple) writer.SendMessage(dispose: true);
-                return true;
+                return (true, writer);
             }
 
             string[] lines = title.Split('\n');
@@ -1440,7 +1454,7 @@ public static class Utils
             if (shortenedTitle.Length > 0 && !shortenedTitle.IsNullOrWhiteSpace())
                 writer = SendTempTitleMessage(shortenedTitle);
 
-            if (text == "\n") return true;
+            if (text == "\n") return (true, writer);
 
             title = "\u200e";
 
@@ -1482,7 +1496,7 @@ public static class Utils
                 return writer;
             }
         }
-        return false;
+        return (false, writer);
     }
 
     private static void HandleSplitMessage(string text, int textRpcSizeLimit, byte sendTo, int targetClientId, string title, PlayerControl sender, ref CustomRpcSender writer, SendOption sendOption, bool multiple)
@@ -1804,8 +1818,23 @@ public static class Utils
             {
                 int titleRpcSizeLimit = fullRpcSizeLimit - textRpcSize - resetNameRpcSize;
 
-                bool handled = HandleSplitTitle(fullRpcSize, fullRpcSizeLimit, titleRpcSize, titleRpcSizeLimit, resetNameRpcSize, title, text, multiple, writer, sender, targetClientId, sendOption, sendTo, addToHistory);
-                if (handled) return writer;
+                var splitResult = HandleSplitTitle(
+                    fullRpcSize,
+                    fullRpcSizeLimit,
+                    titleRpcSize,
+                    titleRpcSizeLimit,
+                    resetNameRpcSize,
+                    title,
+                    text,
+                    multiple,
+                    writer,
+                    sender,
+                    targetClientId,
+                    sendOption,
+                    sendTo,
+                    addToHistory);
+                writer = splitResult.writer;
+                if (splitResult.handled) return writer;
             }
 
             titleRpcSize = title.Length * 2 + 4;
@@ -2909,6 +2938,11 @@ public static class Utils
     }
     public static void AfterMeetingTasks()
     {
+        Logger.Info(
+            $"[BHR-BS-FIX] AfterMeetingTasks entered: host={AmongUsClient.Instance.AmHost}; " +
+            $"firstMeeting={MeetingStates.FirstMeeting}; inGame={GameStates.InGame}; " +
+            $"players={Main.EnumeratePlayerControls().Count()}",
+            "FixBlackScreen");
         PhantomRolePatch.AfterMeeting();
         ChatManager.ClearLastSysMsg();
         FallFromLadder.Reset();
@@ -2960,6 +2994,11 @@ public static class Utils
 
                 // Immediate vanilla-client black-screen recovery after meeting wrap-up.
                 // This is intentionally independent of the AFK detection timer.
+                Logger.Info(
+                    $"[BHR-BS-FIX] Post-meeting candidate {player.GetNameWithRole()}: " +
+                    $"alive={player.IsAlive()}; modded={player.IsModded()}; " +
+                    $"firstMeeting={MeetingStates.FirstMeeting}; disconnected={player.IsDisconnected()}",
+                    "FixBlackScreen");
                 if (player.IsAlive() && !player.IsModded() && !MeetingStates.FirstMeeting)
                 {
                     Logger.Info($"[BHR-BS-FIX] Triggering post-meeting recovery for {player.GetNameWithRole()}.", "FixBlackScreen");

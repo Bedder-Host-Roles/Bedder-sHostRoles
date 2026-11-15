@@ -25,7 +25,9 @@ public static class FixedUpdatePatch
         return target != null
             && target != killer
             && target.Data != null
-            && !target.Data.Disconnected
+            // GameData.Disconnected can be stale for vanilla clients after
+            // role assignment/meeting transitions. Use BHR's authoritative state.
+            && !target.IsDisconnected()
             && target.IsAlive()
             && !target.inVent
             && !target.onLadder
@@ -351,6 +353,14 @@ public static class FixedUpdatePatch
                 {
                     var players = player.GetPlayersInAbilityRangeSorted(target => IsValidKillButtonTarget(player, target));
                     PlayerControl closest = players.Count == 0 ? null : players[0];
+                    if (__instance.KillButton.currentTarget != closest)
+                    {
+                        Logger.Info(
+                            $"[KillButton] Target refresh for {player.GetRealName()}: " +
+                            $"target={(closest != null ? closest.GetRealName() : "<none>")}; " +
+                            $"candidates={players.Count}; canKill={canKill}; inTask={inTask}",
+                            "KillButton");
+                    }
 
                     if (__instance.KillButton.currentTarget && __instance.KillButton.currentTarget != closest)
                         __instance.KillButton.currentTarget.ToggleHighlight(false, RoleTeamTypes.Impostor);

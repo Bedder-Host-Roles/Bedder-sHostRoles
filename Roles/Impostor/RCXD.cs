@@ -344,6 +344,14 @@ internal static class RCXDKillButtonPatch
     public static bool Prefix()
     {
         var player = PlayerControl.LocalPlayer;
+        var button = HudManager.Instance != null ? HudManager.Instance.KillButton : null;
+        Logger.Info(
+            $"[KillButton] DoClick received: player={(player != null ? player.GetRealName() : "<null>")}; " +
+            $"role={(player != null ? player.GetCustomRole().ToString() : "<none>")}; " +
+            $"target={(button != null && button.currentTarget != null ? button.currentTarget.GetRealName() : "<none>")}; " +
+            $"visible={(button != null && button.gameObject.activeInHierarchy)}; " +
+            $"canKill={(player != null && player.CanUseKillButton())}",
+            "KillButton");
         return !RCXD.HandleKillButtonClick(player);
     }
 }
