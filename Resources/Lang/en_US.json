@@ -619,7 +619,7 @@
     "MaverickInfo": "Kill and survive to the end",
     "CursedSoulInfo": "Snatch souls and steal the win",
     "PickpocketInfo": "Steal votes from your kills",
-    "TraitorInfo": "Eliminate the <color=#ff1919>Impostors</color>, then win",
+    "TraitorInfo": "Eliminate the <color=#ff1919>Impostors</color> by other means than killing, then win",
     "TrollerInfo": "Make random events happen by completing a task",
     "VultureInfo": "Eat bodies by reporting to win",
     "TaskinatorInfo": "Silent tasks, deadly blasts",
