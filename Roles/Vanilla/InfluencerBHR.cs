@@ -23,7 +23,7 @@ internal sealed class Influencer : RoleBase
     public override CustomRoles Role => CustomRoles.Influencer;
     private const int Id = 28300;
     public static bool HasEnabled => CustomRoleManager.HasEnabled(CustomRoles.Influencer);
-    public override CustomRoles ThisRoleBase => CustomRoles.GuardianAngel;
+    public override CustomRoles ThisRoleBase => CustomRoles.SpiritGuide;
     public override Custom_RoleType ThisRoleType => Custom_RoleType.CrewmateGhosts;
 
     private static OptionItem AbilityCooldown;

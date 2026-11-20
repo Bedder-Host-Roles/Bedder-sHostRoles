@@ -603,9 +603,16 @@ public static class CheckShapeshiftPatch
     private static readonly LogHandler logger = Logger.Handler(nameof(PlayerControl.CheckShapeshift));
     public static bool Prefix(PlayerControl __instance, [HarmonyArgument(0)] PlayerControl target, [HarmonyArgument(1)] bool shouldAnimate)
     {
-        if (AmongUsClient.Instance.IsGameOver || !AmongUsClient.Instance.AmHost)
+        if (AmongUsClient.Instance.IsGameOver)
         {
             return false;
+        }
+
+        // Non-hosts must keep the vanilla client -> host CheckShapeshift path.
+        // Only the host performs BHR's authoritative validation and RPC.
+        if (!AmongUsClient.Instance.AmHost)
+        {
+            return true;
         }
 
         // No called code if is invalid shapeshifting
@@ -1315,14 +1322,10 @@ class FixedUpdateInNormalGamePatch
 
                 if (playerAmOwner)
                 {
-                    //Kill target override processing
-                    if (player.CanUseKillButton() && !playerData.IsDead)
-                    {
-                        var players = player.GetPlayersInAbilityRangeSorted();
-                        PlayerControl closest = !players.Any() ? null : players.First();
-                        DestroyableSingleton<HudManager>.Instance.KillButton.SetTarget(closest);
-                    }
-
+                    // Kill-button target selection is handled centrally by
+                    // FixedUpdatePatch.UpdateHud. Do not call SetTarget here: this
+                    // per-player update used a separate, unfiltered range query and
+                    // could overwrite the validated target/button state every tick.
                     if (timerLowLoad % 6 == 0)
                     {
                         PlayerGameOptionsSender.SetDirtyToAll();

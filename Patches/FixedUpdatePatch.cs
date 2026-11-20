@@ -86,30 +86,6 @@ public static class FixedUpdatePatch
             if (amongUsClient.IsGameStarted)
                 Utils.CountAlivePlayers();
 
-            try
-            {
-                if (HudManager.InstanceExists && GameStates.IsInTask && !ExileController.Instance && !AntiBlackout.SkipTasks && PlayerControl.LocalPlayer.CanUseKillButton())
-                {
-                    List<PlayerControl> players = PlayerControl.LocalPlayer.GetPlayersInAbilityRangeSorted(target => IsValidKillButtonTarget(PlayerControl.LocalPlayer, target));
-                    PlayerControl closest = players.Count == 0 ? null : players[0];
-
-                    KillButton killButton = HudManager.Instance.KillButton;
-
-                    if (killButton.currentTarget && killButton.currentTarget != closest)
-                        killButton.currentTarget.ToggleHighlight(false, RoleTeamTypes.Impostor);
-
-                    killButton.currentTarget = closest;
-
-                    if (killButton.currentTarget)
-                    {
-                        killButton.currentTarget.ToggleHighlight(true, RoleTeamTypes.Impostor);
-                        killButton.SetEnabled();
-                    }
-                    else
-                        killButton.SetDisabled();
-                }
-            }
-            catch { }
 
             // try
             // {
@@ -349,7 +325,7 @@ public static class FixedUpdatePatch
 
                 // The vanilla HUD can clear currentTarget after meetings or role
                 // changes. Re-select the nearest target every FixedUpdate.
-                if (player == PlayerControl.LocalPlayer && inTask && canKill && !player.Data.IsDead)
+                if (player == PlayerControl.LocalPlayer && inTask && canKill && player.IsAlive())
                 {
                     var players = player.GetPlayersInAbilityRangeSorted(target => IsValidKillButtonTarget(player, target));
                     PlayerControl closest = players.Count == 0 ? null : players[0];

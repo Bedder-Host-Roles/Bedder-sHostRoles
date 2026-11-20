@@ -1211,6 +1211,75 @@ class MeetingHudStartPatch
         SoundManager.Instance.ChangeAmbienceVolume(0f);
         if (!GameStates.IsModHost) return;
 
+        // MeetingHud can retain a stale AmDead flag. Rebuild the displayed
+        // state from the authoritative player state before adding BHR UI.
+        foreach (var voterState in __instance.playerStates)
+        {
+            if (voterState == null) continue;
+
+            var target = ((byte)voterState.PlayerId).GetPlayer();
+            if (target == null || target.Data == null) continue;
+
+            bool shouldBeDead = target.Data.Disconnected || !target.IsAlive();
+            if (voterState.AmDead != shouldBeDead)
+            {
+                // SetDead has changed between Among Us game builds. Resolve a
+                // compatible overload at runtime instead of referencing GAIcon,
+                // which is not present in every PlayerVoteArea version.
+                var setDeadMethod = typeof(PlayerVoteArea)
+                    .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(method => method.Name == "SetDead")
+                    .Where(method =>
+                    {
+                        var parameters = method.GetParameters();
+                        return parameters.Length >= 2
+                            && parameters[0].ParameterType == typeof(bool)
+                            && parameters[1].ParameterType == typeof(bool);
+                    })
+                    .OrderBy(method => method.GetParameters().Length)
+                    .FirstOrDefault();
+
+                if (setDeadMethod != null)
+                {
+                    var parameters = setDeadMethod.GetParameters();
+                    var arguments = new object[parameters.Length];
+                    arguments[0] = voterState.DidReport;
+                    arguments[1] = shouldBeDead;
+
+                    // Supply safe defaults for any additional parameters used
+                    // by older/newer game builds (for example an optional icon).
+                    for (int i = 2; i < parameters.Length; i++)
+                    {
+                        var parameterType = parameters[i].ParameterType;
+                        arguments[i] = parameters[i].IsOptional
+                            ? parameters[i].DefaultValue
+                            : parameterType.IsValueType
+                                ? Activator.CreateInstance(parameterType)
+                                : null;
+                    }
+
+                    try
+                    {
+                        setDeadMethod.Invoke(voterState, arguments);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Warn($"Failed to correct meeting alive state: {ex}", "MeetingHudAliveState");
+                    }
+                }
+                else
+                {
+                    Logger.Warn("No compatible PlayerVoteArea.SetDead overload was found.", "MeetingHudAliveState");
+                }
+
+                Logger.Info(
+                    $"Meeting alive-state corrected: PlayerId={voterState.PlayerId}, " +
+                    $"Name={target.Data.PlayerName}, IsAlive={target.IsAlive()}, " +
+                    $"Disconnected={target.Data.Disconnected}, MeetingAmDead={shouldBeDead}",
+                    "MeetingHudAliveState");
+            }
+        }
+
         GuessManager.textTemplate = UnityEngine.Object.Instantiate(__instance.playerStates[0].NameText);
         GuessManager.textTemplate.enabled = false;
 

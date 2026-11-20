@@ -1242,7 +1242,7 @@ public static class ExtendedPlayerControl
     }
     public static bool CanUseKillButtonNested(this PlayerControl pc)
     {
-        if (!pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId))
+        if (pc == null || !pc.IsAlive() || Pelican.IsEaten(pc.PlayerId) || DollMaster.IsDoll(pc.PlayerId))
         {
             if (KillButtonCache.TryGetValue(pc.PlayerId, out var cachedResult) && cachedResult)
             {
@@ -1250,6 +1250,7 @@ public static class ExtendedPlayerControl
             }
             return false;
         }
+        
         if (MeetingStates.FirstMeeting && !Options.ShieldedCanUseKillButton.GetBool() && pc.CheckFirstDied()) return false;
         if (pc.Is(CustomRoles.Killer) || Mastermind.PlayerIsManipulated(pc)) return true;
         if (pc.Is(CustomRoles.Narc) && !NarcManager.NarcCanUseKillButton(pc)) return false;

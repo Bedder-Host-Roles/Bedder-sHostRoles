@@ -53,68 +53,60 @@ public static class ServerDropDownPatch
     {
         if (SceneManager.GetActiveScene().name == "FindAGame") return true;
 
-        __instance.background.size = new Vector2(5, 1);
+        __instance.background.size = new Vector2(4, 1);
 
-        int num = 0;
-        int column = 0;
-        int maxPerColumn = 6;
-        const float columnWidth = 4.15f;
-        const float buttonSpacing = 0.5f;
+        ServerManager serverManager = DestroyableSingleton<ServerManager>.Instance;
+        TranslationController translationController = DestroyableSingleton<TranslationController>.Instance;
 
-        // Get all available regions except current one
-        var regions = DestroyableSingleton<ServerManager>.Instance.AvailableRegions.OrderBy(ServerManager.DefaultRegions.Contains).ToList();
+        IRegionInfo currentRegion = serverManager.CurrentRegion;
+        if (currentRegion == null)
+            return true;
 
-        // Calculate total columns needed
-        int totalColumns = Mathf.Max(1, Mathf.CeilToInt(regions.Count / (float)maxPerColumn));
-        int rowsInLastColumn = regions.Count % maxPerColumn;
-        int maxRows = (regions.Count > maxPerColumn) ? maxPerColumn : regions.Count;
+        var displayRegions = serverManager.AvailableRegions
+            .Where(region => region.Name != currentRegion.Name)
+            .ToList();
 
-        foreach (IRegionInfo regionInfo in regions)
+        int totalColumns = Mathf.Max(1, Mathf.CeilToInt(displayRegions.Count / 5f));
+        int rowLimit = Mathf.Min(displayRegions.Count, 5);
+
+        __instance.defaultButtonSelected = __instance.firstOption;
+        __instance.firstOption.ChangeButtonText(
+            translationController.GetStringWithDefault(
+                currentRegion.TranslateName,
+                currentRegion.Name,
+                new Il2CppReferenceArray<Il2CppSystem.Object>(0)));
+
+        for (var index = 0; index < displayRegions.Count; index++)
         {
-            if (DestroyableSingleton<ServerManager>.Instance.CurrentRegion.Name == regionInfo.Name)
-            {
-                __instance.defaultButtonSelected = __instance.firstOption;
-                __instance.firstOption.ChangeButtonText(DestroyableSingleton<TranslationController>.Instance.GetStringWithDefault(regionInfo.TranslateName, regionInfo.Name, new Il2CppReferenceArray<Il2CppSystem.Object>(0)));
-                continue;
-            }
+            IRegionInfo regionInfo = displayRegions[index];
+            var buttonPool = __instance.ButtonPool.Get<ServerListButton>();
 
-            IRegionInfo region = regionInfo;
-            ServerListButton serverListButton = __instance.ButtonPool.Get<ServerListButton>();
+            buttonPool.transform.localPosition = new Vector3(
+                (index / 5 - (totalColumns - 1) / 2f) * 3.15f,
+                __instance.y_posButton - 0.5f * (index % 5),
+                -1f);
 
-            // Calculate position based on column and row
-            float xPos = (column - (totalColumns - 1) / 2f) * columnWidth;
-            float yPos = __instance.y_posButton - buttonSpacing * (num % maxPerColumn);
-
-            serverListButton.transform.localPosition = new Vector3(xPos, yPos, -1f);
-            serverListButton.transform.localScale = Vector3.one;
-            serverListButton.Text.text = DestroyableSingleton<TranslationController>.Instance.GetStringWithDefault(
+            buttonPool.transform.localScale = Vector3.one;
+            buttonPool.Text.text = translationController.GetStringWithDefault(
                 regionInfo.TranslateName,
                 regionInfo.Name,
                 new Il2CppReferenceArray<Il2CppSystem.Object>(0));
-            serverListButton.Text.ForceMeshUpdate(false, false);
-            serverListButton.Button.OnClick.RemoveAllListeners();
-            serverListButton.Button.OnClick.AddListener((Action)(() => __instance.ChooseOption(region)));
-            __instance.controllerSelectable.Add(serverListButton.Button);
-
-            // Move to next column if current column is full
-            num++;
-            if (num % maxPerColumn == 0)
-            {
-                column++;
-            }
+            buttonPool.Text.ForceMeshUpdate(false, false);
+            buttonPool.Button.OnClick.RemoveAllListeners();
+            buttonPool.Button.OnClick.AddListener((Action)(() => __instance.ChooseOption(regionInfo)));
+            __instance.controllerSelectable.Add(buttonPool.Button);
         }
 
-        // Calculate background dimensions
-        float backgroundHeight = 1.2f + buttonSpacing * (maxRows - 1);
-        float backgroundWidth = (totalColumns > 1) ?
-            (columnWidth * (totalColumns - 1) + __instance.background.size.x) :
-            __instance.background.size.x;
+        float height = 1.2f + 0.5f * (rowLimit - 1);
+        float width = totalColumns > 1
+            ? 3.15f * (totalColumns - 1) + __instance.background.size.x
+            : __instance.background.size.x;
 
         __instance.background.transform.localPosition = new Vector3(
             0f,
-            __instance.initialYPos - (backgroundHeight - 1.2f) / 2f,
+            __instance.initialYPos - (height - 1.2f) / 2f,
             0f);
-        __instance.background.size = new Vector2(backgroundWidth, backgroundHeight);
+        __instance.background.size = new Vector2(width, height);
 
         return false;
     }
