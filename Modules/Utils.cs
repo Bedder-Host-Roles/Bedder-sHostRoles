@@ -1267,7 +1267,7 @@ public static class Utils
         List<Command> commands = [.. Command.AllCommands.Values.OrderBy(x => x.UsageLevel).ThenBy(x => x.UsageTime)];
 
         helpString.Clear();
-        helpString.Append("CommandList");
+        helpString.AppendGetString("CommandList");
 
         foreach (Command command in commands)
         {
