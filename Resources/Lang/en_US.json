@@ -3098,6 +3098,7 @@
   "StealthDarkenDuration": "Blinding Duration",
   "PenguinAbductTimerLimit": "Dragging Time",
   "PenguinMeetingKill": "Kill the target if a meeting starts during dragging",
+  "PenguinVictimCanUseAbilities": "Victim can use their abilities when being dragged",
   "PenguinKillButtonText": "Drag",
   "PenguinTimerText": "Drag Timer",
   "PenguinTargetOnCheckMurder": "You are grabbed. Try to escape that first!",
