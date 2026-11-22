@@ -1165,7 +1165,7 @@ internal class ChatCommands
             return;
         }
 
-        if (resultId != 0 && !player.FriendCode.GetDevUser().IsUp && !GameStates.IsLocalGame)
+        if (resultId != player.PlayerId && !player.FriendCode.GetDevUser().IsUp && !GameStates.IsLocalGame)
         {
             Utils.SendMessage(GetString("Message.NoPermissionSetRoleOthers"), player.PlayerId);
             return;
@@ -1404,8 +1404,14 @@ internal class ChatCommands
         }
 
         var subArgs = args.Length != 2 ? "" : args[1];
+
         if (subArgs == "" || !int.TryParse(subArgs, out int arg))
-            return;
+        {
+            if (subArgs == "skip")
+               arg = 253;      
+            else
+                return;
+        }
         var plr = Utils.GetPlayerById(arg);
 
         if (GameStates.IsLobby)
